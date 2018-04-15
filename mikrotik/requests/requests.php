@@ -6,7 +6,7 @@ include_once "../header.php";
     $(document).ready(function () {
         $('.dataTables_empty').html('<div class="loader"></div>');
 
-        $.getJSON("<?=$api_url?>requests_api.php", function (result) {
+        $.getJSON("requests_api.php", function (result) {
             $.each(result['requests'], function (i, field) {
                 action_on_date="";
                 if(field['action_on_date'] != null){
