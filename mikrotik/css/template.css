@@ -1,0 +1,99 @@
+jumbotron{
+    height:100px;
+}
+
+body {
+    padding-top: 40px; 
+}
+container{
+    width:70%;
+}
+
+form.register-form{
+    padding: 25px;
+    border: 1px solid #d8d8d8;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+form.register-form > div.form-group > select{
+    width:300px;
+}
+
+form.register-form > div.form-group > textarea{
+    width:300px;
+}
+
+form.register-form > div.form-group > input[type='text']{
+    width:300px;
+}
+
+form.register-form > div.form-group > input[type='password']{
+    width:300px;
+}
+
+@media screen and (max-width: 768px) {
+    div.container{
+        width:100%;
+        margin: 0 auto;
+    }
+    form.register-form > div.form-group > select{
+        width:100%;
+    }
+    
+    form.register-form > div.form-group > textarea{
+        width:100%;
+    }
+
+    form.register-form > div.form-group > input[type='text']{
+        width:100%;
+    }
+
+    form.register-form > div.form-group > input[type='password']{
+        width:100%;
+    } 
+
+}
+
+@media screen and (max-width: 640px) {
+    table#myTable {
+       
+        display: block;
+    }
+}
+
+.page-header{
+    
+}
+
+.functions img:hover{
+    opacity: 0.5;
+}  
+
+.page-header a{
+    font-size: 13px;
+}
+
+.page-header a:link {
+    color: red;
+}
+
+/* visited link */
+.page-header a:visited {
+    color: green;
+}
+
+/* mouse over link */
+.page-header a:hover {
+    color: hotpink;
+}
+
+/* selected link */
+.page-header a:active {
+    color: blue;
+}
+
+.page-header a:not(.last){
+}
