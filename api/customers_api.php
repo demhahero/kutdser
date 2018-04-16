@@ -1,6 +1,6 @@
 <?php
 
-include_once "../mikrotik/dbconfig.php";
+include_once "dbconfig.php";
 $fields = array(
     "customer_id" => "customer_id",
     "phone" => "phone",

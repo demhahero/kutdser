@@ -3,7 +3,7 @@
 //ini_set('display_errors', 1);
 if(isset($_GET['month']) && ctype_digit($_GET['month']) && ((int)$_GET['month'] >=1 && (int)$_GET['month'] <=12 )){
 	
-include_once "../mikrotik/dbconfig.php";
+include_once "dbconfig.php";
 	
 $fields = array(
     "order_id" => "order_id",
