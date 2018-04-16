@@ -6,13 +6,13 @@ include_once "../header.php";
     $(document).ready(function () {
         $('.dataTables_empty').html('<div class="loader"></div>');
 
-        $.getJSON("<?=$api_url?>test.php", function (result) {
+        $.getJSON("<?=$api_url?>orders_api.php", function (result) {
             $.each(result['orders'], function (i, field) {
                 table.row.add([
                     '<a href="order_details.php?order_id='+field['order_id']+'" >'+field['order_id']+'</a>',
                     '<a href="<?= $site_url . "/edit_customer.php?customer_id=" ?>'+field['customer']["0"]["customer_id"]+'">'+field['customer']["0"]["full_name"]+'</a>',
                     '<a href="<?= $site_url . "/edit_customer.php?customer_id=" ?>'+field['reseller']["0"]["customer_id"]+'">'+field['reseller']["0"]["full_name"]+'</a>',
-                    field['product']["0"]["title"],
+                    field["product_title"],
                     field['creation_date'],
                     field['status'],
                     "<a target='_blank' href='<?= $site_url ?>/orders/print_order.php?order_id="+field['order_id']+"'><img src='<?= $site_url ?>/img/print-icon.png' style='width: 25px;' /></a>"
