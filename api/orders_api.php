@@ -9,6 +9,7 @@ $fields = array(
     "product_category" => "product_category",
     "modem_mac_address" => "modem_mac_address",
    "product_subscription_type" => "product_subscription_type",
+    "displayed_order_id" => "order_id"
     );
 $childFields=array(
     "customer_id" => "customer_id",

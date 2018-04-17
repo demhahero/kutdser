@@ -9,7 +9,7 @@ include_once "../header.php";
         $.getJSON("<?=$api_url?>orders_api.php", function (result) {
             $.each(result['orders'], function (i, field) {
                 table.row.add([
-                    '<a href="order_details.php?order_id='+field['order_id']+'" >'+field['order_id']+'</a>',
+                    '<a href="order_details.php?order_id='+field['order_id']+'" >'+field['displayed_order_id']+'</a>',
                     '<a href="<?= $site_url . "/edit_customer.php?customer_id=" ?>'+field['customer']["0"]["customer_id"]+'">'+field['customer']["0"]["full_name"]+'</a>',
                     '<a href="<?= $site_url . "/edit_customer.php?customer_id=" ?>'+field['reseller']["0"]["customer_id"]+'">'+field['reseller']["0"]["full_name"]+'</a>',
                     field["product_title"],

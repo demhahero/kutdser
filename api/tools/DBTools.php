@@ -24,7 +24,7 @@ class DBTools {
     private $db_host = "localhost";
     private $db_username = "root";
     private $db_password = "";
-    private $db_name = 'copy_router'; //database name
+    private $db_name = 'router'; //database name
     private $conn_routers;
     private $query_result;
 
@@ -94,6 +94,10 @@ class DBTools {
             $order = array();
             foreach ($fields as $key => $value)
             {
+                if($key == "displayed_order_id")
+                if ((int) $order_row["order_id"] > 10380)
+                    $order_row[$value] = (((0x0000FFFF & (int) $order_row["order_id"]) << 16) + ((0xFFFF0000 & (int) $order_row["order_id"]) >> 16));
+
                 $order[$key] = $order_row[$value];
             }
             if ($child != null) {
