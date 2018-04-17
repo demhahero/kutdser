@@ -24,7 +24,7 @@ class DBTools {
     private $db_host = "localhost";
     private $db_username = "root";
     private $db_password = "";
-    private $db_name = 'router'; //database name
+    private $db_name = 'routers'; //database name
     private $conn_routers;
     private $query_result;
 
@@ -87,7 +87,6 @@ class DBTools {
         $orders = array();
         
         $this->query("SET CHARACTER SET utf8");
-        
         
         $order_result = $this->query($queryString);
         while ($order_row = $this->fetch_assoc($order_result)) {
