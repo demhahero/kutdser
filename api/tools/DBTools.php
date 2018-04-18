@@ -136,6 +136,68 @@ class DBTools {
         }
         return $orders;
     }
+	public function order_month_query_api($queryString,$fields,$child=null,$childFields=null,$child2=null,$child2Fields=null,$child3=null,$child3Fields=null) {
+        $orders = array();
+        
+        $this->query("SET CHARACTER SET utf8");
+        
+        $order_result = $this->query($queryString);
+        while ($order_row = $this->fetch_assoc($order_result)) {
+            $order = array();
+            foreach ($fields as $key => $value)
+            {
+                if($key == "displayed_order_id")
+                if ((int) $order_row["order_id"] > 10380)
+                    $order_row[$value] = (((0x0000FFFF & (int) $order_row["order_id"]) << 16) + ((0xFFFF0000 & (int) $order_row["order_id"]) >> 16));
+
+                $order[$key] = $order_row[$value];
+            }
+            if ($child != null) {
+                $orderChildArray = array();
+                $orderChild = array();
+                foreach ($childFields as $childKey => $childValue)
+                {
+                    $orderChild[$childKey] = $order_row[$childValue];
+                    
+                }
+                array_push($orderChildArray,$orderChild);
+                $order[$child] = $orderChildArray;
+            }
+			
+            if ($child2 != null) {
+                $orderChildArray = array();
+                $orderChild = array();
+                foreach ($child2Fields as $childKey => $childValue)
+                {
+                    $orderChild[$childKey] = $order_row[$childValue];
+                    
+                }
+                array_push($orderChildArray,$orderChild);
+                $order[$child2] = $orderChildArray;
+            }
+			//print_r($order_row);
+			//echo "1";
+			if($order_row["verdict"]==="approve")
+			{//echo "2";
+				$order["end_date"]=$order_row["action_on_date"];
+				if($order_row["action"]!=="action")
+					if ($child3 != null) {
+						//echo "3";
+						$orderChildArray = array();
+						$orderChild = array();
+						foreach ($child3Fields as $childKey => $childValue)
+						{
+							$orderChild[$childKey] = $order_row[$childValue];
+                    
+						}
+						array_push($orderChildArray,$orderChild);
+						$order[$child3] = $orderChildArray;
+					}
+			}
+            array_push($orders,$order);
+        }
+        return $orders;
+    }
     
     public function customer_query($queryString, $depth = 3, $path= null) {
         $customers = array();
