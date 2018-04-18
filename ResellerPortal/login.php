@@ -5,13 +5,13 @@ include_once "dbconfig.php";
 <?php
 $username = stripslashes(filter_input(INPUT_POST, 'username', FILTER_SANITIZE_SPECIAL_CHARS));
 if ($username != FALSE) {
-    $query = mysql_query("select * from `customers` where `username`='" . $username . "'");
 
-    while ($row = mysql_fetch_array($query)) {
+    $reseller_result = $conn_routers->query("select * from `customers` where `username`='" . $username . "'");
+    while ($row  = $reseller_result->fetch_assoc()) {
         if (password_verify($_POST["password"], $row["password"])) {
             //$session_id = md5(microtime() . $_SERVER['REMOTE_ADDR']);
             $session_id = $row["session_id"];
-            mysql_query("Update `customers` set `session_id` = '" . $session_id . "' where `customer_id` = '" . $row["customer_id"] . "'");
+            $conn_routers->query("Update `customers` set `session_id` = '" . $session_id . "' where `customer_id` = '" . $row["customer_id"] . "'");
 
             setcookie("session_id", $session_id, time() + (86400 * 30), "/");
             if ($row["is_new_system"] == "1") {

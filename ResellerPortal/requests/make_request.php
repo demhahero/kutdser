@@ -9,22 +9,29 @@ $creation_date = new DateTime();
 
 if (isset($_POST["action"])) {
     
-    $action_on_date = new DateTime(mysql_real_escape_string($_POST["action_on_date"]));
+    $action_on_date = new DateTime(($_POST["action_on_date"]));
     
+    $product = $dbTools->objProductTools($_POST["action_value"]);
+
     $requestTools = $dbTools->objRequestTools(null);
     $requestTools->setReseller($dbTools->objCustomerTools($reseller_id));
-    $requestTools->setAction(mysql_real_escape_string($_POST["action"]));
-    $requestTools->setActionValue(mysql_real_escape_string($_POST["action_value"]));
-    $requestTools->setNote(mysql_real_escape_string($_POST["note"]));
+    $requestTools->setAction(($_POST["action"]));
+    $requestTools->setActionValue(($_POST["action_value"]));
+    $requestTools->setNote(($_POST["note"]));
     $requestTools->setOrder($dbTools->objOrderTools($order_id));
     $requestTools->setCreationDate($creation_date);
     $requestTools->setActionOnDate($action_on_date);
+    
+    $requestTools->setProductPrice($product->getPrice());
+    $requestTools->setProductTitle($product->getTitle());
+    $requestTools->setProductCategory($product->getCategory());
+    $requestTools->setProductSubscriptionType($product->getSubscriptionType());
     
     $request_result = $requestTools->doInsert();
 
     if ($request_result) {
         echo "<div class='alert alert-success'>Request sent!</div>";
-        header('Location: '.$site_url.'/requests/requests.php');
+        //header('Location: '.$site_url.'/requests/requests.php');
     }
 }
 ?>

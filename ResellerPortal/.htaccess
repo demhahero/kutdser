@@ -1,4 +1,0 @@
-AuthType Basic
-AuthName "Reseller Portal"
-AuthUserFile "/home/alialsaffar/.htpasswds/public_html/ResellerPortal/passwd"
-require valid-user

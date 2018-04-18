@@ -1,2 +1,0 @@
-AuthName "Admin Mikrotik"
-AuthUserFile "/home/alialsaffar/.htpasswds/public_html/mikrotik/passwd"

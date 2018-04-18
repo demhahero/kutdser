@@ -14,7 +14,7 @@ $api_url = "http://localhost/kutdser/api/";
 $servername = "localhost";
 $username = "root";
 $password = "";
-$dbname = "routers";
+$dbname = "router";
 
 $conn_routers = new mysqli($servername, $username, $password, $dbname);
 
