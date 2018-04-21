@@ -136,6 +136,417 @@ class DBTools {
         }
         return $orders;
     }
+	public function order_requests_query_api($customer_id,$year,$month) {
+        $orders = array();
+        
+        $this->query("SET CHARACTER SET utf8");
+        
+        
+        $result=array();
+$customers = $this->query("SELECT customers.customer_id,resellers.customer_id as 'reseller_id', resellers.full_name as 'reseller_name',`customers`.`full_name` as 'customer_name'
+ from customers
+ INNER JOIN `customers` resellers on resellers.`customer_id` = `customers`.`reseller_id` 
+ where 	customers.customer_id=".$customer_id);
+ 
+	while ($customer_row = $this->fetch_assoc($customers)) {
+		$customer=array();
+		$customer["customer_id"]=$customer_row["customer_id"];
+		$customer["full_name"]=$customer_row["customer_name"];
+		
+		$result["customer"]=$customer;
+		
+		$reseller=array();
+		$reseller["customer_id"]=$customer_row["reseller_id"];
+		$reseller["full_name"]=$customer_row["reseller_name"];
+		$result["reseller"]=$reseller;
+		
+		
+		
+	}
+	
+		$ordersResult = $this->query("SELECT * from orders inner join order_options on orders.order_id= order_options.order_id where 
+	customer_id=".$customer_id."
+	and (year(creation_date) =".$year." and month(creation_date) =".$month." )");
+	
+	$orders=array();
+	
+	while ($order_row = $this->fetch_assoc($ordersResult)) {
+		//print_r($order_row);
+		$order=array();
+		$orders["order_id"]=$order_row["order_id"];
+		$invoice = array();
+		$orderChild = array();
+		$orderChild["date"] = $order_row["creation_date"];
+		$orderChild["total_price"]=$order_row["total_price"];
+		$orderChild["product_price"]=$order_row["product_price"];
+		$orderChild["additional_service_price"]=$order_row["additional_service_price"];
+		$orderChild["setup_price"]=$order_row["setup_price"];
+		$orderChild["modem_price"]=$order_row["modem_price"];
+		
+		$orderChild["router_price"]=$order_row["router_price"];
+		$orderChild["remaining_days_price"]=$order_row["remaining_days_price"];
+		$orderChild["qst_tax"]=$order_row["qst_tax"];
+		$orderChild["gst_tax"]=$order_row["gst_tax"];
+		$orderChild["adapter_price"]=$order_row["adapter_price"];
+		
+		$orderChild["product_title"]=$order_row["product_title"];
+		$orderChild["product_category"]=$order_row["product_category"];
+		$orderChild["product_subscription_type"]=$order_row["product_subscription_type"];
+		
+		$orderChild["action"]="order";
+		array_push($invoice,$orderChild);
+		
+		////echo "same order month</br>";
+		// check if there are any request also in the same month
+		$requestResult = $this->query("SELECT * from requests where 
+		order_id=".$order_row["order_id"]." 
+		and (year(creation_date) =".$year." and month(creation_date) =".$month." )
+		and verdict = 'approve' order by creation_date");
+		
+		
+		while ($request_row = $this->fetch_assoc($requestResult)) {
+			////echo "same request month</br>";
+			$orderChild = array();
+			$orderChild["date"] = $request_row["creation_date"];
+			$orderChild["product_price"]=$request_row["product_price"];
+			$orderChild["action"]=$request_row["action"];
+			
+			$orderChild["product_title"]=$request_row["product_title"];
+			$orderChild["product_category"]=$request_row["product_category"];
+			$orderChild["product_subscription_type"]=$request_row["product_subscription_type"];
+			array_push($invoice,$orderChild);
+		}
+		//print_r($invoice);
+		////echo sizeof($invoice)."</br>";
+		
+		if(sizeof($invoice)===0)
+		{
+			$productPrices = array();
+			$orderChild = array();
+				$orderChild["beginDate"] = "";
+				$orderChild["endDate"]="";
+				$orderChild["price"]="0";
+				
+				$orderChild["product_title"]="";
+				$orderChild["product_category"]="";
+				$orderChild["product_subscription_type"]="";
+				
+				array_push($productPrices,$orderChild);
+			$order["invoic"]=$productPrices;
+			//echo "inside1";
+			//echo "zero </br>";
+		}
+		else if(sizeof($invoice)===1)
+		{
+			//echo "inside2";
+			//echo $invoice[0]["product_price"];
+			$beginDate = new DateTime($invoice[0]["date"]);
+			$date = new DateTime($beginDate->format('y')."-".$beginDate->format('m')."-01 00:00:00");
+			if((int)$beginDate->format('d')===1)
+			{
+				$interval = new DateInterval('P1M');
+				$date->add($interval);
+			}
+			else
+			{
+				$interval = new DateInterval('P2M');
+				$date->add($interval);
+			}
+			$productPrices = array();
+			$orderChild = array();
+				$orderChild["beginDate"] = $beginDate->format('Y-m-d');
+				$orderChild["endDate"]=$date->format('Y-m-d');
+				$orderChild["price"]=$invoice[0]["total_price"];
+				$orderChild["total_price"]=$order_row["total_price"];
+				$orderChild["product_price"]=$order_row["product_price"];
+				$orderChild["additional_service_price"]=$order_row["additional_service_price"];
+				$orderChild["setup_price"]=$order_row["setup_price"];
+				$orderChild["modem_price"]=$order_row["modem_price"];
+		
+				$orderChild["router_price"]=$order_row["router_price"];
+				$orderChild["remaining_days_price"]=$order_row["remaining_days_price"];
+				$orderChild["qst_tax"]=$order_row["qst_tax"];
+				$orderChild["gst_tax"]=$order_row["gst_tax"];
+				$orderChild["adapter_price"]=$order_row["adapter_price"];
+				
+				$orderChild["product_title"]=$order_row["product_title"];
+				$orderChild["product_category"]=$order_row["product_category"];
+				$orderChild["product_subscription_type"]=$order_row["product_subscription_type"];
+				array_push($productPrices,$orderChild);
+			//print_r($productPrices);
+			//array_push($result,$productPrices);
+			$order["invoice"]=$productPrices;
+			//echo "</br>";
+		}
+		else{
+			//echo "inside3";
+			$date = new DateTime($year."-".$month."-01 00:00:00");
+			$monthDays= (int) $date->format( 't' );
+			//echo "monthDays :".$monthDays."</br>";
+			
+			$lastdaydate = new DateTime($year."-".$month."-".$monthDays." 00:00:00");
+			
+			$orderChild = array();
+			$orderChild["date"] = $lastdaydate->format('Y-m-d');
+			$orderChild["product_price"]=0;
+			$orderChild["action"]="end";
+			array_push($invoice,$orderChild);
+			
+			
+			$productPrices = array();
+			
+			for($i=1;$i<sizeof($invoice);$i++){
+				
+				$beginDate = new DateTime($invoice[$i-1]["date"]);
+				$endDate = new DateTime($invoice[$i]["date"]);
+				//echo "beginDate->format('t') :".$beginDate->format('d')."</br>";
+				$periodInDays=(int)$endDate->format('d')-(int)$beginDate->format('d');
+				if($i===1)
+					$periodInDays++;
+				//echo "periodInDays :".$periodInDays."</br>";
+				$pricePerDay= (float)$invoice[$i-1]["product_price"]/$monthDays;
+				//echo "pricePerDay :".$pricePerDay."</br>";
+				$periodPrice=$periodInDays*$pricePerDay;
+				//echo "periodPrice :".$periodPrice."</br>";
+				if($invoice[$i-1]["action"]==="cancel"){
+					$periodPrice=0;
+				}
+				$orderChild = array();
+				$orderChild["beginDate"] = $invoice[$i-1]["date"];
+				$orderChild["endDate"]=$invoice[$i]["date"];
+				$orderChild["price"]=$periodPrice;
+				if($i===1){
+					$orderChild["additional_service_price"]=$order_row["additional_service_price"];
+				$orderChild["setup_price"]=$order_row["setup_price"];
+				$orderChild["modem_price"]=$order_row["modem_price"];
+		
+				$orderChild["router_price"]=$order_row["router_price"];
+				$orderChild["remaining_days_price"]=$order_row["remaining_days_price"];
+				$orderChild["qst_tax"]=$order_row["qst_tax"];
+				$orderChild["gst_tax"]=$order_row["gst_tax"];
+				$orderChild["adapter_price"]=$order_row["adapter_price"];
+				}
+				
+				$orderChild["product_title"]=$invoice[$i-1]["product_title"];
+				$orderChild["product_category"]=$invoice[$i-1]["product_category"];
+				$orderChild["product_subscription_type"]=$invoice[$i-1]["product_subscription_type"];
+			
+				array_push($productPrices,$orderChild);
+			}
+			/*
+			$orderChild = array();
+			$date = new DateTime($invoice[sizeof($invoice)-1]["date"]);
+			$interval = new DateInterval('P1M');
+
+			$date->add($interval);
+			$endDate=$date->format('Y-m-d');
+			$periodPrice=$invoice[sizeof($invoice)-1]["product_price"];
+				if($invoice[sizeof($invoice)-1]["action"]==="cancel"){
+					$periodPrice=0;
+					$endDate="0000-00-00 00:00:00";
+				}
+				
+				$orderChild["beginDate"] = $invoice[sizeof($invoice)-1]["date"];
+				$orderChild["endDate"]=$endDate;
+				$orderChild["price"]=$periodPrice;
+				array_push($productPrices,$orderChild);
+				*/
+			//print_r($productPrices);
+			//array_push($result,$productPrices);
+			$order["invoice"]=$productPrices;
+			//echo "</br>";
+		}
+		array_push($orders,$order);
+	}
+	
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////// request not in the same month as order
+
+//echo " </br></br></br></br></br></br></br></br>";
+		$orderResult = $this->query("SELECT * from orders inner join order_options on orders.order_id= order_options.order_id where 
+	customer_id=".$customer_id."
+	and (year(creation_date) <".$year."
+	or (year(creation_date) =".$year." and month(creation_date) <".$month." ))");
+	
+	
+	while ($order_row = $this->fetch_assoc($orderResult)) {
+		//print_r($order_row);
+		$order=array();
+		$order["order_id"]=$order_row["order_id"];
+		$orderDate = new DateTime($order_row["creation_date"]);
+		
+		
+		$invoice = array();
+		$orderChild = array();
+		
+		
+		if((((int)$orderDate->format('m'))%12+1)===$month && (int)$orderDate->format('d') >1)/// if order done in the previous month and not in 1st day then price is zero
+		{
+			$orderChild["product_price"]="0";
+			
+		}
+		else
+		{
+			$orderChild["product_price"]=$order_row["product_price"];
+		}
+		
+		$beginDate = new DateTime($year."-".$month."-01 00:00:00");
+		$orderChild["date"] = $beginDate->format('Y-m-d');
+			
+		$orderChild["action"]="order";
+		
+		$orderChild["product_title"]=$order_row["product_title"];
+		$orderChild["product_category"]=$order_row["product_category"];
+		$orderChild["product_subscription_type"]=$order_row["product_subscription_type"];
+			
+		array_push($invoice,$orderChild);
+		
+		////echo "same order month</br>";
+		// check if there are any request also before the requested month if exist then set it's price at init value instead of order price
+		$requestResult = $this->query("SELECT * from requests where 
+		order_id=".$order_row["order_id"]." 
+		and (year(creation_date) <".$year."
+		or (year(creation_date) =".$year." and month(creation_date) <".$month." ))
+		and verdict = 'approve' order by creation_date DESC LIMIT 1");
+		
+		
+		while ($request_row = $this->fetch_assoc($requestResult)) {
+			////echo "same request month</br>";
+			$beginDate = new DateTime($year."-".$month."-01 00:00:00");
+			$invoice = array();
+			$orderChild = array();
+			$orderChild["date"] = $beginDate->format('Y-m-d');
+			$orderChild["product_price"]=$request_row["product_price"];
+			$orderChild["action"]=$request_row["action"];
+			
+			$orderChild["product_title"]=$request_row["product_title"];
+			$orderChild["product_category"]=$request_row["product_category"];
+			$orderChild["product_subscription_type"]=$request_row["product_subscription_type"];
+		
+			array_push($invoice,$orderChild);
+		}
+		
+		// now  check if there are any request also in the same month as the requested month
+		$requestResult = $this->query("SELECT * from requests where 
+		order_id=".$order_row["order_id"]." 
+		and (year(creation_date) =".$year." and month(creation_date) =".$month." )
+		and verdict = 'approve' order by creation_date");
+		
+		
+		while ($request_row = $this->fetch_assoc($requestResult)) {
+			////echo "same request month</br>";
+			$orderChild = array();
+			$orderChild["date"] = $request_row["creation_date"];
+			$orderChild["product_price"]=$request_row["product_price"];
+			$orderChild["action"]=$request_row["action"];
+			
+			$orderChild["product_title"]=$request_row["product_title"];
+			$orderChild["product_category"]=$request_row["product_category"];
+			$orderChild["product_subscription_type"]=$request_row["product_subscription_type"];
+			
+			array_push($invoice,$orderChild);
+		}
+		
+		//print_r($invoice);
+		////echo sizeof($invoice)."</br>";
+		
+		if(sizeof($invoice)===0)
+		{
+			$productPrices = array();
+			$orderChild = array();
+				$orderChild["beginDate"] = "";
+				$orderChild["endDate"]="";
+				$orderChild["price"]="0";
+				
+				$orderChild["product_title"]="";
+				$orderChild["product_category"]="";
+				$orderChild["product_subscription_type"]="";
+				
+				array_push($productPrices,$orderChild);
+			//array_push($result,productPrices);
+			$order["invoice"]=$productPrices;
+			//echo "zero </br>";
+		}
+		else if(sizeof($invoice)===1)
+		{
+			//echo "inside2";
+			//echo $invoice[0]["product_price"];
+			$beginDate = new DateTime($invoice[0]["date"]);
+			$date = new DateTime($invoice[0]["date"]);
+			
+				$interval = new DateInterval('P1M');
+				$date->add($interval);
+			
+			$productPrices = array();
+			$orderChild = array();
+				$orderChild["beginDate"] = $beginDate->format('Y-m-d');
+				$orderChild["endDate"]=$date->format('Y-m-d');
+				$orderChild["price"]=$invoice[0]["product_price"];
+				
+				$orderChild["product_title"]=$invoice[0]["product_title"];
+				$orderChild["product_category"]=$invoice[0]["product_category"];
+				$orderChild["product_subscription_type"]=$invoice[0]["product_subscription_type"];
+				
+				array_push($productPrices,$orderChild);
+			//print_r($productPrices);
+			//array_push($result,$productPrices);
+			$order["invoice"]=$productPrices;
+			//echo "</br>";
+		}
+		else{
+			//echo "inside3";
+			$date = new DateTime($year."-".$month."-01 00:00:00");
+			
+			$monthDays= (int) $date->format( 't' );
+			$lastdaydate = new DateTime($year."-".$month."-".$monthDays." 00:00:00");
+			
+			$orderChild = array();
+			$orderChild["date"] = $lastdaydate->format('Y-m-d');
+			$orderChild["product_price"]=0;
+			$orderChild["action"]="end";
+			array_push($invoice,$orderChild);
+			
+			
+			//echo "monthDays :".$monthDays."</br>";
+			$productPrices = array();
+			
+			for($i=1;$i<sizeof($invoice);$i++){
+				
+				$beginDate = new DateTime($invoice[$i-1]["date"]);
+				$endDate = new DateTime($invoice[$i]["date"]);
+				//echo "beginDate->format('t') :".$beginDate->format('d')."</br>";
+				$periodInDays=(int)$endDate->format('d')-(int)$beginDate->format('d');
+				if($i===1)
+					$periodInDays++;
+				//echo "periodInDays :".$periodInDays."</br>";
+				$pricePerDay= (float)$invoice[$i-1]["product_price"]/$monthDays;
+				//echo "pricePerDay :".$pricePerDay."</br>";
+				$periodPrice=$periodInDays*$pricePerDay;
+				//echo "periodPrice :".$periodPrice."</br>";
+				if($invoice[$i-1]["action"]==="cancel"){
+					$periodPrice=0;
+				}
+				$orderChild = array();
+				$orderChild["beginDate"] = $invoice[$i-1]["date"];
+				$orderChild["endDate"]=$invoice[$i]["date"];
+				$orderChild["price"]=$periodPrice;
+				
+				$orderChild["product_title"]=$invoice[$i-1]["product_title"];
+				$orderChild["product_category"]=$invoice[$i-1]["product_category"];
+				$orderChild["product_subscription_type"]=$invoice[$i-1]["product_subscription_type"];
+				
+				array_push($productPrices,$orderChild);
+			}
+			
+			//print_r($productPrices);
+			//array_push($result,$productPrices);
+			$order["invoice"]=$productPrices;
+			//echo "</br>";
+		}
+		array_push($orders,$order);
+	}
+	$result["orders"]=$orders;
+        return $result;
+    }
 	public function order_month_query_api($queryString,$fields,$child=null,$childFields=null,$child2=null,$child2Fields=null,$child3=null,$child3Fields=null) {
         $orders = array();
         
@@ -180,7 +591,7 @@ class DBTools {
 			if($order_row["verdict"]==="approve")
 			{//echo "2";
 				$order["end_date"]=$order_row["action_on_date"];
-				if($order_row["action"]!=="action")
+				if($order_row["action"]!=="cancel")
 					if ($child3 != null) {
 						//echo "3";
 						$orderChildArray = array();
@@ -215,7 +626,7 @@ class DBTools {
         
         $customers_result = $this->query($queryString);
         while ($customer_row = $this->fetch_assoc($customers_result)) {
-            		if(isset($customers[$customer_row['customer_id']]))
+            if(isset($customers[$customer_row['customer_id']]))
             {
                 
                 if ($child2 != null) {
