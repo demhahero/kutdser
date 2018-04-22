@@ -136,6 +136,97 @@ class DBTools {
         }
         return $orders;
     }
+	public function orders_by_month($customer_id,$year,$month) {
+		
+        
+        $this->query("SET CHARACTER SET utf8");
+		
+		$ordersResult = $this->query("SELECT * from orders inner join order_options on orders.order_id= order_options.order_id where 
+		customer_id=".$customer_id);
+	
+		$orders=array();
+	
+		while ($order_row = $this->fetch_assoc($ordersResult)) {
+			
+			$orderChild = array();
+			$orderChild["order_id"]=$order_row["order_id"];
+			$orderChild["creation_date"] = $order_row["creation_date"];
+			$orderChild["total_price"]=$order_row["total_price"];
+			$orderChild["product_price"]=$order_row["product_price"];
+			$orderChild["additional_service_price"]=$order_row["additional_service_price"];
+			$orderChild["setup_price"]=$order_row["setup_price"];
+			$orderChild["modem_price"]=$order_row["modem_price"];
+		
+			$orderChild["router_price"]=$order_row["router_price"];
+			$orderChild["remaining_days_price"]=$order_row["remaining_days_price"];
+			$orderChild["qst_tax"]=$order_row["qst_tax"];
+			$orderChild["gst_tax"]=$order_row["gst_tax"];
+			$orderChild["adapter_price"]=$order_row["adapter_price"];
+			
+			$orderChild["plan"]=$order_row["plan"];
+			$orderChild["modem"]=$order_row["modem"];
+			$orderChild["router"]=$order_row["router"];
+			$orderChild["cable_subscriber"]=$order_row["cable_subscriber"];
+			$orderChild["current_cable_provider"]=$order_row["current_cable_provider"];
+			$orderChild["cancellation_date"]=$order_row["cancellation_date"];
+			$orderChild["installation_date_1"]=$order_row["installation_date_1"];
+			$orderChild["actual_installation_date"]=$order_row["actual_installation_date"];
+		
+			$orderChild["product_title"]=$order_row["product_title"];
+			$orderChild["product_category"]=$order_row["product_category"];
+			$orderChild["product_subscription_type"]=$order_row["product_subscription_type"];
+			
+			if($order_row["product_category"]==="phone"){
+				$orderChild["start_active_date"]=$order_row["creation_date"];
+			}
+			else if($order_row["product_category"]==="internet"){
+				if($order_row["cable_subscriber"]==="yes"){
+					$orderChild["start_active_date"]=$order_row["cancellation_date"];
+				}
+				else {
+					$orderChild["start_active_date"]=$order_row["installation_date_1"];
+				}
+			}
+			$start_active_date = new DateTime($orderChild["start_active_date"]);
+			if(((int)$start_active_date->format('d'))>1)
+			{
+				$recurring_date = new DateTime($start_active_date->format('y')."-".$start_active_date->format('m')."-01 00:00:00");
+				$interval = new DateInterval('P2M');
+				$recurring_date->add($interval);
+				$orderChild["recurring_date"]=$recurring_date->format('Y-m-d');
+			}
+			else{
+				$interval = new DateInterval('P1M');
+				$start_active_date->add($interval);
+				$orderChild["recurring_date"]=$start_active_date->format('Y-m-d');
+			}
+		
+			$requestResult = $this->query("SELECT * from requests where 	
+			order_id=".$order_row["order_id"]." 
+			and (year(action_on_date) =".$year." and month(action_on_date) =".$month." )
+			and verdict = 'approve' order by action_on_date");
+		
+			$requests=array();
+			while ($request_row = $this->fetch_assoc($requestResult)) {
+				$requestChild = array();
+				$requestChild["creation_date"] = $request_row["creation_date"];
+				$requestChild["action_on_date"] = $request_row["action_on_date"];
+				$requestChild["verdict_date"] = $request_row["verdict_date"];
+				$requestChild["verdict"] = $request_row["verdict"];
+				$requestChild["product_price"]=$request_row["product_price"];
+				$requestChild["action"]=$request_row["action"];
+			
+				$requestChild["product_title"]=$request_row["product_title"];
+				$requestChild["product_category"]=$request_row["product_category"];
+				$requestChild["product_subscription_type"]=$request_row["product_subscription_type"];
+				array_push($requests,$requestChild);
+			}
+			$orderChild["requests"]=$requests;
+			
+			array_push($orders,$orderChild);
+		}
+	return $orders;
+	}
 	public function order_requests_query_api($customer_id,$year,$month) {
         $orders = array();
         
