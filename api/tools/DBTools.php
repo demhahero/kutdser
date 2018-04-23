@@ -205,7 +205,14 @@ class DBTools {
 			order_id=".$order_row["order_id"]." 
 			and (year(action_on_date) =".$year." and month(action_on_date) =".$month." )
 			and verdict = 'approve' order by action_on_date");
-		
+			if($requestResult->num_rows===0)
+			{
+				$requestResult = $this->query("SELECT * from requests where 
+				order_id=".$order_row["order_id"]." 
+				and (year(action_on_date) <".$year."
+				or (year(action_on_date) =".$year." and month(action_on_date) <".$month." ))
+				and verdict = 'approve' order by action_on_date DESC LIMIT 1");
+			}
 			$requests=array();
 			while ($request_row = $this->fetch_assoc($requestResult)) {
 				$requestChild = array();
@@ -221,6 +228,7 @@ class DBTools {
 				$requestChild["product_subscription_type"]=$request_row["product_subscription_type"];
 				array_push($requests,$requestChild);
 			}
+			
 			$orderChild["requests"]=$requests;
 			
 			array_push($orders,$orderChild);
