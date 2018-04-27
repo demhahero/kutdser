@@ -2,47 +2,66 @@
 //error_reporting(E_ALL);
 //ini_set('display_errors', 1);
 
-function checkRequest($action_on_date,$order_id,$dbTools){
+//function checkRequest($action_on_date,$order_id,$dbTools){
+function checkRequest($order_id,$dbTools){
 	
-		$getOrder=$dbTools->query("SELECT actual_installation_date from order_options where order_id=".$order_id);
+	//$getOrder=$dbTools->query("SELECT actual_installation_date from order_options where order_id=".$order_id);
+	$getOrder=$dbTools->query("SELECT * from orders inner join order_options on orders.order_id= order_options.order_id where  orders.order_id=".$order_id);
 	
-	
-	while ($order = $dbTools->fetch_assoc($getOrder)) {
-		$actual_installation_date=new DateTime($order["actual_installation_date"]);
-		
-		if($action_on_date < $actual_installation_date)
-		{
-			echo "{\"canInsert\" :false,\"error\" :\"error: action_on_date can not be earlier than actual_installation_date\"}";
-			return false;
-		}
+	$start_active_date=null;
+	while ($order_row = $dbTools->fetch_assoc($getOrder)) {
+		if($order_row["product_category"]==="phone"){
+				$orderChild["start_active_date"]=$order_row["creation_date"];
+			}
+			else if($order_row["product_category"]==="internet"){
+				if($order_row["cable_subscriber"]==="yes"){
+					$orderChild["start_active_date"]=$order_row["cancellation_date"];
+				}
+				else {
+					$orderChild["start_active_date"]=$order_row["installation_date_1"];
+				}
+			}
+			$start_active_date = $orderChild["start_active_date"];
 		break;
 	}
 	
-	$getCanceledRequest=$dbTools->query("SELECT request_id from requests where order_id=".$order_id." and action='cancel' and verdict='approve'");
-	while ($request = $dbTools->fetch_assoc($getCanceledRequest)) {
-		echo "{\"canInsert\" :false,\"error\" :\"error: ordere already canceled\"}";
+	$getrequest=$dbTools->query("SELECT action_on_date,action from requests where order_id=".$order_id." and verdict='approve' order by action_on_date desc limit 1");
+	while ($request = $dbTools->fetch_assoc($getrequest)) {
+		if($request["action"]==="terminate")
+		{
+		echo "{\"canInsert\" :false,\"error\" :\"error: ordere already terminated\"}";
 			return false;
+		}
+		else{
+			$action_on_date = new DateTime($request["action_on_date"]);
+			$action_on_datePlus = new DateTime($action_on_date->format('y')."-".$action_on_date->format('m')."-01 00:00:00");
+			$interval = new DateInterval('P1M');
+			$action_on_datePlus->add($interval);
+			$start_active_date=$action_on_datePlus->format('Y-m-d');
+		}
 	}
-	
-	$getRequestOnMonth=$dbTools->query("SELECT request_id from requests 
+	/*
+	$getRequestOnMonth=$dbTools->query("SELECT action_on_date from requests 
 	where order_id=".$order_id." and year(action_on_date)=".$action_on_date->format('Y')." and month(action_on_date) = ".$action_on_date->format('m')." and verdict='approve'");
 	while ($request = $dbTools->fetch_assoc($getRequestOnMonth)) {
 		echo "{\"canInsert\" :false,\"error\" :\"error: there is request regestered in this month for this order\"}";
 			return false;
 	}
+	*/
 	
-	
-	return true;
+	return $start_active_date;
 }
-if(isset($_GET["order_id"]) && isset($_GET["action_on_date"])){
+if(isset($_GET["order_id"]) /*&& isset($_GET["action_on_date"])*/){
 	include_once "dbconfig.php";
 	
-	$action_on_dateString=$_GET["action_on_date"];
-	$action_on_date=new DateTime($action_on_dateString);
+	//$action_on_dateString=$_GET["action_on_date"];
+	//$action_on_date=new DateTime($action_on_dateString);
 	$order_id=$_GET["order_id"];
 	
-	if(checkRequest($action_on_date,$order_id,$dbTools))
-		echo "{\"canInsert\" :true,\"error\" :\"null\"}";
+	//if(checkRequest($action_on_date,$order_id,$dbTools))
+	$start_active_date=checkRequest($order_id,$dbTools);
+	if($start_active_date)
+		echo "{\"start_active_date\" :\"".$start_active_date."\",\"error\" :\"null\"}";
 	
 	
 	
@@ -55,9 +74,11 @@ include_once "dbconfig.php";
 	$action_on_date=new DateTime($action_on_dateString);
 	$order_id=$_POST["order_id"];
 	
-	if(!checkRequest($action_on_date,$order_id,$dbTools))
+	//if(!checkRequest($action_on_date,$order_id,$dbTools))
+	$start_active_date=checkRequest($order_id,$dbTools);
+	if(!$start_active_date)
 		exit();
-
+	
 
 $PostFields = array(
     "reseller_id"=>"",
@@ -93,19 +114,36 @@ $InsertFieldValues = array(
 	 "product_subscription_type"=>"",
     );
 	
+	if(!isset($_POST["product_id"])){
+			
+		echo "{\"inserted\" :false,\"error\" :\"error: not all values sent in POST\"}";
+		exit();
+	}
 	foreach ($PostFields as $key => $value)
     {
 		if(isset($_POST[$key])){
 			$InsertFieldValues[$key]=$_POST[$key];
 			
 		}
+		else if( $key==="verdict" || $key==="verdict_date" || $key==="action_value" || $key==="admin_id" || $key==="note"){
+			$InsertFieldValues[$key]="";
+		}
 		else{
 			echo "{\"inserted\" :false,\"error\" :\"error: not all values sent in POST\"}";
 			exit();
 		}
 	}
+	$action_on_date = new DateTime($InsertFieldValues["action_on_date"]);
+	$start_active_date = new DateTime($start_active_date);
 	
-	$product=$dbTools->query("SELECT products.* FROM `orders` INNER JOIN products on products.product_id=orders.product_id where orders.order_id=".$InsertFieldValues["order_id"]);
+	if($action_on_date<$start_active_date)
+	{
+		echo "{\"inserted\" :false,\"error\" :\"error: action_on_date can not be before ".$start_active_date->format('Y-m-d')."\"}";
+		exit();
+	}
+	
+	
+	$product=$dbTools->query("SELECT * FROM `products` where product_id=".$_POST["product_id"]);
 	
 	while ($product_row = $dbTools->fetch_assoc($product)) {
 		$InsertFieldValues["product_title"]=$product_row["title"];
@@ -131,5 +169,5 @@ $InsertFieldValues = array(
 	
 
 	$json = json_encode($requests);
-	echo "{\"inserted\" :" ,$json , ",\"error\" :null}";
+	echo "{\"inserted\" :" ,$json , ",\"error\" :\"null\"}";
 }
