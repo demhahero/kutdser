@@ -232,38 +232,6 @@ class RequestTools {
                 . "" . $verdictDate . ""
                 . ")");
         
-        echo "insert into `requests` ("
-                . "`reseller_id` ,"
-                . "`order_id` ,"
-                . "`creation_date` ,"
-                . "`action` ,"
-                . "`action_value` ,"
-                . "`action_on_date` ,"
-                . "`admin_id` ,"
-                . "`note` ,"
-                . "`product_price` ,"
-                . "`product_title` ,"
-                . "`product_category` ,"
-                . "`product_subscription_type` ,"
-                . "`verdict` ,"
-                . "`verdict_date`"
-                . ") VALUES ("
-                . "'" . $this->getReseller()->getCustomerID() . "', "
-                . "'" . $this->getOrder()->getOrderID() . "', "
-                . "'" . $this->getCreationDate()->format("Y-m-d H:i:s") . "', "
-                . "'" . $this->action . "', "
-                . "'" . $this->action_value . "', "
-                . "'" . $this->getActionOnDate()->format("Y-m-d H:i:s") . "', "
-                . "'" . $admin_id . "', "
-                . "'" . $this->getNote() . "', "
-                . "'" . $this->getProductPrice() . "', "
-                . "'" . $this->getProductTitle() . "', "
-                . "'" . $this->getProductCategory() . "', "
-                . "'" . $this->getProductSubscriptionType() . "', "
-                . "'" . $this->verdict . "', "
-                . "" . $verdictDate . ""
-                . ")";
-        
         return $result;
     }
 

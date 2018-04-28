@@ -8,9 +8,9 @@ $order_id = intval($_GET["order_id"]);
 $creation_date = new DateTime();
 
 if (isset($_POST["action"])) {
-    
+
     $action_on_date = new DateTime(($_POST["action_on_date"]));
-    
+
     $product = $dbTools->objProductTools($_POST["action_value"]);
 
     $requestTools = $dbTools->objRequestTools(null);
@@ -21,12 +21,12 @@ if (isset($_POST["action"])) {
     $requestTools->setOrder($dbTools->objOrderTools($order_id));
     $requestTools->setCreationDate($creation_date);
     $requestTools->setActionOnDate($action_on_date);
-    
+
     $requestTools->setProductPrice($product->getPrice());
     $requestTools->setProductTitle($product->getTitle());
     $requestTools->setProductCategory($product->getCategory());
     $requestTools->setProductSubscriptionType($product->getSubscriptionType());
-    
+
     $request_result = $requestTools->doInsert();
 
     if ($request_result) {
@@ -41,11 +41,27 @@ if (isset($_POST["action"])) {
 <script>
     $(document).ready(function () {
         $("select[name=\"action\"]").change(function () {
-            if (this.value == "upgrade" || this.value == "downgrade") {
+            if (this.value == "change_speed") {
                 $(".action-value").show();
-            } else if (this.value == "cancel") {
+            } else{
                 $(".action-value").hide();
             }
+        });
+        
+        $(".submit").click(function () {
+            
+            var order_id = "<?=$order_id?>";
+            var action_on_date = $("input[name=\"action_on_date\"]").val();
+            var note = $("textarea[name=\"note\"]").val();
+            var reseller_id = "<?=$reseller_id?>";
+            var action_value = $("select[name=\"product_id\"]").val();
+            var action = $("select[name=\"action\"]").val();
+            var product_id = $("select[name=\"product_id\"]").val();
+            alert(product_id);
+            $.post("<?=$api_url?>insert_requests_api.php", {order_id: order_id, action:action, product_id:product_id, action_on_date: action_on_date, note: note, reseller_id: reseller_id} , function (data, status) {
+                alert("Data: " + data + "\nStatus: " + status);
+            });
+            return false;
         });
     });
 </script>
@@ -73,9 +89,8 @@ if (isset($_POST["action"])) {
     <div class="form-group">
         <label>Action:</label>
         <select name="action" class="form-control">
-            <option value="upgrade">Upgrade</option>
-            <option value="downgrade">Downgrade</option>
-            <option value="cancel">Cancel</option>
+            <option value="change_speed">Change speed</option>
+            <option value="terminate">Terminate</option>
         </select> 
     </div>
     <div class="form-group">
@@ -84,7 +99,7 @@ if (isset($_POST["action"])) {
     </div>
     <div class="form-group action-value">
         <label>Speed:</label>
-        <select name="action_value" class="form-control">
+        <select name="product_id" class="form-control">
             <option price='29.9' value='383'>Internet 5 Mbps ($29.9)</option>
             <option price='34.9' value='335'>Internet 10 Mbps ($34.9)</option>	
             <option price='39.9' value='380'>Internet 15 Mbps ($39.9)</option>	
@@ -100,7 +115,7 @@ if (isset($_POST["action"])) {
         <label>Note:</label>
         <textarea name="note" class="form-control"></textarea> 
     </div>
-    <input type="submit" class="btn btn-default"  value="Send">
+    <input type="submit" class="btn btn-default submit"  value="Send">
 </form>
 
 <?php

@@ -115,10 +115,13 @@ class OrderTools {
                     if ($request->getAction() == "cancel" && $request->getVerdict() == "approve" && $request->getActionOnDate <= $today) {
                         $this->termination_date = $request->getActionOnDate();
                     }
+                    /*
                     //if Upgraded , change his product id
                     else if (($request->getAction() == "upgrade" || $request->getAction() == "downgrade") && $request->getVerdict() == "approve" && $request->getActionOnDate <= $today) {
                         $this->product_id = $request->getActionValue();
                     }
+                     * 
+                     */
                 }
         }
         

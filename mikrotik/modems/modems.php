@@ -18,7 +18,7 @@ if (isset($_GET["modem_id"])) {
     $(document).ready(function () {
         $('.dataTables_empty').html('<div class="loader"></div>');
 
-        $.getJSON("https://www.amprotelecom.com/draft/api/modems_api.php", function (result) {
+        $.getJSON("<?=$api_url?>modems_api.php", function (result) {
             $.each(result['modems'], function (i, field) {
                 table.row.add([
                     field['modem_id'],
