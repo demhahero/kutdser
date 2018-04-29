@@ -200,20 +200,34 @@ class DBTools {
 				$start_active_date->add($interval);
 				$orderChild["recurring_date"]=$start_active_date->format('Y-m-d');
 			}
-		
+			$requests=array();
 			$requestResult = $this->query("SELECT * from requests where 	
 			order_id=".$order_row["order_id"]." 
 			and (year(action_on_date) =".$year." and month(action_on_date) =".$month." )
 			and verdict = 'approve' order by action_on_date");
-			if($requestResult->num_rows===0)
-			{
+			while ($request_row = $this->fetch_assoc($requestResult)) {
+				$requestChild = array();
+				$requestChild["creation_date"] = $request_row["creation_date"];
+				$requestChild["action_on_date"] = $request_row["action_on_date"];
+				$requestChild["verdict_date"] = $request_row["verdict_date"];
+				$requestChild["verdict"] = $request_row["verdict"];
+				$requestChild["product_price"]=$request_row["product_price"];
+				$requestChild["action"]=$request_row["action"];
+			
+				$requestChild["product_title"]=$request_row["product_title"];
+				$requestChild["product_category"]=$request_row["product_category"];
+				$requestChild["product_subscription_type"]=$request_row["product_subscription_type"];
+				array_push($requests,$requestChild);
+			}
+			//if($requestResult->num_rows===0)
+			//{
 				$requestResult = $this->query("SELECT * from requests where 
 				order_id=".$order_row["order_id"]." 
 				and (year(action_on_date) <".$year."
 				or (year(action_on_date) =".$year." and month(action_on_date) <".$month." ))
 				and verdict = 'approve' order by action_on_date DESC LIMIT 1");
-			}
-			$requests=array();
+			//}
+			
 			while ($request_row = $this->fetch_assoc($requestResult)) {
 				$requestChild = array();
 				$requestChild["creation_date"] = $request_row["creation_date"];
