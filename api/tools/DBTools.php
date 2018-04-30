@@ -145,8 +145,10 @@ class DBTools {
 		customer_id=".$customer_id);
 	
 		$orders=array();
-	
+		
 		while ($order_row = $this->fetch_assoc($ordersResult)) {
+			$monthsInfo=array();
+			
 			
 			$orderChild = array();
 			$orderChild["order_id"]=$order_row["order_id"];
@@ -196,11 +198,85 @@ class DBTools {
 				$orderChild["recurring_date"]=$recurring_date->format('Y-m-d');
 			}
 			else{
+				$recurring_date=new DateTime($orderChild["start_active_date"]);
 				$interval = new DateInterval('P1M');
-				$start_active_date->add($interval);
-				$orderChild["recurring_date"]=$start_active_date->format('Y-m-d');
+				$recurring_date->add($interval);
+				$orderChild["recurring_date"]=$recurring_date->format('Y-m-d');
 			}
+			
+///////////////// get month info from order			
+			$monthInfo=array();
+			$monthInfo["total_price"]=$order_row["total_price"];
+			$monthInfo["product_price"]=$order_row["product_price"];
+			$monthInfo["additional_service_price"]=$order_row["additional_service_price"];
+			$monthInfo["setup_price"]=$order_row["setup_price"];
+			$monthInfo["modem_price"]=$order_row["modem_price"];
+			$monthInfo["router_price"]=$order_row["router_price"];
+			$monthInfo["plan"]=$order_row["plan"];
+			$monthInfo["modem"]=$order_row["modem"];
+			$monthInfo["router"]=$order_row["router"];
+			$monthInfo["remaining_days_price"]=$order_row["remaining_days_price"];
+			$monthInfo["qst_tax"]=$order_row["qst_tax"];
+			$monthInfo["gst_tax"]=$order_row["gst_tax"];
+			$monthInfo["adapter_price"]=$order_row["adapter_price"];
+			$monthInfo["product_title"]=$order_row["product_title"];
+			$monthInfo["days"]=$recurring_date->diff($start_active_date)->days;
+/////////////////// end get month infor from order
+			
+
+////////////////// check if there is any request before the selected date, if yes get it's infor instead of order info
+			$date = new DateTime($year."-".$month."-01 00:00:00");
+			$monthDays= (int) $date->format( 't' );
+			
+			//if($requestResult->num_rows===0)
+			//{
+				$requestResult = $this->query("SELECT * from requests where 
+				order_id=".$order_row["order_id"]." 
+				and (year(action_on_date) <".$year."
+				or (year(action_on_date) =".$year." and month(action_on_date) <".$month." ))
+				and verdict = 'approve' order by action_on_date DESC LIMIT 1");
+			//}
 			$requests=array();
+			$hasRequest=false;
+			while ($request_row = $this->fetch_assoc($requestResult)) {
+				$hasRequest=true;
+				$requestChild = array();
+				$requestChild["creation_date"] = $request_row["creation_date"];
+				$requestChild["action_on_date"] = $request_row["action_on_date"];
+				$requestChild["verdict_date"] = $request_row["verdict_date"];
+				$requestChild["verdict"] = $request_row["verdict"];
+				$requestChild["product_price"]=$request_row["product_price"];
+				$requestChild["action"]=$request_row["action"];
+			
+				$requestChild["product_title"]=$request_row["product_title"];
+				$requestChild["product_category"]=$request_row["product_category"];
+				$requestChild["product_subscription_type"]=$request_row["product_subscription_type"];
+				
+				
+////////////////// update month info 
+				
+				$monthInfo["product_price"]=$request_row["product_price"];
+				$monthInfo["additional_service_price"]="0";
+				$monthInfo["setup_price"]="0";
+				
+				if($monthInfo["router"]!=="rent" )
+					$monthInfo["router_price"]="0";
+				if($monthInfo["modem"]!=="rent" )
+					$monthInfo["modem_price"]="0";
+				$monthInfo["remaining_days_price"]="0";
+				$monthInfo["qst_tax"]="0";
+				$monthInfo["gst_tax"]="0";
+				$monthInfo["adapter_price"]="0";
+				$monthInfo["total_price"]=(float)$monthInfo["product_price"]+(float)$monthInfo["modem_price"]+(float)$monthInfo["router_price"];
+				$monthInfo["product_title"]=$request_row["product_title"];
+				$monthInfo["days"]=$monthDays;
+////////////////// end update month info
+				array_push($requests,$requestChild);
+			}
+			
+			
+///////////////// check if there is request in the same month as the requested date
+			
 			$requestResult = $this->query("SELECT * from requests where 	
 			order_id=".$order_row["order_id"]." 
 			and (year(action_on_date) =".$year." and month(action_on_date) =".$month." )
@@ -217,33 +293,98 @@ class DBTools {
 				$requestChild["product_title"]=$request_row["product_title"];
 				$requestChild["product_category"]=$request_row["product_category"];
 				$requestChild["product_subscription_type"]=$request_row["product_subscription_type"];
+				
+				
+				
+////////////////// update month info 
+				$this_action_on_date = new DateTime($request_row["action_on_date"]);
+				$recurring_date = new DateTime($orderChild["recurring_date"]);
+	/////////////////////////// check if this request is made after the 1st day in month or made before the first recurring_date
+
+//// this condition take care of the folloing scenarios :
+////// 1- request made 	is made after the 1st day in month and has previous request 
+////// 2- request might happened in any day of the month but it happened before the first recurring_date 
+////// so in both scenario we have to calculate and split the price in to two periods 
+////// assuming only one request or order in month, and assuming if order made after the 1st day then the remaining days price in already count and product price is for full month
+				
+				
+				if( ( (int)$this_action_on_date->format('d')>1 && $hasRequest)
+					|| 
+					(
+						(int)$recurring_date->format('Y') > (int)$year 
+						|| 
+						((int)$recurring_date->format('Y') === (int)$year && (int)$recurring_date->format('m') > (int)$month)  
+						
+					) 
+				)
+				
+				{
+					$this_request_days=$monthDays-(int)$this_action_on_date->format('d');
+					$previous_days=$monthDays-$this_request_days;
+					
+					$this_product_price= (((float)$request_row["product_price"])/$monthDays)*$this_request_days;
+					$previous_product_price= (((float)$monthInfo["product_price"])/$monthDays)*$previous_days;
+					
+					$monthInfo["product_price_previous"]=$monthInfo["product_price"];
+					
+					$monthInfo["product_price"]=$previous_product_price;
+					$monthInfo["product_price_2"]=$this_product_price;
+					
+					$monthInfo["days"]=$previous_days;
+					$monthInfo["days_2"]=$this_request_days;
+					
+					
+					$monthInfo["product_title_2"]=$request_row["product_title"];
+					
+					$monthInfo["additional_service_price"]="0";
+					$monthInfo["setup_price"]="0";
+				
+					if($monthInfo["router"]!=="rent" )
+						$monthInfo["router_price"]="0";
+					if($monthInfo["modem"]!=="rent" )
+						$monthInfo["modem_price"]="0";
+					$monthInfo["remaining_days_price"]="0";
+					$monthInfo["qst_tax"]="0";
+					$monthInfo["gst_tax"]="0";
+					$monthInfo["adapter_price"]="0";
+					$monthInfo["total_price"]=(float)$monthInfo["product_price"]+(float)$monthInfo["product_price_2"]+(float)$monthInfo["modem_price"]+(float)$monthInfo["router_price"];
+					
+				}
+				else{
+					
+					$monthInfo["product_price"]=$request_row["product_price"];
+				
+					$monthInfo["product_title"]=$request_row["product_title"];
+					$monthInfo["days"]=$monthDays;
+					
+										$monthInfo["product_title_2"]=$request_row["product_title"];
+					
+					$monthInfo["additional_service_price"]="0";
+					$monthInfo["setup_price"]="0";
+				
+					if($monthInfo["router"]!=="rent" )
+						$monthInfo["router_price"]="0";
+					if($monthInfo["modem"]!=="rent" )
+						$monthInfo["modem_price"]="0";
+					$monthInfo["remaining_days_price"]="0";
+					$monthInfo["qst_tax"]="0";
+					$monthInfo["gst_tax"]="0";
+					$monthInfo["adapter_price"]="0";
+					$monthInfo["total_price"]=(float)$monthInfo["product_price"]+(float)$monthInfo["modem_price"]+(float)$monthInfo["router_price"];
+				}
+				
+				
+				
+				
+////////////////// end update month info
+
+
 				array_push($requests,$requestChild);
 			}
-			//if($requestResult->num_rows===0)
-			//{
-				$requestResult = $this->query("SELECT * from requests where 
-				order_id=".$order_row["order_id"]." 
-				and (year(action_on_date) <".$year."
-				or (year(action_on_date) =".$year." and month(action_on_date) <".$month." ))
-				and verdict = 'approve' order by action_on_date DESC LIMIT 1");
-			//}
 			
-			while ($request_row = $this->fetch_assoc($requestResult)) {
-				$requestChild = array();
-				$requestChild["creation_date"] = $request_row["creation_date"];
-				$requestChild["action_on_date"] = $request_row["action_on_date"];
-				$requestChild["verdict_date"] = $request_row["verdict_date"];
-				$requestChild["verdict"] = $request_row["verdict"];
-				$requestChild["product_price"]=$request_row["product_price"];
-				$requestChild["action"]=$request_row["action"];
-			
-				$requestChild["product_title"]=$request_row["product_title"];
-				$requestChild["product_category"]=$request_row["product_category"];
-				$requestChild["product_subscription_type"]=$request_row["product_subscription_type"];
-				array_push($requests,$requestChild);
-			}
-			
+			array_push($monthsInfo,$monthInfo);
 			$orderChild["requests"]=$requests;
+			$orderChild["monthInfo"]=$monthsInfo;
 			
 			array_push($orders,$orderChild);
 		}
