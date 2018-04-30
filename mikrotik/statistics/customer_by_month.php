@@ -25,22 +25,34 @@ if (isset($_GET["modem_id"])) {
                         var request_product_price;
                         var request_product_title;
                         var request_action_on_date;
-                        
+                        var current_product_price;
+                        var current_product_title;
+
                         $(".order-product-title").html(field["product_title"]);
                         $(".order-product-price").html(field["product_price"] + "$");
-                        
+
                         product_price = field["product_price"];
                         product_title = field["product_title"];
-                        
+                        current_product_price = product_price;
+                        current_product_title = product_title;
+
+                        var selected_date = new Date("<?= $_GET["year"] ?>-<?= $_GET["month"] ?>-01");
+
                         $.each(field["requests"], function (i2, field2) {
-                            $(".request-creation-date").html(field2["creation_date"]);
-                            $(".request-action-on-date").html(field2["action_on_date"]);
-                            $(".request-product-price").html(field2["product_price"] + "$");
-                            $(".request-product-title").html(field2["product_title"]);
-                            request_action_on_date = new Date(field2["action_on_date"]);
-                            request_product_price = field2["product_price"];
-                            request_product_title = field2["product_title"];
+                            $("table.requests").append('<tr><td>' + field2["creation_date"] + '</td><td>' + field2["action_on_date"] + '</td><td>' + field2["product_price"] + "$" + '</td><td>' + field2["product_title"] + '</td></tr>');
+                            var action_on_date = new Date(field2["action_on_date"]);
+                            if (selected_date > action_on_date) {
+                                current_product_price = field2["product_price"];
+                                current_product_title = field2["product_title"];
+                            } else {
+                                request_product_price = field2["product_price"];
+                                request_product_title = field2["product_title"];
+                                request_action_on_date = action_on_date;
+                            }
                         });
+
+                        $(".product-price").html(current_product_price);
+                        $(".product-title").html(current_product_title);
 
                         var start_active_date = new Date(field["start_active_date"]);
                         var selected_date = new Date("<?= $_GET["year"] ?>-<?= $_GET["month"] ?>-02");
@@ -51,7 +63,7 @@ if (isset($_GET["modem_id"])) {
                             var start_active_date_next_month = new Date(start_active_date.getFullYear(), start_active_date.getMonth() + 1, 1);
                         }
 
-                        if (start_active_date.getFullYear() == selected_date.getFullYear() 
+                        if (start_active_date.getFullYear() == selected_date.getFullYear()
                                 && start_active_date.getMonth() == selected_date.getMonth()) {
                             $(".product-price").html(product_price);
                             $(".product-title").html(product_title);
@@ -64,38 +76,26 @@ if (isset($_GET["modem_id"])) {
                             $(".modem-price").html(field["modem_price"]);
                             $(".setup-price").html(field["setup_price"]);
                             $(".additional-service-price").html(field["additional_service_price"]);
-                        } else if (parseFloat(field["remaining_days_price"]) > 0 
-                                && start_active_date_next_month.getFullYear() == selected_date.getFullYear() 
-                                && start_active_date_next_month.getMonth() == selected_date.getMonth()) {
-                            
-                            if(request_product_price != null){
+                        } else {
+                            if (request_product_price != null) {
                                 var days_in_month = new Date("<?= $_GET["year"] ?>", "<?= $_GET["month"] ?>", 0).getDate();
-                                $(".product-title").html(product_title+", "+request_product_title);
-                                $(".product-price").html(product_price+", "+request_product_price);
+                                $(".product-title").html(current_product_title + ", " + request_product_title);
+                                $(".product-price").html(current_product_price + ", " + request_product_price);
                                 var second_duration = days_in_month - request_action_on_date.getDate();
                                 var first_duration = days_in_month - second_duration;
-                                var product_day_price = product_price/days_in_month;
-                                var request_product_day_price = request_product_price/days_in_month;
-                                if(request_action_on_date.getDate()!=1){
-                                    $(".product-title").html(product_title+"("+first_duration+"), "+request_product_title+"("+second_duration+")");
-                                    $(".product-price").html((product_day_price*first_duration).toFixed(2)+", "+(request_product_day_price*second_duration).toFixed(2));
-                                }else{
+                                var product_day_price = current_product_price / days_in_month;
+                                var request_product_day_price = request_product_price / days_in_month;
+                                if (request_action_on_date.getDate() != 1) {
+                                    $(".product-title").html(current_product_title + "(" + first_duration + " days), " + request_product_title + "(" + second_duration + " days)");
+                                    $(".product-price").html((product_day_price * first_duration).toFixed(2) + "$ , " + (request_product_day_price * second_duration).toFixed(2) + "$");
+                                } else {
                                     $(".product-title").html(request_product_title);
                                     $(".product-price").html(request_product_price);
                                 }
-                            } else{
-                                $(".product-title").html(product_title);
-                                $(".product-price").html(product_price);
+                            } else {
+                                $(".product-title").html(current_product_title);
+                                $(".product-price").html(current_product_price);
                             }
-                        } else{
-                            if(request_product_price != null){
-                                $(".product-title").html(request_product_title);
-                                $(".product-price").html(request_product_price);
-                            } else{
-                                $(".product-title").html(product_title);
-                                $(".product-price").html(product_price);
-                            }
-                            $(".additional-service-price").html(field["additional_service_price"]);
                         }
                     });
                 });
@@ -175,23 +175,14 @@ if (isset($_GET["modem_id"])) {
 </table>
 
 <h5>Requests</h5>
-<table class="display table table-striped table-bordered">
+<table class="requests display table table-striped table-bordered">
     <tr>
-        <td style="width:20%;">Request - Creation Date</td>
-        <td class="request-creation-date"></td>
+        <td style="width:20%;">Creation Date</td>
+        <td style="width:20%;">Action on Date</td>
+        <td style="width:20%;">Product Title</td>
+        <td style="width:20%;">Product Price</td>
+
     </tr>
-    <tr>
-        <td style="width:20%;">Request - Action on Date</td>
-        <td class="request-action-on-date"></td>
-    </tr>
-    <tr>
-        <td style="width:20%;">Request - Product Title</td>
-        <td class="request-product-title"></td>
-    </tr>
-    <tr>
-        <td style="width:20%;">Request - Product Price</td>
-        <td class="request-product-price"></td>
-    </tr>  
 </table>
 <?php
 include_once "../footer.php";
