@@ -189,6 +189,10 @@ class DBTools {
 					$orderChild["start_active_date"]=$order_row["installation_date_1"];
 				}
 			}
+			else // if not internet nor phone then ignore for now 
+			{
+				continue;
+			}
 			$start_active_date = new DateTime($orderChild["start_active_date"]);
 			if(((int)$start_active_date->format('d'))>1)
 			{
@@ -253,8 +257,26 @@ class DBTools {
 				$requestChild["product_subscription_type"]=$request_row["product_subscription_type"];
 				
 				
-////////////////// update month info 
 				
+////////////////// update month info 
+				if($request_row["action"]==="terminate")
+				{
+				$monthInfo["product_price"]="0";
+				$monthInfo["additional_service_price"]="0";
+				$monthInfo["setup_price"]="0";
+				$monthInfo["router_price"]="0";
+				$monthInfo["modem_price"]="0";
+				$monthInfo["remaining_days_price"]="0";
+				$monthInfo["qst_tax"]="0";
+				$monthInfo["gst_tax"]="0";
+				$monthInfo["adapter_price"]="0";
+				$monthInfo["total_price"]="0";
+				$monthInfo["product_title"]=$request_row["product_title"];
+				$monthInfo["days"]=$monthDays;
+				$monthInfo["action"]="terminated";
+				}
+				else
+				{
 				$monthInfo["product_price"]=$request_row["product_price"];
 				$monthInfo["additional_service_price"]="0";
 				$monthInfo["setup_price"]="0";
@@ -270,6 +292,7 @@ class DBTools {
 				$monthInfo["total_price"]=(float)$monthInfo["product_price"]+(float)$monthInfo["modem_price"]+(float)$monthInfo["router_price"];
 				$monthInfo["product_title"]=$request_row["product_title"];
 				$monthInfo["days"]=$monthDays;
+				}
 ////////////////// end update month info
 				array_push($requests,$requestChild);
 			}
@@ -306,7 +329,24 @@ class DBTools {
 ////// 2- request might happened in any day of the month but it happened before the first recurring_date 
 ////// so in both scenario we have to calculate and split the price in to two periods 
 ////// assuming only one request or order in month, and assuming if order made after the 1st day then the remaining days price in already count and product price is for full month
-				
+				if($request_row["action"]==="terminate")
+				{
+				$monthInfo["product_price"]="0";
+				$monthInfo["additional_service_price"]="0";
+				$monthInfo["setup_price"]="0";
+				$monthInfo["router_price"]="0";
+				$monthInfo["modem_price"]="0";
+				$monthInfo["remaining_days_price"]="0";
+				$monthInfo["qst_tax"]="0";
+				$monthInfo["gst_tax"]="0";
+				$monthInfo["adapter_price"]="0";
+				$monthInfo["total_price"]="0";
+				$monthInfo["product_title"]=$request_row["product_title"];
+				$monthInfo["days"]=$monthDays;
+				$monthInfo["action"]="terminated";
+				}
+				else
+				{
 				
 				if( ( (int)$this_action_on_date->format('d')>1 && $hasRequest)
 					|| 
@@ -373,7 +413,7 @@ class DBTools {
 					$monthInfo["total_price"]=(float)$monthInfo["product_price"]+(float)$monthInfo["modem_price"]+(float)$monthInfo["router_price"];
 				}
 				
-				
+				}
 				
 				
 ////////////////// end update month info
