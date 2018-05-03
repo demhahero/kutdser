@@ -196,7 +196,7 @@ class DBTools {
 			$start_active_date = new DateTime($orderChild["start_active_date"]);
 			if(((int)$start_active_date->format('d'))>1)
 			{
-				$recurring_date = new DateTime($start_active_date->format('y')."-".$start_active_date->format('m')."-01 00:00:00");
+				$recurring_date = new DateTime($start_active_date->format('Y')."-".$start_active_date->format('m')."-01 00:00:00");
 				$interval = new DateInterval('P2M');
 				$recurring_date->add($interval);
 				$orderChild["recurring_date"]=$recurring_date->format('Y-m-d');
@@ -535,7 +535,7 @@ $customers = $this->query("SELECT customers.customer_id,resellers.customer_id as
 			//echo "inside2";
 			//echo $invoice[0]["product_price"];
 			$beginDate = new DateTime($invoice[0]["date"]);
-			$date = new DateTime($beginDate->format('y')."-".$beginDate->format('m')."-01 00:00:00");
+			$date = new DateTime($beginDate->format('Y')."-".$beginDate->format('m')."-01 00:00:00");
 			if((int)$beginDate->format('d')===1)
 			{
 				$interval = new DateInterval('P1M');

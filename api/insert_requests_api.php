@@ -30,7 +30,7 @@ function checkRequest($order_id, $dbTools) {
             return false;
         } else {
             $action_on_date = new DateTime($request["action_on_date"]);
-            $action_on_datePlus = new DateTime($action_on_date->format('y') . "-" . $action_on_date->format('m') . "-01 00:00:00");
+            $action_on_datePlus = new DateTime($action_on_date->format('Y') . "-" . $action_on_date->format('m') . "-01 00:00:00");
             $interval = new DateInterval('P1M');
             $action_on_datePlus->add($interval);
             $start_active_date = $action_on_datePlus->format('Y-m-d');
