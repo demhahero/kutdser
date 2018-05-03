@@ -14,8 +14,9 @@ include_once "../header.php";
                     field['reseller'][0]['full_name'],
                     field['phone'],    
                     field['email'], 
-                    '<a href="customer_orders.php?customer_id='+field['order_id']+'">Invoices</a>',
-                    '<a href="customer_orders.php?customer_id='+field['order_id']+'">Orders</a>'
+                    '<a href="customer_orders.php?customer_id='+field['customer_id']+'">Invoices</a>',
+                    '<a href="customer_orders.php?customer_id='+field['customer_id']+'">Orders</a>',
+                    '<a href="customer_by_month.php?customer_id='+field['customer_id']+'&month=4&year=2018">status</a>'
                 ]).draw(false);
             });
         });
@@ -52,12 +53,13 @@ include_once "../header.php";
 <table id="myTable" class="display table table-striped table-bordered">
     <thead>
     <th style="width: 10%">ID</th>
-    <th style="width: 25%">Full Name</th>
+    <th style="width: 20%">Full Name</th>
     <th style="width: 20%">Reseller</th>
     <th style="width: 10%">Phone</th>
-    <th style="width: 25%">Email</th>
+    <th style="width: 20%">Email</th>
     <th style="width: 5%">Invoices</th>
     <th style="width: 5%">Orders</th>
+    <th style="width: 5%">Monthly</th>
 </thead>
 <tbody>
 </tbody>

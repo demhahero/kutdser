@@ -127,8 +127,47 @@ if (isset($_GET["modem_id"])) {
 
 <title>Customer by month</title>
 <div class="page-header">
-    <h4>Customer by month</h4>    
+    <a href="customers.php">Customers</a>
+    <span class="glyphicon glyphicon-play"></span>
+    <a class="last" href="">Customer by month</a>
 </div>
+
+<?php
+$customer_id = intval(filter_input(INPUT_GET, 'customer_id', FILTER_VALIDATE_INT));
+$month = intval(filter_input(INPUT_GET, 'month', FILTER_VALIDATE_INT));
+$year = intval(filter_input(INPUT_GET, 'year', FILTER_VALIDATE_INT));
+?>
+<form class="register-form form-inline" method="get">
+    <input name="customer_id" style="display:none;" value="<?= $customer_id ?>"/>
+    <div class="form-group">
+        <label for="email">Month:</label>
+        <select  name="month" class="form-control">
+            <?php
+            for ($i = 1; $i <= 12; $i++) {
+                if ($month == $i)
+                    echo "<option selected value=\"$i\">$i</option>";
+                else
+                    echo "<option value=\"$i\">$i</option>";
+            }
+            ?>
+
+        </select>
+        <label for="email">Year:</label>
+        <select  name="year" class="form-control">
+            <?php
+            for ($i = 2017; $i <= 2020; $i++) {
+                if ($year == $i)
+                    echo "<option selected value=\"$i\">$i</option>";
+                else
+                    echo "<option value=\"$i\">$i</option>";
+            }
+            ?>
+
+        </select>
+    </div>
+    <input type="submit" class="btn btn-default" value="Search">
+</form>
+<br/>
 
 <h5>Month Info</h5>
 <table class="display table table-striped table-bordered">

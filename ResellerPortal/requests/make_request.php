@@ -43,23 +43,28 @@ if (isset($_POST["action"])) {
         $("select[name=\"action\"]").change(function () {
             if (this.value == "change_speed") {
                 $(".action-value").show();
-            } else{
+            } else {
                 $(".action-value").hide();
             }
         });
-        
+
         $(".submit").click(function () {
-            
-            var order_id = "<?=$order_id?>";
+
+            var order_id = "<?= $order_id ?>";
             var action_on_date = $("input[name=\"action_on_date\"]").val();
             var note = $("textarea[name=\"note\"]").val();
-            var reseller_id = "<?=$reseller_id?>";
+            var reseller_id = "<?= $reseller_id ?>";
             var action_value = $("select[name=\"product_id\"]").val();
             var action = $("select[name=\"action\"]").val();
             var product_id = $("select[name=\"product_id\"]").val();
-            alert(product_id);
-            $.post("<?=$api_url?>insert_requests_api.php", {order_id: order_id, action:action, product_id:product_id, action_on_date: action_on_date, note: note, reseller_id: reseller_id} , function (data, status) {
-                alert("Data: " + data + "\nStatus: " + status);
+            $.post("<?= $api_url ?>insert_requests_api.php", {order_id: order_id, action: action, product_id: product_id, action_on_date: action_on_date, note: note, reseller_id: reseller_id}, function (data, status) {
+                data = $.parseJSON(data);
+                if (data.inserted == true){
+                    alert("Request sent");
+                    location.href = "requests.php";
+                }
+                else
+                    alert("Error, try again");
             });
             return false;
         });

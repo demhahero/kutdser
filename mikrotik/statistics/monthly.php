@@ -6,7 +6,7 @@ include_once "../header.php";
     $(document).ready(function () {
         $('.dataTables_empty').html('<div class="loader"></div>');
 
-        $.getJSON("https://www.amprotelecom.com/draft/api/orders_by_month.php?month=2", function (result) {
+        $.getJSON("<?= $api_url ?>orders_by_month.php?month=2", function (result) {
             $.each(result['orders'], function (i, field) {
                 table.row.add([
                     '<a href="order_details.php?order_id='+field['order_id']+'" >'+field['order_id']+'</a>',

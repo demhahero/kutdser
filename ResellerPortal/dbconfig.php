@@ -7,6 +7,7 @@ include 'tools/DBTools.php';
 $dbTools = new DBTools();
 
 $site_url="http://localhost/kutdser-master/ResellerPortal";
+$api_url = "http://localhost/kutdser-master/api/";
 
 $db_host 	= "localhost";
 $db_username 	= "root";
