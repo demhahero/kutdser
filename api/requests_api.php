@@ -9,6 +9,7 @@ $fields = array(
     "action_on_date" => "action_on_date",
     "creation_date" => "creation_date",
     "product_price" => "product_price",
+    "product_title" => "product_title",
     "note" => "note",
     "verdict" => "verdict",
     );
@@ -34,7 +35,7 @@ $child2="reseller";
 $child3="order";
 $child4="customer";
 
-$requests = $dbTools->request_query_api("SELECT requests.request_id,requests.product_price,requests.verdict,requests.note,orders.order_id,customers.customer_id,customers.full_name,requests.action,requests.action_value,requests.action_on_date,requests.creation_date,resellers.full_name as 'reseller_name',resellers.customer_id as 'reseller_id',admins.admin_id,admins.username FROM requests 
+$requests = $dbTools->request_query_api("SELECT requests.request_id,requests.product_price,requests.product_title,requests.verdict,requests.note,orders.order_id,customers.customer_id,customers.full_name,requests.action,requests.action_value,requests.action_on_date,requests.creation_date,resellers.full_name as 'reseller_name',resellers.customer_id as 'reseller_id',admins.admin_id,admins.username FROM requests
 INNER JOIN `customers` resellers on resellers.`customer_id` = requests.reseller_id
 INNER JOIN orders on orders.order_id = requests.order_id
 INNER JOIN customers on customers.customer_id=orders.customer_id
