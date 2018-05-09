@@ -19,7 +19,7 @@ include_once "../header.php";
                     field['customer']["0"]["full_name"],
                     field['reseller']["0"]["full_name"],
                     field['action'],
-                    field['action_value'],
+                    field['product_title'],
                     action_on_date,
                     field['creation_date'],
                     field['verdict'],
@@ -64,7 +64,7 @@ include_once "../header.php";
     <th style="width: 15%;">Customer</th>
     <th style="width: 15%;">Reseller</th>
     <th style="width: 5%;">Action</th>
-    <th style="width: 5%;">Value</th>
+    <th style="width: 5%;">Product title</th>
     <th style="width: 10%;">Action on Date</th>
     <th style="width: 15%;">Date</th>
     <th style="width: 10%;">Verdict</th>
