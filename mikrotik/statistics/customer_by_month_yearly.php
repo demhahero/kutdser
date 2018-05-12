@@ -17,8 +17,8 @@ if (isset($_GET["modem_id"])) {
 <script>
     $(document).ready(function () {
         $('.dataTables_empty').html('<div class="loader"></div>');
-	
-        $.getJSON("<?= $api_url ?>orders_by_month_for_customer.php?customer_id=<?= $_GET["customer_id"] ?>&month=<?= $_GET["month"] ?>&year=<?= $_GET["year"] ?>", function (result) {
+
+        $.getJSON("<?= $api_url ?>orders_by_month_for_customer_yearly.php?customer_id=<?= $_GET["customer_id"] ?>&month=<?= $_GET["month"] ?>&year=<?= $_GET["year"] ?>", function (result) {
                     var total=0;
 					var totalWT=0;
 					$.each(result['orders'], function (i, field) {
@@ -33,11 +33,29 @@ if (isset($_GET["modem_id"])) {
                         $(".order-product-title").html(field["product_title"]);
                         $(".order-product-price").html(field["product_price"] + "$");
 
-                        
-                        $.each(field["requests"], function (i2, field2) {
-                            $("table.requests").append('<tr><td>' + field2["creation_date"] + '</td><td>' + field2["action_on_date"] + '</td><td>' + field2["product_title"] + "$" + '</td><td>' + field2["product_price"] + '</td></tr>');
-                        });
-						
+						if(field["requests"].length===1)
+						{
+							$.each(field["requests"], function (i2, field2) {
+								$("table.requests").append('<tr><td>' + field2["action"] + '</td><td>' + field2["action_on_date"] + '</td><td>' + field2["product_title"] + "$" + '</td><td>' + field2["product_price"] + '</td></tr>');
+							});
+						}
+						else{
+							for(var i=field["requests"].length-2;i>=0;i--)
+							{
+								
+									
+								$("table.requests").append(
+								'<tr><td>' 
+								+ field["requests"][i]["action"] 
+								+ '</td><td>' 
+								+ field["requests"][i]["action_on_date"] 
+								+ '</td><td>' 
+								+ field["requests"][i]["product_title"] + "$" 
+								+ '</td><td>' 
+								+ field["requests"][i]["product_price"] + '</td></tr>');
+							}
+						}
+
 						$.each(field["monthInfo"], function (i2, monthInfo) {
 							var product_price=parseFloat(monthInfo["product_price"]).toFixed(2);
 							var product_title=monthInfo["product_title"];
@@ -75,13 +93,13 @@ if (isset($_GET["modem_id"])) {
 							+'<td>'+parseFloat(monthInfo["total_price_with_tax"]).toFixed(2)+'</td>'
 							+'<td>'+parseFloat(monthInfo["total_price_with_tax_p7"]).toFixed(2)+'</td>'
 							+'</tr>');
-							
+
                         });
-						
-                        
-                        
+
+
+
                     });
-					
+
 					$("table.invoice").append('<tr>'
 							+'<td></td>'
 							+'<td></td>'
@@ -91,10 +109,10 @@ if (isset($_GET["modem_id"])) {
 							//+'<td></td>'
 							+'<td colspan="3">Total Price for all orders</td>'
 							+'<td>'+total.toFixed(2)+'</td>'
-							+'<td colspan="3">Total Price for all orders With Tax</td>'
+							+'<td colspan="3">Total Price with Tax for all orders</td>'
 							+'<td>'+totalWT.toFixed(2)+'</td>'
 							+'</tr>');
-							
+
                 });
             });
 </script>
@@ -124,7 +142,7 @@ if (isset($_GET["modem_id"])) {
 
 <title>Customer by month</title>
 <div class="page-header">
-    <h4>Customer by month</h4>    
+    <h4>Customer by month</h4>
 </div>
 
 <h5>Month Info</h5>
@@ -137,11 +155,11 @@ if (isset($_GET["modem_id"])) {
     <tr>
         <td style="width:20%;">Product Price</td>
         <td class="product-price"></td>
-    </tr> 
+    </tr>
     <tr>
         <td style="width:20%;">Remaining Days Price</td>
         <td class="remaining-days-price"></td>
-    </tr> 
+    </tr>
     <tr>
         <td style="width:20%;">Router Price</td>
         <td class="router-price"></td>
@@ -175,28 +193,29 @@ if (isset($_GET["modem_id"])) {
 <table class="invoice display table table-striped table-bordered">
     <tr>
         <td style="width:20%;">Product Title</td>
-        
+
         <td style="width:20%;">Product Price</td>
-        
+
         <td style="width:20%;">Remaining Days Price</td>
-      
+
         <td style="width:20%;">Router Price</td>
-       
+
         <td style="width:20%;">Modem Price</td>
-        
+
         <td style="width:20%;">Setup Price</td>
-        
+
         <td style="width:20%;">Additional Service Price</td>
-		
-		<td style="width:20%;">Total Price WoT</td>
-       
+
+        <td style="width:20%;">Total price WoT</td>
+
         <td style="width:20%;">qst tax</td>
-        
+
         <td style="width:20%;">gst tax</td>
-        
-        <td style="width:20%;">Total Price WT</td>
-		<td style="width:20%;">Total Price WT plus 7$ CST</td>
-        
+
+        <td style="width:20%;">Total price WT</td>
+
+        <td style="width:20%;">Total Price Plus 7$ CST</td>
+
     </tr>
 </table>
 <h5>Order</h5>
@@ -208,14 +227,14 @@ if (isset($_GET["modem_id"])) {
     <tr>
         <td style="width:20%;">Order - Product Price</td>
         <td class="order-product-price"></td>
-    </tr>  
+    </tr>
 </table>
 
 <h5>Requests</h5>
 <table class="requests display table table-striped table-bordered">
     <tr>
-        <td style="width:20%;">Creation Date</td>
-        <td style="width:20%;">Action on Date</td>
+        <td style="width:20%;">action</td>
+        <td style="width:20%;">Date</td>
         <td style="width:20%;">Product Title</td>
         <td style="width:20%;">Product Price</td>
 

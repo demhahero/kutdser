@@ -17,9 +17,10 @@ $customer_id=$_GET['customer_id'];
 $year=$_GET['year'];
 $month=$_GET['month'];
 
+
 //$orders = $dbTools->order_requests_query_api($customer_id,$year,$month);
-$orders=$dbTools->orders_by_month($customer_id,$year,$month);
-//$orders=$dbTools->orders_by_month_yearly($customer_id,$year,$month);
+//$orders=$dbTools->orders_by_month($customer_id,$year,$month);
+$orders=$dbTools->orders_by_month_yearly($customer_id,$year,$month);
 
 $json = json_encode($orders);
 echo "{\"orders\" :" ,$json , ",\"error\" :null}";
