@@ -1,5 +1,5 @@
 <?php
-include_once "../header.php";
+include_once "../../header.php";
 ?>
 
 <?php
@@ -42,16 +42,16 @@ if (isset($_GET["modem_id"])) {
 						else{
 							for(var i=field["requests"].length-2;i>=0;i--)
 							{
-								
-									
+
+
 								$("table.requests").append(
-								'<tr><td>' 
-								+ field["requests"][i]["action"] 
-								+ '</td><td>' 
-								+ field["requests"][i]["action_on_date"] 
-								+ '</td><td>' 
-								+ field["requests"][i]["product_title"] + "$" 
-								+ '</td><td>' 
+								'<tr><td>'
+								+ field["requests"][i]["action"]
+								+ '</td><td>'
+								+ field["requests"][i]["action_on_date"]
+								+ '</td><td>'
+								+ field["requests"][i]["product_title"] + "$"
+								+ '</td><td>'
 								+ field["requests"][i]["product_price"] + '</td></tr>');
 							}
 						}
@@ -241,5 +241,5 @@ if (isset($_GET["modem_id"])) {
     </tr>
 </table>
 <?php
-include_once "../footer.php";
+include_once "../../footer.php";
 ?>

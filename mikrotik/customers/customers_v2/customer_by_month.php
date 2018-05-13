@@ -1,5 +1,5 @@
 <?php
-include_once "../header.php";
+include_once "../../header.php";
 ?>
 
 <?php
@@ -17,7 +17,7 @@ if (isset($_GET["modem_id"])) {
 <script>
     $(document).ready(function () {
         $('.dataTables_empty').html('<div class="loader"></div>');
-	
+
         $.getJSON("<?= $api_url ?>orders_by_month_for_customer.php?customer_id=<?= $_GET["customer_id"] ?>&month=<?= $_GET["month"] ?>&year=<?= $_GET["year"] ?>", function (result) {
                     var total=0;
 					var totalWT=0;
@@ -29,15 +29,21 @@ if (isset($_GET["modem_id"])) {
                         var request_action_on_date;
                         var current_product_price;
                         var current_product_title;
+                        $("table.orders").append(
+                        '<tr>'
+                            +'<td style="width:20%;">#'+(i+1)+'</td>'
+                            +'<td >'+field["product_title"]+'</td>'
+                            +'<td style="width:20%;">'+field["start_active_date"]+'</td>'
+                            +'<td style="width:20%;">'+field["recurring_date"]+'</td>'
+                            +'<td>'+field["product_price"]+'</td>'
+          							+'</tr>');
 
-                        $(".order-product-title").html(field["product_title"]);
-                        $(".order-product-price").html(field["product_price"] + "$");
 
-                        
+
                         $.each(field["requests"], function (i2, field2) {
                             $("table.requests").append('<tr><td>' + field2["creation_date"] + '</td><td>' + field2["action_on_date"] + '</td><td>' + field2["product_title"] + "$" + '</td><td>' + field2["product_price"] + '</td></tr>');
                         });
-						
+
 						$.each(field["monthInfo"], function (i2, monthInfo) {
 							var product_price=parseFloat(monthInfo["product_price"]).toFixed(2);
 							var product_title=monthInfo["product_title"];
@@ -75,13 +81,13 @@ if (isset($_GET["modem_id"])) {
 							+'<td>'+parseFloat(monthInfo["total_price_with_tax"]).toFixed(2)+'</td>'
 							+'<td>'+parseFloat(monthInfo["total_price_with_tax_p7"]).toFixed(2)+'</td>'
 							+'</tr>');
-							
+
                         });
-						
-                        
-                        
+
+
+
                     });
-					
+
 					$("table.invoice").append('<tr>'
 							+'<td></td>'
 							+'<td></td>'
@@ -94,7 +100,7 @@ if (isset($_GET["modem_id"])) {
 							+'<td colspan="3">Total Price for all orders With Tax</td>'
 							+'<td>'+totalWT.toFixed(2)+'</td>'
 							+'</tr>');
-							
+
                 });
             });
 </script>
@@ -124,7 +130,7 @@ if (isset($_GET["modem_id"])) {
 
 <title>Customer by month</title>
 <div class="page-header">
-    <h4>Customer by month</h4>    
+    <h4>Customer by month</h4>
 </div>
 
 <h5>Month Info</h5>
@@ -137,11 +143,11 @@ if (isset($_GET["modem_id"])) {
     <tr>
         <td style="width:20%;">Product Price</td>
         <td class="product-price"></td>
-    </tr> 
+    </tr>
     <tr>
         <td style="width:20%;">Remaining Days Price</td>
         <td class="remaining-days-price"></td>
-    </tr> 
+    </tr>
     <tr>
         <td style="width:20%;">Router Price</td>
         <td class="router-price"></td>
@@ -175,40 +181,39 @@ if (isset($_GET["modem_id"])) {
 <table class="invoice display table table-striped table-bordered">
     <tr>
         <td style="width:20%;">Product Title</td>
-        
+
         <td style="width:20%;">Product Price</td>
-        
+
         <td style="width:20%;">Remaining Days Price</td>
-      
+
         <td style="width:20%;">Router Price</td>
-       
+
         <td style="width:20%;">Modem Price</td>
-        
+
         <td style="width:20%;">Setup Price</td>
-        
+
         <td style="width:20%;">Additional Service Price</td>
-		
+
 		<td style="width:20%;">Total Price WoT</td>
-       
+
         <td style="width:20%;">qst tax</td>
-        
+
         <td style="width:20%;">gst tax</td>
-        
+
         <td style="width:20%;">Total Price WT</td>
 		<td style="width:20%;">Total Price WT plus 7$ CST</td>
-        
+
     </tr>
 </table>
 <h5>Order</h5>
-<table class="display table table-striped table-bordered">
-    <tr>
-        <td style="width:20%;">Order - Product Title</td>
-        <td class="order-product-title"></td>
-    </tr>
-    <tr>
-        <td style="width:20%;">Order - Product Price</td>
-        <td class="order-product-price"></td>
-    </tr>  
+<table class="orders display table table-striped table-bordered">
+<tr>
+  <td>#No</td>
+  <td>Title</td>
+  <td>Start Active Date</td>
+  <td>Recurring Date</td>
+  <td>Price</td>
+</tr>
 </table>
 
 <h5>Requests</h5>
@@ -222,5 +227,5 @@ if (isset($_GET["modem_id"])) {
     </tr>
 </table>
 <?php
-include_once "../footer.php";
+include_once "../../footer.php";
 ?>
