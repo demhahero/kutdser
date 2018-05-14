@@ -24,7 +24,7 @@ class DBTools {
     private $db_host = "localhost";
     private $db_username = "root";
     private $db_password = "";
-    private $db_name = 'router'; //database name
+    private $db_name = 'routers_2018_05_14'; //database name
     private $conn_routers;
     private $query_result;
 
@@ -289,8 +289,8 @@ class DBTools {
 				$monthInfo["modem"]=$order_row["modem"];
 				$monthInfo["router"]=$order_row["router"];
 				$monthInfo["remaining_days_price"]="0";
-				$monthInfo["qst_tax"]=$order_row["qst_tax"];
-				$monthInfo["gst_tax"]=$order_row["gst_tax"];
+				$monthInfo["qst_tax"]=$qst_tax;
+				$monthInfo["gst_tax"]=$gst_tax;
 				$monthInfo["adapter_price"]="0";
 				$monthInfo["product_title"]=$order_row["product_title"];
 				$monthInfo["days"]=$startEndRecurringDate["start_date"]->diff($startEndRecurringDate["end_date"])->days;
@@ -804,6 +804,8 @@ class DBTools {
 
 		while ($order_row = $this->fetch_assoc($ordersResult)) {
 			$monthsInfo=array();
+      $tempDate = new DateTime($year."-".$month."-01");
+      $postDate = new DateTime($year."-".$month."-".$tempDate->format( 't' ));
 
 
 			$orderChild = array();
@@ -850,6 +852,12 @@ class DBTools {
 				continue;
 			}
 			$start_active_date = new DateTime($orderChild["start_active_date"]);
+      if(
+				((int)$postDate->format('Y')<(int)$start_active_date->format('Y'))
+				||
+				((int)$postDate->format('m')<(int)$start_active_date->format('m') && (int)$postDate->format('Y')===(int)$start_active_date->format('Y'))
+			)
+				continue;
 			if(((int)$start_active_date->format('d'))>1)
 			{
 				$recurring_date = new DateTime($start_active_date->format('Y')."-".$start_active_date->format('m')."-01 00:00:00");
@@ -1010,7 +1018,7 @@ class DBTools {
 					$gst_tax=$totalPriceWoT*0.05;
 
 					$totalPriceWT=$totalPriceWoT+$qst_tax+$gst_tax;
-					$totalPriceWT7=$totalPriceWT+7;
+					$totalPriceWT7=$totalPriceWT;
 
 					$monthInfo["total_price_with_out_tax"]=round($totalPriceWoT,2, PHP_ROUND_HALF_UP);
 					$monthInfo["total_price_with_tax"]=round($totalPriceWT,2, PHP_ROUND_HALF_UP);
@@ -1113,9 +1121,11 @@ class DBTools {
 
 					$previous_product_price= (((float)$monthInfo["product_price"])/$monthDays)*$previous_days;
 
-					$priceDifference=$this_product_price-((float)$monthInfo["product_price"]-$previous_product_price);
+					$priceDifference=$this_product_price+$previous_product_price;//-(float)$monthInfo["product_price"];
+
 					$monthInfo["product_price_previous"]=$monthInfo["product_price"];
-          $monthInfo["product_price_current"]=$request_row["product_price"];
+          $monthInfo["product_price_current"]=(float)$request_row["product_price"];
+          //$totalPriceWoT=(float)$monthInfo["product_price"]+$priceDifference;
 
 					$monthInfo["product_price"]=$previous_product_price;
 					$monthInfo["product_price_2"]=$this_product_price;
@@ -1123,6 +1133,7 @@ class DBTools {
 					$monthInfo["days"]=$previous_days;
 					$monthInfo["days_2"]=$this_request_days;
 
+          //echo $monthInfo["product_price"]."-".$priceDifference;
 					$totalPriceWoT=$priceDifference;
 
 					$qst_tax=abs($totalPriceWoT)*0.09975;

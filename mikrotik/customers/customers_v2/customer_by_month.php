@@ -41,14 +41,15 @@ if (isset($_GET["modem_id"])) {
 
 
                         $.each(field["requests"], function (i2, field2) {
-                            $("table.requests").append('<tr><td>' + field2["creation_date"] + '</td><td>' + field2["action_on_date"] + '</td><td>' + field2["product_title"] + "$" + '</td><td>' + field2["product_price"] + '</td></tr>');
+                            $("table.requests").append('<tr><td>' + field2["action"] + '</td><td>' + field2["action_on_date"] + '</td><td>' + field2["product_title"] + "" + '</td><td>' + field2["product_price"] + '$</td></tr>');
                         });
 
 						$.each(field["monthInfo"], function (i2, monthInfo) {
 							var product_price=parseFloat(monthInfo["product_price"]).toFixed(2);
 							var product_title=monthInfo["product_title"];
 							var days=monthInfo["days"];
-							if(monthInfo["product_price_2"])
+              if (typeof monthInfo["product_price_2"] !== 'undefined' && monthInfo["product_price_2"] !== null)
+
 							{
 								product_title=monthInfo["product_title"]+" ("+monthInfo["days"]+" days), "+monthInfo["product_title_2"]+" ("+monthInfo["days_2"]+" days)";
 								product_price=monthInfo["product_price"].toFixed(2)+"$, "+monthInfo["product_price_2"].toFixed(2)+"$";
@@ -219,7 +220,7 @@ if (isset($_GET["modem_id"])) {
 <h5>Requests</h5>
 <table class="requests display table table-striped table-bordered">
     <tr>
-        <td style="width:20%;">Creation Date</td>
+        <td style="width:20%;">Action</td>
         <td style="width:20%;">Action on Date</td>
         <td style="width:20%;">Product Title</td>
         <td style="width:20%;">Product Price</td>
