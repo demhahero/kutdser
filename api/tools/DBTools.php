@@ -24,7 +24,7 @@ class DBTools {
     private $db_host = "localhost";
     private $db_username = "root";
     private $db_password = "";
-    private $db_name = 'routers_2018_05_14'; //database name
+    private $db_name = 'router'; //database name
     private $conn_routers;
     private $query_result;
 
@@ -1888,4 +1888,63 @@ $customers = $this->query("SELECT customers.customer_id,resellers.customer_id as
         return $routers;
     }
 
+    public function tik_monitoring_query_api($queryString, $fields, $child = null, $childFields = null, $child2 = null, $child2Fields = null, $child3 = null, $child3Fields = null) {
+        $customers = array();
+
+        $this->query("SET CHARACTER SET utf8");
+
+
+        $customers_result = $this->query($queryString);
+        while ($customer_row = $this->fetch_assoc($customers_result)) {
+            if (isset($customers[$customer_row['customer_id']])) {
+
+                if ($child2 != null) {
+                    $customerChildArray = $customers[$customer_row['customer_id']][$child2];
+                    $customerChild = array();
+                    foreach ($child2Fields as $childKey => $childValue) {
+                        $customerChild[$childKey] = $customer_row[$childValue];
+                    }
+                    array_push($customerChildArray, $customerChild);
+                    $customers[$customer_row['customer_id']][$child2] = $customerChildArray;
+                }
+            } else {
+                $customers[$customer_row['customer_id']] = array();
+                foreach ($fields as $key => $value) {
+                    $customers[$customer_row['customer_id']][$key] = $customer_row[$value];
+                }
+                if ($child != null) {
+                    $customerChildArray = array();
+                    $customerChild = array();
+                    foreach ($childFields as $childKey => $childValue) {
+                        $customerChild[$childKey] = $customer_row[$childValue];
+                    }
+                    array_push($customerChildArray, $customerChild);
+                    $customers[$customer_row['customer_id']][$child] = $customerChildArray;
+                }
+                if ($child2 != null) {
+                    $customerChildArray = array();
+                    $customerChild = array();
+                    foreach ($child2Fields as $childKey => $childValue) {
+                        $customerChild[$childKey] = $customer_row[$childValue];
+                    }
+                    array_push($customerChildArray, $customerChild);
+                    $customers[$customer_row['customer_id']][$child2] = $customerChildArray;
+                }
+                if ($child3 != null) {
+                    $customerChildArray = array();
+                    $customerChild = array();
+                    foreach ($child3Fields as $childKey => $childValue) {
+                        $customerChild[$childKey] = $customer_row[$childValue];
+                    }
+                    array_push($customerChildArray, $customerChild);
+                    $customers[$customer_row['customer_id']][$child3] = $customerChildArray;
+                }
+            }
+        }
+        $customersPure = array();
+        foreach ($customers as $row) {
+            array_push($customersPure, $row);
+        }
+        return $customersPure;
+    }    
 }

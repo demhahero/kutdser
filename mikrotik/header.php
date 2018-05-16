@@ -88,6 +88,7 @@ include_once "dbconfig.php";
                                 <li><a href="<?= $site_url ?>/requests/requests.php">Requests</a></li>
                             </ul>
                         </li>
+                        <li><a href="<?= $site_url ?>/tik_monitoring/customers.php">Support</a></li>
                     </ul>
                     <ul class="nav navbar-nav navbar-right">
                         <li><a href="#">Hello "<?= $username; ?>"</a></li>
