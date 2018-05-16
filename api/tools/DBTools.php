@@ -22,9 +22,11 @@ include "RouterTools.php";
 class DBTools {
 
     private $db_host = "localhost";
+
     private $db_username = "root";
     private $db_password = "";
-    private $db_name = 'routers_2018_05_14'; //database name
+    private $db_name = 'router'; //database name
+
     private $conn_routers;
     private $query_result;
 
@@ -181,8 +183,18 @@ class DBTools {
 
         $this->query("SET CHARACTER SET utf8");
 
-		$ordersResult = $this->query("SELECT * from orders inner join order_options on orders.order_id= order_options.order_id where product_subscription_type='yearly' and
-		customer_id=".$customer_id);
+    $query="SELECT
+        orders.*,order_options.*,merchantrefs.*
+        ,resellers.full_name as 'reseller_name',`customers`.`full_name` as 'customer_name'
+        from orders
+        INNER JOIN `customers` on `orders`.`customer_id`=`customers`.`customer_id`
+        INNER JOIN `customers` resellers on resellers.`customer_id` = `orders`.`reseller_id`
+        INNER join order_options on orders.order_id= order_options.order_id
+        LEFT join merchantrefs on orders.order_id= merchantrefs.order_id
+        where product_subscription_type='yearly' and
+    		orders.customer_id=".$customer_id;
+        //echo $query;
+		$ordersResult = $this->query($query);
 
 		$orders=array();
 
@@ -194,18 +206,20 @@ class DBTools {
 
 			$orderChild = array();
 			$orderChild["order_id"]=$order_row["order_id"];
+      $orderChild["reseller_name"]=$order_row["reseller_name"];
+      $orderChild["customer_name"]=$order_row["customer_name"];
 			$orderChild["creation_date"] = $order_row["creation_date"];
-			$orderChild["total_price"]=$order_row["total_price"];
-			$orderChild["product_price"]=$order_row["product_price"];
-			$orderChild["additional_service_price"]=$order_row["additional_service_price"];
-			$orderChild["setup_price"]=$order_row["setup_price"];
-			$orderChild["modem_price"]=$order_row["modem_price"];
+			$orderChild["total_price"]=is_numeric($order_row["total_price"])?$order_row["total_price"]:0;
+			$orderChild["product_price"]=is_numeric($order_row["product_price"])?$order_row["product_price"]:0;
+			$orderChild["additional_service_price"]=is_numeric($order_row["additional_service_price"])?$order_row["additional_service_price"]:0;
+			$orderChild["setup_price"]=is_numeric($order_row["setup_price"])?$order_row["setup_price"]:0;
+			$orderChild["modem_price"]=is_numeric($order_row["modem_price"])?$order_row["modem_price"]:0;
 
-			$orderChild["router_price"]=$order_row["router_price"];
-			$orderChild["remaining_days_price"]=$order_row["remaining_days_price"];
-			$orderChild["qst_tax"]=$order_row["qst_tax"];
-			$orderChild["gst_tax"]=$order_row["gst_tax"];
-			$orderChild["adapter_price"]=$order_row["adapter_price"];
+			$orderChild["router_price"]=is_numeric($order_row["router_price"])?$order_row["router_price"]:0;
+			$orderChild["remaining_days_price"]=is_numeric($order_row["remaining_days_price"])?$order_row["remaining_days_price"]:0;
+			$orderChild["qst_tax"]=is_numeric($order_row["qst_tax"])?$order_row["qst_tax"]:0;
+			$orderChild["gst_tax"]=is_numeric($order_row["gst_tax"])?$order_row["gst_tax"]:0;
+			$orderChild["adapter_price"]=is_numeric($order_row["adapter_price"])?$order_row["adapter_price"]:0;
 
 			$orderChild["plan"]=$order_row["plan"];
 			$orderChild["modem"]=$order_row["modem"];
@@ -219,6 +233,12 @@ class DBTools {
 			$orderChild["product_title"]=$order_row["product_title"];
 			$orderChild["product_category"]=$order_row["product_category"];
 			$orderChild["product_subscription_type"]=$order_row["product_subscription_type"];
+
+      $orderChild["payment_method"]="Cash on Delivery";
+      if($order_row["is_credit"]==="yes")
+      {
+        $orderChild["payment_method"]="VISA";
+      }
 
 			if($order_row["product_category"]==="phone"){
 				$orderChild["start_active_date"]=$order_row["creation_date"];
@@ -267,7 +287,7 @@ class DBTools {
 			$startEndRecurringDate=$this->getRecurringDateForDate($start_active_date,$recurring_date,$postDate);
 			if($startEndRecurringDate["start_date"]!== $start_active_date)
 			{
-				$product_price=(float)$order_row["product_price"];
+				$product_price=(float)$orderChild["product_price"];
 				$totalPriceWoT=$product_price;
 
 				$qst_tax=$totalPriceWoT*0.09975;
@@ -275,20 +295,20 @@ class DBTools {
 
 				$totalPriceWT=$totalPriceWoT+$qst_tax+$gst_tax;
 
-
+        $monthInfo["total_price_with_out_router"]=round($totalPriceWoT,2, PHP_ROUND_HALF_UP);
 				$monthInfo["total_price_with_out_tax"]=round($totalPriceWoT,2, PHP_ROUND_HALF_UP);
 				$monthInfo["total_price_with_tax"]=round($totalPriceWT,2, PHP_ROUND_HALF_UP);
 				$monthInfo["total_price_with_tax_p7"]=round($totalPriceWT,2, PHP_ROUND_HALF_UP);
 
-				$monthInfo["product_price"]=$order_row["product_price"];
-				$monthInfo["additional_service_price"]="0";
-				$monthInfo["setup_price"]="0";
-				$monthInfo["modem_price"]=$order_row["modem_price"];
-				$monthInfo["router_price"]=$order_row["router_price"];
-				$monthInfo["plan"]=$order_row["plan"];
-				$monthInfo["modem"]=$order_row["modem"];
+				$monthInfo["product_price"]=$orderChild["product_price"];
+				$monthInfo["additional_service_price"]=0;
+				$monthInfo["setup_price"]=0;
+				$monthInfo["modem_price"]=$orderChild["modem_price"];
+				$monthInfo["router_price"]=$orderChild["router_price"];
+				$monthInfo["plan"]=$orderChild["plan"];
+				$monthInfo["modem"]=$orderChild["modem"];
 				$monthInfo["router"]=$order_row["router"];
-				$monthInfo["remaining_days_price"]="0";
+				$monthInfo["remaining_days_price"]=0;
 				$monthInfo["qst_tax"]=$qst_tax;
 				$monthInfo["gst_tax"]=$gst_tax;
 				$monthInfo["adapter_price"]="0";
@@ -309,19 +329,20 @@ class DBTools {
 ////////////////// update month info
 					if($request_row["action"]==="terminate")
 					{
+            $monthInfo["total_price_with_out_router"]=0;
 						$monthInfo["total_price_with_out_tax"]=0;
 						$monthInfo["total_price_with_tax"]=0;
 						$monthInfo["total_price_with_tax_p7"]=0;
 						$monthInfo["product_price"]=0;
-						$monthInfo["additional_service_price"]="0";
-						$monthInfo["setup_price"]="0";
-						$monthInfo["router_price"]="0";
-						$monthInfo["modem_price"]="0";
-						$monthInfo["remaining_days_price"]="0";
+						$monthInfo["additional_service_price"]=0;
+						$monthInfo["setup_price"]=0;
+						$monthInfo["router_price"]=0;
+						$monthInfo["modem_price"]=0;
+						$monthInfo["remaining_days_price"]=0;
 						$monthInfo["qst_tax"]=round($qst_tax,2, PHP_ROUND_HALF_UP);
 						$monthInfo["gst_tax"]=round($gst_tax,2, PHP_ROUND_HALF_UP);
-						$monthInfo["adapter_price"]="0";
-						$monthInfo["total_price"]="0";
+						$monthInfo["adapter_price"]=0;
+						$monthInfo["total_price"]=0;
 						$monthInfo["product_title"]=$request_row["product_title"];
 						$monthInfo["days"]=$startEndRecurringDate["start_date"]->diff($startEndRecurringDate["end_date"])->days;
 						$monthInfo["action"]="recurring";
@@ -339,22 +360,23 @@ class DBTools {
 					$totalPriceWT=$totalPriceWoT+$qst_tax+$gst_tax;
 
 
+          $monthInfo["total_price_with_out_router"]=round($totalPriceWoT,2, PHP_ROUND_HALF_UP);
 					$monthInfo["total_price_with_out_tax"]=round($totalPriceWoT,2, PHP_ROUND_HALF_UP);
 					$monthInfo["total_price_with_tax"]=round($totalPriceWT,2, PHP_ROUND_HALF_UP);
 					$monthInfo["total_price_with_tax_p7"]=round($totalPriceWT,2, PHP_ROUND_HALF_UP);
 
 					$monthInfo["product_price"]=round($request_row["product_price"],2, PHP_ROUND_HALF_UP);
-					$monthInfo["additional_service_price"]="0";
-					$monthInfo["setup_price"]="0";
+					$monthInfo["additional_service_price"]=0;
+					$monthInfo["setup_price"]=0;
 					$monthInfo["plan"]=$order_row["plan"];
 					$monthInfo["modem"]=$order_row["modem"];
 					$monthInfo["router"]=$order_row["router"];
-					$monthInfo["router_price"]="0";
-						$monthInfo["modem_price"]="0";
-					$monthInfo["remaining_days_price"]="0";
+					$monthInfo["router_price"]=0;
+						$monthInfo["modem_price"]=0;
+					$monthInfo["remaining_days_price"]=0;
 					$monthInfo["qst_tax"]=round($qst_tax,2, PHP_ROUND_HALF_UP);
 					$monthInfo["gst_tax"]=round($gst_tax,2, PHP_ROUND_HALF_UP);
-					$monthInfo["adapter_price"]="0";
+					$monthInfo["adapter_price"]=0;
 					$monthInfo["product_title"]=$request_row["product_title"];
 					$monthInfo["days"]=$startEndRecurringDate["start_date"]->diff($startEndRecurringDate["end_date"])->days;
 					$monthInfo["action"]="recurring";
@@ -373,15 +395,15 @@ class DBTools {
 			$startSubscriptionYearlyDate->sub($interval);
 
 			$yearDays=$recurring_date->diff($startSubscriptionYearlyDate)->days;
-			$oneDayPrice=(float)$order_row["product_price"]/(int)$yearDays;
+			$oneDayPrice=(float)$orderChild["product_price"]/(int)$yearDays;
 			$remaining_days_price=$oneDayPrice*$remaining_days;
 
-			$product_price=(float)$order_row["product_price"];
-			$additional_service_price=(float)$order_row["additional_service_price"];
-			$setup_price=(float)$order_row["setup_price"];
-			$modem_price=(float)$order_row["modem_price"];
-			$router_price=(float)$order_row["router_price"];
-			$adapter_price=(float)$order_row["adapter_price"];
+			$product_price=(float)$orderChild["product_price"];
+			$additional_service_price=(float)$orderChild["additional_service_price"];
+			$setup_price=(float)$orderChild["setup_price"];
+			$modem_price=(float)$orderChild["modem_price"];
+			$router_price=(float)$orderChild["router_price"];
+			$adapter_price=(float)$orderChild["adapter_price"];
 
 			/*
 			echo "</br> remaining_days_price: ".$remaining_days_price;
@@ -394,22 +416,22 @@ class DBTools {
 			*/
 
 			$totalPriceWoT=$remaining_days_price+$product_price+$additional_service_price+$setup_price+$modem_price+$router_price+$adapter_price;
-
+      $totalPriceWoR=$remaining_days_price+$product_price;
 			$qst_tax=$totalPriceWoT*0.09975;
 			$gst_tax=$totalPriceWoT*0.05;
 
 			$totalPriceWT=$totalPriceWoT+$qst_tax+$gst_tax;
 			$totalPriceWT7=$totalPriceWT;
 
-
+      $monthInfo["total_price_with_out_router"]=round($totalPriceWoR,2, PHP_ROUND_HALF_UP);
 			$monthInfo["total_price_with_out_tax"]=round($totalPriceWoT,2, PHP_ROUND_HALF_UP);
 			$monthInfo["total_price_with_tax"]=round($totalPriceWT,2, PHP_ROUND_HALF_UP);
 			$monthInfo["total_price_with_tax_p7"]=round($totalPriceWT7,2, PHP_ROUND_HALF_UP);
-			$monthInfo["product_price"]=(float)$order_row["product_price"];
-			$monthInfo["additional_service_price"]=$order_row["additional_service_price"];
-			$monthInfo["setup_price"]=$order_row["setup_price"];
-			$monthInfo["modem_price"]=$order_row["modem_price"];
-			$monthInfo["router_price"]=$order_row["router_price"];
+			$monthInfo["product_price"]=(float)$orderChild["product_price"];
+			$monthInfo["additional_service_price"]=$orderChild["additional_service_price"];
+			$monthInfo["setup_price"]=$orderChild["setup_price"];
+			$monthInfo["modem_price"]=$orderChild["modem_price"];
+			$monthInfo["router_price"]=$orderChild["router_price"];
 			$monthInfo["plan"]=$order_row["plan"];
 			$monthInfo["modem"]=$order_row["modem"];
 			$monthInfo["router"]=$order_row["router"];
@@ -417,7 +439,7 @@ class DBTools {
 			$monthInfo["remaining_days"]=$remaining_days;
 			$monthInfo["qst_tax"]=round($qst_tax,2, PHP_ROUND_HALF_UP);
 			$monthInfo["gst_tax"]=round($gst_tax,2, PHP_ROUND_HALF_UP);
-			$monthInfo["adapter_price"]=$order_row["adapter_price"];
+			$monthInfo["adapter_price"]=$orderChild["adapter_price"];
 			$monthInfo["product_title"]=$order_row["product_title"];
 			$monthInfo["days"]=$recurring_date->diff($start_active_date)->days;
 			$monthInfo["from"]="order";
@@ -671,7 +693,7 @@ class DBTools {
 			$totalPriceWT7=$totalPriceWT+7; // change speed fee
 
 
-
+      $monthInfo["total_price_with_out_router"]=round($totalPriceWoT,2, PHP_ROUND_HALF_UP);
 			$monthInfo["total_price_with_out_tax"]=round($totalPriceWoT,2, PHP_ROUND_HALF_UP);
 			$monthInfo["total_price_with_tax"]=round($totalPriceWT,2, PHP_ROUND_HALF_UP);
 			$monthInfo["total_price_with_tax_p7"]=round($totalPriceWT7,2, PHP_ROUND_HALF_UP);
@@ -758,6 +780,7 @@ class DBTools {
 			!((int)$postDate->format('m')===(int)$start_active_date->format('m') && (int)$postDate->format('Y')===(int)$start_active_date->format('Y')) &&// and it is not start_active_date same month
 			!((int)$postDate->format('m')===(int)$recurring_date->format('m') && (int)$postDate->format('Y')===(int)$recurring_date->format('Y')))// and it is not recurring_date same month
 			{ // then value should be zero for all prices at this month
+        $monthInfo["total_price_with_out_router"]=0;
 				$monthInfo["total_price_with_out_tax"]=0;
 				$monthInfo["total_price_with_tax"]=0;
 				$monthInfo["total_price_with_tax_p7"]=0;
@@ -797,8 +820,19 @@ class DBTools {
 
         $this->query("SET CHARACTER SET utf8");
 
-		$ordersResult = $this->query("SELECT * from orders inner join order_options on orders.order_id= order_options.order_id  where product_subscription_type='monthly' and
-		customer_id=".$customer_id);
+    $query="SELECT
+        orders.*,order_options.*,merchantrefs.*
+        ,resellers.full_name as 'reseller_name',`customers`.`full_name` as 'customer_name'
+        from orders
+        INNER JOIN `customers` on `orders`.`customer_id`=`customers`.`customer_id`
+        INNER JOIN `customers` resellers on resellers.`customer_id` = `orders`.`reseller_id`
+        INNER join order_options on orders.order_id= order_options.order_id
+        LEFT join merchantrefs on orders.order_id= merchantrefs.order_id
+        where product_subscription_type='monthly' and
+  		orders.customer_id=".$customer_id;
+      //echo $query;
+		$ordersResult = $this->query($query);
+
 
 		$orders=array();
 
@@ -810,18 +844,20 @@ class DBTools {
 
 			$orderChild = array();
 			$orderChild["order_id"]=$order_row["order_id"];
+      $orderChild["reseller_name"]=$order_row["reseller_name"];
+      $orderChild["customer_name"]=$order_row["customer_name"];
 			$orderChild["creation_date"] = $order_row["creation_date"];
-			$orderChild["total_price"]=$order_row["total_price"];
-			$orderChild["product_price"]=$order_row["product_price"];
-			$orderChild["additional_service_price"]=$order_row["additional_service_price"];
-			$orderChild["setup_price"]=$order_row["setup_price"];
-			$orderChild["modem_price"]=$order_row["modem_price"];
+      $orderChild["total_price"]=is_numeric($order_row["total_price"])?$order_row["total_price"]:0;
+			$orderChild["product_price"]=is_numeric($order_row["product_price"])?$order_row["product_price"]:0;
+			$orderChild["additional_service_price"]=is_numeric($order_row["additional_service_price"])?$order_row["additional_service_price"]:0;
+			$orderChild["setup_price"]=is_numeric($order_row["setup_price"])?$order_row["setup_price"]:0;
+			$orderChild["modem_price"]=is_numeric($order_row["modem_price"])?$order_row["modem_price"]:0;
 
-			$orderChild["router_price"]=$order_row["router_price"];
-			$orderChild["remaining_days_price"]=$order_row["remaining_days_price"];
-			$orderChild["qst_tax"]=$order_row["qst_tax"];
-			$orderChild["gst_tax"]=$order_row["gst_tax"];
-			$orderChild["adapter_price"]=$order_row["adapter_price"];
+			$orderChild["router_price"]=is_numeric($order_row["router_price"])?$order_row["router_price"]:0;
+			$orderChild["remaining_days_price"]=is_numeric($order_row["remaining_days_price"])?$order_row["remaining_days_price"]:0;
+			$orderChild["qst_tax"]=is_numeric($order_row["qst_tax"])?$order_row["qst_tax"]:0;
+			$orderChild["gst_tax"]=is_numeric($order_row["gst_tax"])?$order_row["gst_tax"]:0;
+			$orderChild["adapter_price"]=is_numeric($order_row["adapter_price"])?$order_row["adapter_price"]:0;
 
 			$orderChild["plan"]=$order_row["plan"];
 			$orderChild["modem"]=$order_row["modem"];
@@ -834,7 +870,13 @@ class DBTools {
 
 			$orderChild["product_title"]=$order_row["product_title"];
 			$orderChild["product_category"]=$order_row["product_category"];
-			$orderChild["product_subscription_type"]=$order_row["product_subscription_type"];
+
+      $orderChild["payment_method"]="Cash on Delivery";
+      if($order_row["is_credit"]==="yes")
+      {
+        $orderChild["payment_method"]="VISA";
+      }
+      $orderChild["product_subscription_type"]=$order_row["product_subscription_type"];
 
 			if($order_row["product_category"]==="phone"){
 				$orderChild["start_active_date"]=$order_row["creation_date"];
@@ -878,15 +920,15 @@ class DBTools {
 			$remaining_days=(int)$start_active_date->format('t')-(int)$start_active_date->format('d');
 
 			$monthDays=(int)$start_active_date->format('t');
-			$oneDayPrice=(float)$order_row["product_price"]/(int)$monthDays;
+			$oneDayPrice=(float)$orderChild["product_price"]/(int)$monthDays;
 			$remaining_days_price=$oneDayPrice*$remaining_days;
 
-			$product_price=(float)$order_row["product_price"];
-			$additional_service_price=(float)$order_row["additional_service_price"];
-			$setup_price=(float)$order_row["setup_price"];
-			$modem_price=(float)$order_row["modem_price"];
-			$router_price=(float)$order_row["router_price"];
-			$adapter_price=(float)$order_row["adapter_price"];
+			$product_price=(float)$orderChild["product_price"];
+			$additional_service_price=(float)$orderChild["additional_service_price"];
+			$setup_price=(float)$orderChild["setup_price"];
+			$modem_price=(float)$orderChild["modem_price"];
+			$router_price=(float)$orderChild["router_price"];
+			$adapter_price=(float)$orderChild["adapter_price"];
 
 			/*
 			echo "</br> remaining_days_price: ".$remaining_days_price;
@@ -899,26 +941,28 @@ class DBTools {
 			*/
 			$days=$recurring_date->diff($start_active_date)->days;
 			$totalPriceWoT=$remaining_days_price+$product_price+$additional_service_price+$setup_price+$modem_price+$router_price+$adapter_price;
+      $totalPriceWoR=$remaining_days_price+$product_price;
       $qst_tax=$totalPriceWoT*0.09975;
       $gst_tax=$totalPriceWoT*0.05;
 
-      $monthInfo["additional_service_price"]=$order_row["additional_service_price"];
-      $monthInfo["setup_price"]=$order_row["setup_price"];
-      $monthInfo["modem_price"]=$order_row["modem_price"];
-      $monthInfo["router_price"]=$order_row["router_price"];
-      $monthInfo["plan"]=$order_row["plan"];
-      $monthInfo["modem"]=$order_row["modem"];
-      $monthInfo["router"]=$order_row["router"];
+      $monthInfo["additional_service_price"]=$orderChild["additional_service_price"];
+      $monthInfo["setup_price"]=$orderChild["setup_price"];
+      $monthInfo["modem_price"]=$orderChild["modem_price"];
+      $monthInfo["router_price"]=$orderChild["router_price"];
+      $monthInfo["plan"]=$orderChild["plan"];
+      $monthInfo["modem"]=$orderChild["modem"];
+      $monthInfo["router"]=$orderChild["router"];
       $monthInfo["remaining_days_price"]=round($remaining_days_price,2, PHP_ROUND_HALF_UP);
       $monthInfo["qst_tax"]=round($qst_tax,2, PHP_ROUND_HALF_UP);
       $monthInfo["gst_tax"]=round($gst_tax,2, PHP_ROUND_HALF_UP);
-      $monthInfo["adapter_price"]=$order_row["adapter_price"];
-      $monthInfo["product_title"]=$order_row["product_title"];
+      $monthInfo["adapter_price"]=$orderChild["adapter_price"];
+      $monthInfo["product_title"]=$orderChild["product_title"];
       $monthInfo["days"]=$days;
       if($recurring_date->format('Y')<$year
         || ($recurring_date->format('Y')===$year && $recurring_date->format('m')<$month)
         )
         {
+          $totalPriceWoR=$product_price;
           $totalPriceWoT=$product_price+$router_price;
           $qst_tax=$totalPriceWoT*0.09975;
           $gst_tax=$totalPriceWoT*0.05;
@@ -927,19 +971,19 @@ class DBTools {
           $monthInfo["additional_service_price"]=0;
     			$monthInfo["setup_price"]=0;
     			$monthInfo["modem_price"]=0;
-          if($order_row["router"]==='rent')
-             $monthInfo["router_price"]=$order_row["router_price"];
+          if($orderChild["router"]==='rent')
+             $monthInfo["router_price"]=$orderChild["router_price"];
           else {
             $monthInfo["router_price"]=0;
           }
-    			$monthInfo["plan"]=$order_row["plan"];
-    			$monthInfo["modem"]=$order_row["modem"];
-    			$monthInfo["router"]=$order_row["router"];
+    			$monthInfo["plan"]=$orderChild["plan"];
+    			$monthInfo["modem"]=$orderChild["modem"];
+    			$monthInfo["router"]=$orderChild["router"];
     			$monthInfo["remaining_days_price"]=0;
     			$monthInfo["qst_tax"]=round($qst_tax,2, PHP_ROUND_HALF_UP);
     			$monthInfo["gst_tax"]=round($gst_tax,2, PHP_ROUND_HALF_UP);
-    			$monthInfo["adapter_price"]=$order_row["adapter_price"];
-    			$monthInfo["product_title"]=$order_row["product_title"];
+    			$monthInfo["adapter_price"]=$orderChild["adapter_price"];
+    			$monthInfo["product_title"]=$orderChild["product_title"];
     			$monthInfo["days"]=$days;
         }
 
@@ -948,11 +992,12 @@ class DBTools {
 			$totalPriceWT=$totalPriceWoT+$qst_tax+$gst_tax;
 			$totalPriceWT7=$totalPriceWT;
 
+      $monthInfo["total_price_with_out_router"]=round($totalPriceWoR,2, PHP_ROUND_HALF_UP);
 			$monthInfo["total_price_with_out_tax"]=round($totalPriceWoT,2, PHP_ROUND_HALF_UP);
 			$monthInfo["total_price_with_tax"]=round($totalPriceWT,2, PHP_ROUND_HALF_UP);
 			$monthInfo["total_price_with_tax_p7"]=round($totalPriceWT7,2, PHP_ROUND_HALF_UP);
 
-			$monthInfo["product_price"]=round($order_row["product_price"],2, PHP_ROUND_HALF_UP);
+			$monthInfo["product_price"]=round($orderChild["product_price"],2, PHP_ROUND_HALF_UP);
 
 /////////////////// end get month infor from order
 
@@ -991,7 +1036,7 @@ class DBTools {
 				if($request_row["action"]==="terminate")
 				{
 
-
+          $monthInfo["total_price_with_out_router"]=0;
 					$monthInfo["total_price_with_out_tax"]=0;
 					$monthInfo["total_price_with_tax"]=0;
 					$monthInfo["total_price_with_tax_p7"]=0;
@@ -1020,6 +1065,7 @@ class DBTools {
 					$totalPriceWT=$totalPriceWoT+$qst_tax+$gst_tax;
 					$totalPriceWT7=$totalPriceWT;
 
+          $monthInfo["total_price_with_out_router"]=round($totalPriceWoT,2, PHP_ROUND_HALF_UP);
 					$monthInfo["total_price_with_out_tax"]=round($totalPriceWoT,2, PHP_ROUND_HALF_UP);
 					$monthInfo["total_price_with_tax"]=round($totalPriceWT,2, PHP_ROUND_HALF_UP);
 					$monthInfo["total_price_with_tax_p7"]=round($totalPriceWT7,2, PHP_ROUND_HALF_UP);
@@ -1142,6 +1188,7 @@ class DBTools {
 					$totalPriceWT=$totalPriceWoT+$qst_tax+$gst_tax;
 					$totalPriceWT7=$totalPriceWT+7;
 
+          $monthInfo["total_price_with_out_router"]=round($totalPriceWoT,2, PHP_ROUND_HALF_UP);
 					$monthInfo["total_price_with_out_tax"]=round($totalPriceWoT,2, PHP_ROUND_HALF_UP);
 					$monthInfo["total_price_with_tax"]=round($totalPriceWT,2, PHP_ROUND_HALF_UP);
 					$monthInfo["total_price_with_tax_p7"]=round($totalPriceWT7,2, PHP_ROUND_HALF_UP);
@@ -1171,6 +1218,7 @@ class DBTools {
 					$totalPriceWT=$totalPriceWoT+$qst_tax+$gst_tax;
 					$totalPriceWT7=$totalPriceWT+7;
 
+          $monthInfo["total_price_with_out_router"]=round($totalPriceWoT,2, PHP_ROUND_HALF_UP);
 					$monthInfo["total_price_with_out_tax"]=round($totalPriceWoT,2, PHP_ROUND_HALF_UP);
 					$monthInfo["total_price_with_tax"]=round($totalPriceWT,2, PHP_ROUND_HALF_UP);
 					$monthInfo["total_price_with_tax_p7"]=round($totalPriceWT7,2, PHP_ROUND_HALF_UP);

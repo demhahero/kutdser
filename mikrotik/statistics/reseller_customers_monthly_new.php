@@ -1,30 +1,19 @@
 <?php
-include_once "../../header.php";
-?>
-
-<?php
-if (isset($_GET["modem_id"])) {
-
-    $modemTools = $dbTools->objModemTools(intval($_GET["modem_id"]));
-
-    $result = $modemTools->doDelete();
-
-    if ($result)
-        echo "<div class='alert alert-success'>done</div>";
-}
-
+include_once "../header.php";
 ?>
 
 <script>
     $(document).ready(function () {
         $('.dataTables_empty').html('<div class="loader"></div>');
 
-        $.getJSON("<?= $api_url ?>orders_by_month_for_customer.php?customer_id=<?= $_GET["customer_id"] ?>&month=<?= $_GET["month"] ?>&year=<?= $_GET["year"] ?>", function (result) {
+        $.getJSON("<?= $api_url ?>orders_by_month_for_reseller.php?reseller_id=<?= $_GET["reseller_id"] ?>&month=4&year=2018", function (result) {
           var total=0;
           var totalWoR=0;
 					var totalWT=0;
-					$.each(result['orders'], function (i, field) {
-            $('#customer_header').html("Customer Name: "+field["customer_name"]+', Reseller Name: '+field["reseller_name"])
+          $.each(result['customers'], function (index, customers) {
+
+					$.each(customers['orders'], function (i, field) {
+            $(".last").html(field["reseller_name"]+"'s Customers")
                         var product_price;
                         var product_title;
                         var request_product_price;
@@ -72,6 +61,18 @@ if (isset($_GET["modem_id"])) {
               totalWoR+= parseFloat(monthInfo["total_price_with_out_router"]);
 							total+= parseFloat(monthInfo["total_price_with_out_tax"]);
 							totalWT+= parseFloat(monthInfo["total_price_with_tax_p7"]);
+              table.row.add([
+                  customers['customer_id'],
+                  customers['full_name'],
+                  product_title,
+                  field['payment_method'],
+                  field['start_active_date'],
+                  field['recurring_date'],
+                  monthInfo["total_price_with_out_router"],
+                  monthInfo["total_price_with_out_tax"],
+                  monthInfo["total_price_with_tax_p7"]
+              ]).draw(false);
+/*
 							$("table.invoice").append('<tr>'
 							+'<td>'+product_title+'</td>'
               +'<td>'+field["payment_method"]+'</td>'
@@ -88,14 +89,17 @@ if (isset($_GET["modem_id"])) {
 							+'<td>'+parseFloat(monthInfo["total_price_with_tax"]).toFixed(2)+'</td>'
 							+'<td class="bg-danger">'+parseFloat(monthInfo["total_price_with_tax_p7"]).toFixed(2)+'</td>'
 							+'</tr>');
-
+*/
                         });
 
 
 
                     });
 
-					$("table.invoice").append('<tr>'
+          });
+
+
+					$("#totalTable").append('<tr>'
 							+'<td></td>'
               +'<td colspan="3" class="bg-success">Total Price for all orders </td>'
 							+'<td class="bg-success">'+totalWoR.toFixed(2)+'$</td>'
@@ -109,7 +113,10 @@ if (isset($_GET["modem_id"])) {
 							+'</tr>');
 
                 });
+
             });
+
+
 </script>
 <style>
     .loader {
@@ -135,97 +142,44 @@ if (isset($_GET["modem_id"])) {
     }
 </style>
 
-<title>Customer by month</title>
+<title><?= "reseller" //$reseller->getFullName(); ?>'s customers</title>
 <div class="page-header">
-    <h4>Statistics for month <?= $_GET["month"] ?> year <?= $_GET["year"] ?> </h4>
-    <h3 id="customer_header"></h3>
+    <a href="resellers.php">Resellers</a>
+    <span class="glyphicon glyphicon-play"></span>
+    <a class="last" href=""></a>
 </div>
 
-<h5>Month Info</h5>
-<!--
-<table class="display table table-striped table-bordered">
-    <tr>
-        <td style="width:20%;">Product Title</td>
-        <td class="product-title"></td>
-    </tr>
-    <tr>
-        <td style="width:20%;">Product Price</td>
-        <td class="product-price"></td>
-    </tr>
-    <tr>
-        <td style="width:20%;">Remaining Days Price</td>
-        <td class="remaining-days-price"></td>
-    </tr>
-    <tr>
-        <td style="width:20%;">Router Price</td>
-        <td class="router-price"></td>
-    </tr>
-    <tr>
-        <td style="width:20%;">Modem Price</td>
-        <td class="modem-price"></td>
-    </tr>
-    <tr>
-        <td style="width:20%;">Setup Price</td>
-        <td class="setup-price"></td>
-    </tr>
-    <tr>
-        <td style="width:20%;">Additional Service Price</td>
-        <td class="additional-service-price"></td>
-    </tr>
-	<tr>
-        <td style="width:20%;">qst tax</td>
-        <td class="qst_tax"></td>
-    </tr>
-	<tr>
-        <td style="width:20%;">gst tax</td>
-        <td class="gst_tax"></td>
-    </tr>
-	<tr>
-        <td style="width:20%;">Total Price</td>
-        <td class="total-price"></td>
-    </tr>
-</table>
--->
-<table class="invoice display table table-striped table-bordered">
-    <tr>
-        <td >Product Title</td>
-        <td >Payment Method</td>
-        <td >Product Price</td>
-        <td >Remaining Days Price</td>
-        <td> Total Price </td>
-        <td >Router Price</td>
-        <td >Modem Price</td>
-        <td >Setup Price</td>
-        <td >Additional Service Price</td>
-		    <td >Total Price WoT</td>
-        <td >qst tax</td>
-        <td >gst tax</td>
-        <td >Total Price WT</td>
-		    <td >Total Price WT plus 7$ CST</td>
+<a href="reseller_customers_monthly_generateXLS.php?reseller_id=<?=$_GET["reseller_id"]?>" class="btn btn-primary">XML</a>
 
-    </tr>
-</table>
-<h5>Order</h5>
-<table class="orders display table table-striped table-bordered">
-<tr>
-  <td>#No</td>
-  <td>Title</td>
-  <td>Start Active Date</td>
-  <td>Recurring Date</td>
-  <td>Price</td>
-</tr>
-</table>
+<br><br>
+<table id="myTable" class="display table table-striped table-bordered">
+    <thead>
+    <th>ID</th>
+    <th>Full Name</th>
+    <th>Product</th>
+    <th>Payment Method</th>
+    <th>Start Date</th>
+    <th>Recurring Start</th>
+    <th>total</th>
+    <th>total WoT</th>
+    <th>total with Tax p7</th>
+</thead>
+<tbody>
 
-<h5>Requests</h5>
-<table class="requests display table table-striped table-bordered">
-    <tr>
-        <td style="width:20%;">Action</td>
-        <td style="width:20%;">Action on Date</td>
-        <td style="width:20%;">Product Title</td>
-        <td style="width:20%;">Product Price</td>
 
-    </tr>
+</tbody>
 </table>
+<table id="totalTable" class="display table table-striped table-bordered">
+
+</table>
+<p id="total_price_with_out_router"></p>
+<p id="total_price_with_out_tax"></p>
+<p id="total_price_with_tax_p7"></p>
 <?php
-include_once "../../footer.php";
+//echo "Total without tax:" . number_format((float) $total_without_tax, 2, '.', '') . "$";
+//echo "<br>";
+//echo "Total with tax:" . number_format((float) $total_with_tax, 2, '.', '') . "$";
+?>
+<?php
+include_once "../footer.php";
 ?>

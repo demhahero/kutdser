@@ -4,7 +4,7 @@ include_once "../header.php";
 
 <title>Resellers</title>
 <div class="page-header">
-    <a class="last" href="">Resellers</a>    
+    <a class="last" href="">Resellers</a>
 </div>
 <table id="myTable" class="display table table-striped table-bordered">
     <thead>
@@ -14,6 +14,7 @@ include_once "../header.php";
     <th>Email</th>
     <th>Customers</th>
     <th>Statistics</th>
+    <th>New Statistics</th>
 </thead>
 <tbody>
     <?php
@@ -24,17 +25,20 @@ include_once "../header.php";
             <td style="width: 5%;"><?=$customer->getCustomerID()?></td>
             <td style="width: 45%;"><?=$customer->getFullName()?></td>
             <td style="width: 15%;"><?=$customer->getPhone()?></td>
-            <td style="width: 30%;"><?=$customer->getEmail()?></td>
+            <td style="width: 25%;"><?=$customer->getEmail()?></td>
             <td style="width: 5%;">
                 <a href="reseller_customers.php?reseller_id=<?=$customer->getCustomerID()?>">Customers</a>
             </td>
             <td style="width: 5%;">
                 <a href="<?=$site_url?>/statistics/reseller_customers_monthly.php?reseller_id=<?=$customer->getCustomerID()?>">Monthly</a>
             </td>
+            <td style="width: 5%;">
+                <a href="<?=$site_url?>/statistics/reseller_customers_monthly_new.php?reseller_id=<?=$customer->getCustomerID()?>">Monthly</a>
+            </td>
         </tr>
         <?php
     }
-    ?>	
+    ?>
 </tbody>
 </table>
 
