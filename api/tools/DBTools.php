@@ -25,7 +25,7 @@ class DBTools {
 
     private $db_username = "root";
     private $db_password = "";
-    private $db_name = 'routers_2018_05_14'; //database name
+    private $db_name = 'router'; //database name
 
     private $conn_routers;
     private $query_result;
@@ -85,6 +85,57 @@ class DBTools {
         }
         return $orders;
     }
+
+    public function customer_log_query_api($queryString,$fields,$child=null,$childFields=null,$child2=null,$child2Fields=null,$child3=null,$child3Fields=null) {
+        $customer_logs = array();
+
+        $this->query("SET CHARACTER SET utf8");
+
+        $customer_log_result = $this->query($queryString);
+        while ($customer_log_row = $this->fetch_assoc($customer_log_result)) {
+            $customer_log = array();
+            foreach ($fields as $key => $value)
+            {
+                $customer_log[$key] = $customer_log_row[$value];
+            }
+            if ($child != null) {
+                $customer_logChildArray = array();
+                $customer_logChild = array();
+                foreach ($childFields as $childKey => $childValue)
+                {
+                    $customer_logChild[$childKey] = $customer_log_row[$childValue];
+
+                }
+                array_push($customer_logChildArray,$customer_logChild);
+                $customer_log[$child] = $customer_logChildArray;
+            }
+            if ($child2 != null) {
+                $customer_logChildArray = array();
+                $customer_logChild = array();
+                foreach ($child2Fields as $childKey => $childValue)
+                {
+                    $customer_logChild[$childKey] = $customer_log_row[$childValue];
+
+                }
+                array_push($customer_logChildArray,$customer_logChild);
+                $customer_log[$child2] = $customer_logChildArray;
+            }
+            if ($child3 != null) {
+                $customer_logChildArray = array();
+                $customer_logChild = array();
+                foreach ($child3Fields as $childKey => $childValue)
+                {
+                    $customer_logChild[$childKey] = $this->conn_routers->real_escape_string($customer_log_row[$childValue]);
+
+                }
+                array_push($customer_logChildArray,$customer_logChild);
+                $customer_log[$child3] = $customer_logChildArray;
+            }
+            array_push($customer_logs,$customer_log);
+        }
+        return $customer_logs;
+    }
+
     public function order_query_api($queryString,$fields,$child=null,$childFields=null,$child2=null,$child2Fields=null,$child3=null,$child3Fields=null) {
         $orders = array();
 
