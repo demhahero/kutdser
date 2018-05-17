@@ -257,6 +257,7 @@ class DBTools {
 
 			$orderChild = array();
 			$orderChild["order_id"]=$order_row["order_id"];
+      $orderChild["join_type"]=$order_row["join_type"];
       $orderChild["reseller_name"]=$order_row["reseller_name"];
       $orderChild["customer_name"]=$order_row["customer_name"];
 			$orderChild["creation_date"] = $order_row["creation_date"];
@@ -465,9 +466,9 @@ class DBTools {
 			echo "</br> router_price: ".$router_price;
 			echo "</br> adapter_price: ".$adapter_price;
 			*/
-
-			$totalPriceWoT=$remaining_days_price+$product_price+$additional_service_price+$setup_price+$modem_price+$router_price+$adapter_price;
       $totalPriceWoR=$remaining_days_price+$product_price;
+			$totalPriceWoT=$totalPriceWoR+$additional_service_price+$setup_price+$modem_price+$router_price+$adapter_price;
+
 			$qst_tax=$totalPriceWoT*0.09975;
 			$gst_tax=$totalPriceWoT*0.05;
 
@@ -691,7 +692,7 @@ class DBTools {
 							$periodPricePrevious=$periodInDaysPrevious*$pricePerDayPrevious;
 							$periodPriceCurrent=$periodInDaysCurrent*$pricePerDayCurrent;
 							//echo "periodPrice :".$periodPrice."</br>";
-							if($requests[$i]["action"]==="cancel"){
+							if($requests[$i]["action"]==="terminate"){
 								$periodPriceCurrent=0;
 							}
 							$orderChild = array();
@@ -732,7 +733,19 @@ class DBTools {
 
 
 
-			$totalPriceWoT=$productPrices[sizeof($productPrices)-2]["priceDifference"];
+			$totalPriceWoR=$productPrices[sizeof($productPrices)-2]["priceDifference"];
+
+      $fees=0;
+      if($productPrices[sizeof($productPrices)-1]["action_previous"]==="terminate")
+      {
+        $fees=82;
+      }
+      else if($productPrices[sizeof($productPrices)-1]["action_previous"]==="change_speed")
+      {
+        $fees=7;
+      }
+
+      $totalPriceWoT=$totalPriceWoR+$fees;
 
 			$qst_tax=abs($totalPriceWoT)*0.09975;
 			$gst_tax=abs($totalPriceWoT)*0.05;
@@ -744,7 +757,7 @@ class DBTools {
 			$totalPriceWT7=$totalPriceWT+7; // change speed fee
 
 
-      $monthInfo["total_price_with_out_router"]=round($totalPriceWoT,2, PHP_ROUND_HALF_UP);
+      $monthInfo["total_price_with_out_router"]=round($totalPriceWoR,2, PHP_ROUND_HALF_UP);
 			$monthInfo["total_price_with_out_tax"]=round($totalPriceWoT,2, PHP_ROUND_HALF_UP);
 			$monthInfo["total_price_with_tax"]=round($totalPriceWT,2, PHP_ROUND_HALF_UP);
 			$monthInfo["total_price_with_tax_p7"]=round($totalPriceWT7,2, PHP_ROUND_HALF_UP);
@@ -895,6 +908,7 @@ class DBTools {
 
 			$orderChild = array();
 			$orderChild["order_id"]=$order_row["order_id"];
+      $orderChild["join_type"]=$order_row["join_type"];
       $orderChild["reseller_name"]=$order_row["reseller_name"];
       $orderChild["customer_name"]=$order_row["customer_name"];
 			$orderChild["creation_date"] = $order_row["creation_date"];
@@ -951,6 +965,7 @@ class DBTools {
 				((int)$postDate->format('m')<(int)$start_active_date->format('m') && (int)$postDate->format('Y')===(int)$start_active_date->format('Y'))
 			)
 				continue;
+      $recurring_date=null;
 			if(((int)$start_active_date->format('d'))>1)
 			{
 				$recurring_date = new DateTime($start_active_date->format('Y')."-".$start_active_date->format('m')."-01 00:00:00");
@@ -968,7 +983,7 @@ class DBTools {
 ///////////////// get month info from order
 			$monthInfo=array();
 
-			$remaining_days=(int)$start_active_date->format('t')-(int)$start_active_date->format('d');
+			$remaining_days=(int)$start_active_date->format('t')-(int)$start_active_date->format('d')+1;
 
 			$monthDays=(int)$start_active_date->format('t');
 			$oneDayPrice=(float)$orderChild["product_price"]/(int)$monthDays;
@@ -991,8 +1006,12 @@ class DBTools {
 			echo "</br> adapter_price: ".$adapter_price;
 			*/
 			$days=$recurring_date->diff($start_active_date)->days;
-			$totalPriceWoT=$remaining_days_price+$product_price+$additional_service_price+$setup_price+$modem_price+$router_price+$adapter_price;
+
+      //commission base amount
       $totalPriceWoR=$remaining_days_price+$product_price;
+      // subtotal
+			$totalPriceWoT=$totalPriceWoR+$additional_service_price+$setup_price+$modem_price+$router_price+$adapter_price;
+
       $qst_tax=$totalPriceWoT*0.09975;
       $gst_tax=$totalPriceWoT*0.05;
 
@@ -1009,8 +1028,9 @@ class DBTools {
       $monthInfo["adapter_price"]=$orderChild["adapter_price"];
       $monthInfo["product_title"]=$orderChild["product_title"];
       $monthInfo["days"]=$days;
+      $monthInfo["action"]="order";
       if($recurring_date->format('Y')<$year
-        || ($recurring_date->format('Y')===$year && $recurring_date->format('m')<$month)
+        || ($recurring_date->format('Y')===$year && $recurring_date->format('m')<=$month)
         )
         {
           $totalPriceWoR=$product_price;
@@ -1036,6 +1056,7 @@ class DBTools {
     			$monthInfo["adapter_price"]=$orderChild["adapter_price"];
     			$monthInfo["product_title"]=$orderChild["product_title"];
     			$monthInfo["days"]=$days;
+          $monthInfo["action"]="recurring";
         }
 
 
@@ -1054,6 +1075,8 @@ class DBTools {
 
 
 ////////////////// check if there is any request before the selected date, if yes get it's info instead of order info
+      $change_speed_fee=0;// check if request before one month and after 1st day, if yes set this value to 7$
+
 			$date = new DateTime($year."-".$month."-01 00:00:00");
 			$monthDays= (int) $date->format( 't' );
 
@@ -1071,6 +1094,16 @@ class DBTools {
 				$hasRequest=true;
 				$requestChild = array();
 				$requestChild["creation_date"] = $request_row["creation_date"];
+        $change_speed_date=new DateTime($request_row["creation_date"]);
+				$interval = new DateInterval('P1M');
+				$change_speed_date->add($interval);
+
+        if(((int)$change_speed_date->format('Y')===(int)$year)
+         &&(int)$change_speed_date->format('m')===(int)$month)
+         {
+
+           $change_speed_fee=7;
+         }
 				$requestChild["action_on_date"] = $request_row["action_on_date"];
 				$requestChild["verdict_date"] = $request_row["verdict_date"];
 				$requestChild["verdict"] = $request_row["verdict"];
@@ -1086,7 +1119,7 @@ class DBTools {
 ////////////////// update month info
 				if($request_row["action"]==="terminate")
 				{
-
+          $orderChild["recurring_date"]="0000-00-00";
           $monthInfo["total_price_with_out_router"]=0;
 					$monthInfo["total_price_with_out_tax"]=0;
 					$monthInfo["total_price_with_tax"]=0;
@@ -1108,14 +1141,14 @@ class DBTools {
 				}
 				else
 				{
-					$totalPriceWoT=(float)$request_row["product_price"];
+					$totalPriceWoT=(float)$request_row["product_price"]+$change_speed_fee;
 
 					$qst_tax=$totalPriceWoT*0.09975;
 					$gst_tax=$totalPriceWoT*0.05;
 
 					$totalPriceWT=$totalPriceWoT+$qst_tax+$gst_tax;
 					$totalPriceWT7=$totalPriceWT;
-
+          $monthInfo["change_speed_fee"]=$change_speed_fee;
           $monthInfo["total_price_with_out_router"]=round($totalPriceWoT,2, PHP_ROUND_HALF_UP);
 					$monthInfo["total_price_with_out_tax"]=round($totalPriceWoT,2, PHP_ROUND_HALF_UP);
 					$monthInfo["total_price_with_tax"]=round($totalPriceWT,2, PHP_ROUND_HALF_UP);
@@ -1136,6 +1169,7 @@ class DBTools {
 					$monthInfo["adapter_price"]=0;
 					$monthInfo["product_title"]=$request_row["product_title"];
 					$monthInfo["days"]=$monthDays;
+          $monthInfo["action"]=$request_row["action"];
 				}
 ////////////////// end update month info
 				array_push($requests,$requestChild);
@@ -1151,6 +1185,9 @@ class DBTools {
 			while ($request_row = $this->fetch_assoc($requestResult)) {
 				$requestChild = array();
 				$requestChild["creation_date"] = $request_row["creation_date"];
+
+
+
 				$requestChild["action_on_date"] = $request_row["action_on_date"];
 				$requestChild["verdict_date"] = $request_row["verdict_date"];
 				$requestChild["verdict"] = $request_row["verdict"];
@@ -1196,29 +1233,73 @@ class DBTools {
 				}
 				else
 				{*/
-				if( ( (int)$this_action_on_date->format('d')>1 && $hasRequest)
+        $start_month_between_start_and_recurring = new DateTime($start_active_date->format('Y')."-".$start_active_date->format('m')."-01 00:00:00");
+        $interval = new DateInterval('P1M');
+        $start_month_between_start_and_recurring->add($interval);
+
+        $start_day_of_post_month = new DateTime($postDate->format('Y')."-".$postDate->format('m')."-01 00:00:00");
+/*
+print_r($requests);
+echo "size of requests".sizeof($requests)."</br>";
+echo "hasRequest: ".((sizeof($requests)>0)?"true":"fals")."</br>";
+echo "start_active_date: ".$start_active_date->format('Y-m-d')."</br>";
+echo "start_day_of_post_month: ".$start_day_of_post_month->format('Y-m-d')."</br>";
+echo "start_month_between_start_and_recurring: ".$start_month_between_start_and_recurring->format('Y-m-d')."</br>";
+*/
+
+				if( ( (int)$this_action_on_date->format('d')>1 && sizeof($requests)>0)
 					||
-					(
+					((int)$this_action_on_date->format('d')>1 &&(
 						(int)$recurring_date->format('Y') < (int)$year
 						||
-						((int)$recurring_date->format('Y') === (int)$year && (int)$recurring_date->format('m') < (int)$month)
-
+						((int)$recurring_date->format('Y') === (int)$year && (int)$recurring_date->format('m') <= (int)$month)
+            )
 					)
+          ||/// check if post month greater than start_active_date month and before recurring_date month so show zeros
+          ((int)$start_active_date->format('d')>1 //and there is remaining_days
+          && (// and posted date between start active date and recurring Date
+              $start_day_of_post_month->getTimestamp() > $start_active_date->getTimestamp() &&
+              $start_day_of_post_month->getTimestamp() <= $start_month_between_start_and_recurring->getTimestamp())
+              )
 				)
 
-				{
-
-					$this_request_days=$monthDays-(int)$this_action_on_date->format('d');
+				{/*
+          / if there is request in the middle of the month
+          then we have to split our price calculation as follow:
+          1- calculate the paid prices for product and it's tax.
+          2- calculate the days used for the current product.
+          3- calculate prices for product and tax for the used days.
+          4- caculate the days for the remining days that will be used using the new speed.
+          5- calculate prices for product and tax for the remaining days.
+          6- calculate the difference in product prices.
+          7- calualte the difference in tax prices.
+          */
+          //echo "hi";
+          $actionTax=$change_speed_fee;//change speed fee
+					$this_request_days=$monthDays-(int)$this_action_on_date->format('d')+1;
 					$previous_days=$monthDays-$this_request_days;
           $this_product_price= (((float)$request_row["product_price"])/$monthDays)*$this_request_days;
           if($request_row["action"]==="terminate")
           {
+            $actionTax+=82;//termination fee
             $this_product_price= 0;
+            $orderChild["recurring_date"]="0000-00-00";
           }
 
 					$previous_product_price= (((float)$monthInfo["product_price"])/$monthDays)*$previous_days;
 
-					$priceDifference=$this_product_price+$previous_product_price;//-(float)$monthInfo["product_price"];
+          $paid_qst_tax=abs((float)$monthInfo["product_price"])*0.09975;
+          $paid_gst_tax=abs((float)$monthInfo["product_price"])*0.05;
+          $paid_Tax=$paid_qst_tax+$paid_gst_tax;
+
+          $previous_qst_tax=abs($previous_product_price)*0.09975;
+          $previous_gst_tax=abs($previous_product_price)*0.05;
+          $previous_Tax=$previous_qst_tax+$previous_gst_tax;
+
+
+
+
+					$priceDifference=($this_product_price+$previous_product_price)-(float)$monthInfo["product_price"];//-(float)$monthInfo["product_price"];
 
 					$monthInfo["product_price_previous"]=$monthInfo["product_price"];
           $monthInfo["product_price_current"]=(float)$request_row["product_price"];
@@ -1231,16 +1312,22 @@ class DBTools {
 					$monthInfo["days_2"]=$this_request_days;
 
           //echo $monthInfo["product_price"]."-".$priceDifference;
+          ///commission base amount: product + remaining days
 					$totalPriceWoT=$priceDifference;
+          // subtotal : commission+all addition prices+fees
+          $subtotal=$totalPriceWoT+$actionTax;
 
-					$qst_tax=abs($totalPriceWoT)*0.09975;
-					$gst_tax=abs($totalPriceWoT)*0.05;
+          $total_qst_tax=abs((float)$subtotal)*0.09975;
+          $total_gst_tax=abs((float)$subtotal)*0.05;
+          $total_tax=$total_qst_tax +$total_gst_tax;
 
-					$totalPriceWT=$totalPriceWoT+$qst_tax+$gst_tax;
-					$totalPriceWT7=$totalPriceWT+7;
+					$totalPriceWT=$subtotal+$total_tax;
+					$totalPriceWT7=$totalPriceWT;
+
+          $monthInfo["change_speed_fee"]=$actionTax;
 
           $monthInfo["total_price_with_out_router"]=round($totalPriceWoT,2, PHP_ROUND_HALF_UP);
-					$monthInfo["total_price_with_out_tax"]=round($totalPriceWoT,2, PHP_ROUND_HALF_UP);
+					$monthInfo["total_price_with_out_tax"]=round($subtotal,2, PHP_ROUND_HALF_UP);
 					$monthInfo["total_price_with_tax"]=round($totalPriceWT,2, PHP_ROUND_HALF_UP);
 					$monthInfo["total_price_with_tax_p7"]=round($totalPriceWT7,2, PHP_ROUND_HALF_UP);
 
@@ -1255,22 +1342,37 @@ class DBTools {
 					if($monthInfo["modem"]!=="rent" )
 						$monthInfo["modem_price"]=0;
 					$monthInfo["remaining_days_price"]=0;
-					$monthInfo["qst_tax"]=round($qst_tax,2, PHP_ROUND_HALF_UP);
-					$monthInfo["gst_tax"]=round($gst_tax,2, PHP_ROUND_HALF_UP);
+					$monthInfo["qst_tax"]=round($previous_qst_tax,2, PHP_ROUND_HALF_UP);
+					$monthInfo["gst_tax"]=round($previous_gst_tax,2, PHP_ROUND_HALF_UP);
+          $monthInfo["qst_tax_2"]=round($total_qst_tax,2, PHP_ROUND_HALF_UP);
+          $monthInfo["gst_tax_2"]=round($total_gst_tax,2, PHP_ROUND_HALF_UP);
 					$monthInfo["adapter_price"]=0;
 
 				}
 				else{
-					$totalPriceWoT=(float)$request_row["product_price"];
+          $actionTax=7;
+          $this_product_price=(float)$request_row["product_price"];
+          if($request_row["action"]==="terminate")
+          {
+            $actionTax=82;//termination fee
+            $this_product_price= 0;
+            $orderChild["recurring_date"]="0000-00-00";
+          }
+					$totalPriceWoT=$this_product_price;
 
-					$qst_tax=$totalPriceWoT*0.09975;
-					$gst_tax=$totalPriceWoT*0.05;
 
-					$totalPriceWT=$totalPriceWoT+$qst_tax+$gst_tax;
-					$totalPriceWT7=$totalPriceWT+7;
+          $subtotal=$totalPriceWoT+$actionTax;
+
+          $qst_tax=$subtotal*0.09975;
+					$gst_tax=$subtotal*0.05;
+
+					$totalPriceWT=$subtotal+$qst_tax+$gst_tax;
+					$totalPriceWT7=$totalPriceWT;
+
+          $monthInfo["change_speed_fee"]=$actionTax;
 
           $monthInfo["total_price_with_out_router"]=round($totalPriceWoT,2, PHP_ROUND_HALF_UP);
-					$monthInfo["total_price_with_out_tax"]=round($totalPriceWoT,2, PHP_ROUND_HALF_UP);
+					$monthInfo["total_price_with_out_tax"]=round($subtotal,2, PHP_ROUND_HALF_UP);
 					$monthInfo["total_price_with_tax"]=round($totalPriceWT,2, PHP_ROUND_HALF_UP);
 					$monthInfo["total_price_with_tax_p7"]=round($totalPriceWT7,2, PHP_ROUND_HALF_UP);
 
@@ -1295,8 +1397,9 @@ class DBTools {
 					$monthInfo["gst_tax"]=round($gst_tax,2, PHP_ROUND_HALF_UP);
 					$monthInfo["adapter_price"]=0;
 				}
-
+        $monthInfo["action"]=$request_row["action"];
 				//}
+
 
 
 ////////////////// end update month info
@@ -1304,6 +1407,45 @@ class DBTools {
 
 				array_push($requests,$requestChild);
 			}
+
+      $start_month_between_start_and_recurring = new DateTime($start_active_date->format('Y')."-".$start_active_date->format('m')."-01 00:00:00");
+      $interval = new DateInterval('P1M');
+      $start_month_between_start_and_recurring->add($interval);
+
+      $start_day_of_post_month = new DateTime($postDate->format('Y')."-".$postDate->format('m')."-01 00:00:00");
+
+
+
+      /// check if post month greater than start_active_date month and before recurring_date month so show zeros
+      if(sizeof($requests)===0 // if no requests
+      && (int)$start_active_date->format('d')>1 //and there is remaining_days
+      && (// and posted date between start active date and recurring Date
+          $start_day_of_post_month->getTimestamp() > $start_active_date->getTimestamp() &&
+          $start_day_of_post_month->getTimestamp() <= $start_month_between_start_and_recurring->getTimestamp())
+          )
+          {
+            /// then show zeros values
+            $monthInfo["total_price_with_out_router"]=0;
+  					$monthInfo["total_price_with_out_tax"]=0;
+  					$monthInfo["total_price_with_tax"]=0;
+  					$monthInfo["total_price_with_tax_p7"]=0;
+
+  					$monthInfo["product_price"]=0;
+  					$monthInfo["additional_service_price"]=0;
+  					$monthInfo["setup_price"]=0;
+  					$monthInfo["router_price"]=0;
+  					$monthInfo["modem_price"]=0;
+  					$monthInfo["remaining_days_price"]=0;
+  					$monthInfo["qst_tax"]=0;
+  					$monthInfo["gst_tax"]=0;
+  					$monthInfo["adapter_price"]=0;
+  					$monthInfo["total_price"]=0;
+
+  					$monthInfo["days"]=$start_month_between_start_and_recurring->format('t');
+  					$monthInfo["action"]="month after start active date";
+          }
+
+
 
 			array_push($monthsInfo,$monthInfo);
 			$orderChild["requests"]=$requests;

@@ -85,7 +85,6 @@ if (isset($_GET["modem_id"])) {
 							+'<td class="bg-warning">'+parseFloat(monthInfo["total_price_with_out_tax"]).toFixed(2)+'</td>'
 							+'<td>'+parseFloat(monthInfo["qst_tax"]).toFixed(2)+'</td>'
 							+'<td>'+parseFloat(monthInfo["gst_tax"]).toFixed(2)+'</td>'
-							+'<td>'+parseFloat(monthInfo["total_price_with_tax"]).toFixed(2)+'</td>'
 							+'<td class="bg-danger">'+parseFloat(monthInfo["total_price_with_tax_p7"]).toFixed(2)+'</td>'
 							+'</tr>');
 
@@ -104,7 +103,7 @@ if (isset($_GET["modem_id"])) {
 							//+'<td></td>'
 							+'<td colspan="4" class="bg-warning">Total Price for all orders with additional prices</td>'
 							+'<td class="bg-warning">'+total.toFixed(2)+'$</td>'
-							+'<td colspan="3" class="bg-danger">Total Price for all orders With Tax</td>'
+							+'<td colspan="2" class="bg-danger">Total Price for all orders With Tax</td>'
 							+'<td class="bg-danger">'+totalWT.toFixed(2)+'$</td>'
 							+'</tr>');
 
@@ -192,16 +191,15 @@ if (isset($_GET["modem_id"])) {
         <td >Payment Method</td>
         <td >Product Price</td>
         <td >Remaining Days Price</td>
-        <td> Total Price </td>
+        <td> Commission base amount </td>
         <td >Router Price</td>
         <td >Modem Price</td>
         <td >Setup Price</td>
         <td >Additional Service Price</td>
-		    <td >Total Price WoT</td>
+		    <td >Subtotal</td>
         <td >qst tax</td>
         <td >gst tax</td>
-        <td >Total Price WT</td>
-		    <td >Total Price WT plus 7$ CST</td>
+        <td >Total Price With Tax</td>
 
     </tr>
 </table>

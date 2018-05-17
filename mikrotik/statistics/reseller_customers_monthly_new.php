@@ -1,12 +1,15 @@
 <?php
 include_once "../header.php";
+
+$month=isset($_GET["month"])?$_GET["month"]:5;
+$year=isset($_GET["year"])?$_GET["year"]:2018;
 ?>
 
 <script>
     $(document).ready(function () {
         $('.dataTables_empty').html('<div class="loader"></div>');
 
-        $.getJSON("<?= $api_url ?>orders_by_month_for_reseller.php?reseller_id=<?= $_GET["reseller_id"] ?>&month=4&year=2018", function (result) {
+        $.getJSON("<?= $api_url ?>orders_by_month_for_reseller.php?reseller_id=<?= $_GET["reseller_id"] ?>&month=<?= $month ?>&year=<?= $year ?>", function (result) {
           var total=0;
           var totalWoR=0;
 					var totalWT=0;
@@ -67,8 +70,10 @@ include_once "../header.php";
                   product_title,
                   field['payment_method'],
                   field['start_active_date'],
+                  field['join_type'],
                   field['recurring_date'],
                   monthInfo["total_price_with_out_router"],
+                  monthInfo["action"],
                   monthInfo["total_price_with_out_tax"],
                   monthInfo["total_price_with_tax_p7"]
               ]).draw(false);
@@ -148,8 +153,38 @@ include_once "../header.php";
     <span class="glyphicon glyphicon-play"></span>
     <a class="last" href=""></a>
 </div>
+<form class="register-form form-inline" method="get">
+    <input name="reseller_id" style="display:none;" value="<?= $_GET["reseller_id"] ?>"/>
+    <div class="form-group">
+        <label for="email">Month:</label>
+        <select  name="month" class="form-control">
+            <?php
+            for ($i = 1; $i <= 12; $i++) {
+                if ($month == $i)
+                    echo "<option selected value=\"$i\">$i</option>";
+                else
+                    echo "<option value=\"$i\">$i</option>";
+            }
+            ?>
 
-<a href="reseller_customers_monthly_generateXLS.php?reseller_id=<?=$_GET["reseller_id"]?>" class="btn btn-primary">XML</a>
+        </select>
+        <label for="email">Year:</label>
+        <select  name="year" class="form-control">
+            <?php
+            for ($i = 2017; $i <= 2020; $i++) {
+                if ($year == $i)
+                    echo "<option selected value=\"$i\">$i</option>";
+                else
+                    echo "<option value=\"$i\">$i</option>";
+            }
+            ?>
+
+        </select>
+    </div>
+    <input type="submit" class="btn btn-default" value="Search">
+    <a href="reseller_customers_monthly_generateXLS.php?reseller_id=<?=$_GET["reseller_id"]?>" class="btn btn-primary">XML</a>
+</form>
+
 
 <br><br>
 <table id="myTable" class="display table table-striped table-bordered">
@@ -159,10 +194,12 @@ include_once "../header.php";
     <th>Product</th>
     <th>Payment Method</th>
     <th>Start Date</th>
+    <th>Join Type</th>
     <th>Recurring Start</th>
-    <th>total</th>
-    <th>total WoT</th>
-    <th>total with Tax p7</th>
+    <th>Commission base amount</th>
+    <th>Type</th>
+    <th>Subtotal</th>
+    <th>total with Tax </th>
 </thead>
 <tbody>
 
