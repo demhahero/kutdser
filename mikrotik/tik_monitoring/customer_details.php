@@ -15,58 +15,62 @@ $html = curl_exec($c);
         $('.dataTables_empty').html('<div class="loader"></div>');
         var subscribers_list = <?= $html ?>;
 
-        $.getJSON("<?= $api_url ?>tik_monitoring_customer_api.php?customer_id=<?=$_GET["customer_id"]?>", function (result) {
+        $.getJSON("<?= $api_url ?>tik_monitoring_customer_api.php?customer_id=<?= $_GET["customer_id"] ?>", function (result) {
 
-            $.each(result['customers'], function (i, field) {
-                var subscriber = subscribers_list.find(function (e) {
-                    return e.mac_address == field['modem'][0]["mac_address"].toLowerCase()
+                    $.each(result['customers'], function (i, field) {
+                        var subscriber = subscribers_list.find(function (e) {
+                            return e.mac_address == field['modem'][0]["mac_address"].toLowerCase()
+                        });
+                        var ip_address = "";
+                        var plan = "";
+                        var router_mac_address = "";
+                        if (subscriber) {
+                            ip_address = subscriber.ip_address;
+                            plan = subscriber.plan;
+                            router_mac_address = subscriber.router_mac_address;
+                        }
+                        $(".customer-id").html(field['customer_id']);
+                        $(".full-name").html(field['full_name']);
+                        $(".reseller").html(field['reseller'][0]['full_name']);
+                        $(".modem-mac").html(field['modem'][0]["mac_address"]);
+                        $(".router-mac").html(router_mac_address);
+                        $(".plan").html(plan);
+                        $(".address").html(field['address']);
+                        $(".phone").html(field['phone']);
+                        $(".ip").html(ip_address);
+                    });
                 });
-                var ip_address = "";
-                var plan = "";
-                var router_mac_address = "";
-                if(subscriber){
-                    ip_address = subscriber.ip_address;
-                    plan = subscriber.plan;
-                    router_mac_address = subscriber.router_mac_address;
-                }
-                $(".customer-id").html(field['customer_id']);
-                $(".full-name").html(field['full_name']);
-                $(".reseller").html(field['reseller'][0]['full_name']);
-                $(".modem-mac").html(field['modem'][0]["mac_address"]);
-                $(".router-mac").html(router_mac_address);
-                $(".plan").html(plan);
-                $(".address").html(field['address']);
-                $(".phone").html(field['phone']);
-                $(".ip").html(ip_address);
-            });
-        });
-        
-        $.getJSON("<?= $api_url ?>customer_log_api.php?customer_id=<?=$_GET["customer_id"]?>", function (result) {
 
-            $.each(result['customers'], function (i, field) {
-                var subscriber = subscribers_list.find(function (e) {
-                    return e.mac_address == field['modem'][0]["mac_address"].toLowerCase()
-                });
-                var ip_address = "";
-                var plan = "";
-                var router_mac_address = "";
-                if(subscriber){
-                    ip_address = subscriber.ip_address;
-                    plan = subscriber.plan;
-                    router_mac_address = subscriber.router_mac_address;
-                }
-                $(".customer-id").html(field['customer_id']);
-                $(".full-name").html(field['full_name']);
-                $(".reseller").html(field['reseller'][0]['full_name']);
-                $(".modem-mac").html(field['modem'][0]["mac_address"]);
-                $(".router-mac").html(router_mac_address);
-                $(".plan").html(plan);
-                $(".address").html(field['address']);
-                $(".phone").html(field['phone']);
-                $(".ip").html(ip_address);
-            });
-        });
-    });
+                $.getJSON("<?= $api_url ?>customer_log_api.php?customer_id=<?= $_GET["customer_id"] ?>", function (result) {
+
+                            $.each(result['customer_logs'], function (i, field) {
+                                table.row.add([
+                                    field['customer_log_id'],
+                                    field['note'],
+                                    field['log_date'],
+                                    field['admin'][0]['username']
+                                ]).draw(false);
+                            });
+                        });
+
+                        $(".submit").click(function () {
+<?php
+$dt = new DateTime();
+?>
+                            var customer_id = "<?= $_GET['customer_id'] ?>";
+                            var log_date = "<?= $dt->format("Y-m-d H:i:s") ?>";
+                            var note = $("textarea[name=\"note\"]").val();
+                            $.post("<?= $api_url ?>customer_log_api.php", {customer_id: customer_id, log_date: log_date, note: note, type: "general", completion: "1", admin_id: '<?= $admin_id ?>'}, function (data, status) {
+                                data = $.parseJSON(data);
+                                if (data.inserted == true) {
+                                    alert("Log inserted");
+                                    location.reload();
+                                } else
+                                    alert("Error, try again");
+                            });
+                            return false;
+                        });
+                    });
 </script>
 <style>
     .loader {
@@ -133,23 +137,30 @@ $html = curl_exec($c);
         <td>Address</td>
         <td class="address"></td>
     </tr>
-<tbody>
-</tbody>
+    <tbody>
+    </tbody>
 </table>
 
 <table id="myTable" class="display table table-striped table-bordered">
     <thead>
-    <th>ID</th>
-    <th>Type</th>
-    <th>Note</th>
-    <th>Due Date</th>
-    <th>Completion</th>
-    <th>Functions</th>
+    <th style="width:10%">ID</th>
+    <th style="width:70%">Note</th>
+    <th style="width:10%">Date</th>
+    <th style="width:10%">Admin</th>
 </thead>
 <tbody>
-	
+
 </tbody>
 </table>
+
+<form class="register-form" method="post">
+    <div class="form-group">
+        <label>Note:</label>
+        <textarea name="note" style="width:100%;" class="form-control"></textarea> 
+    </div>
+    <input type="submit" class="btn btn-default submit"  value="Send">
+</form>
+
 <?php
 include_once "../footer.php";
 ?>
