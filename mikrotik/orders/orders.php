@@ -15,6 +15,7 @@ include_once "../header.php";
                     field["product_title"],
                     field['creation_date'],
                     field['status'],
+                    field['cable_subscriber'],
                     "<a target='_blank' href='<?= $site_url ?>/orders/print_order.php?order_id="+field['order_id']+"'><img src='<?= $site_url ?>/img/print-icon.png' style='width: 25px;' /></a>"
                 ]).draw(false);
             });
@@ -54,10 +55,11 @@ include_once "../header.php";
     <thead>
     <th style="width: 10%">ID</th>
     <th style="width: 20%">Customer</th>
-    <th style="width: 15%">Reseller</th>
+    <th style="width: 20%">Reseller</th>
     <th style="width: 15%">Product</th>
     <th style="width: 15%">Date</th>
-    <th style="width: 10%">Status</th>
+    <th style="width: 5%">Status</th>
+    <th style="width: 5%">C.S.</th>
     <th style="width: 10%">Print</th>
 </thead>
 <tbody>
