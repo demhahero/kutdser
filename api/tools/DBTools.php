@@ -256,6 +256,9 @@ class DBTools {
 
 
 			$orderChild = array();
+      if ((int) $order_row["order_id"] > 10380)
+          $order_row["order_id"] = (((0x0000FFFF & (int) $order_row["order_id"]) << 16) + ((0xFFFF0000 & (int) $order_row["order_id"]) >> 16));
+
 			$orderChild["order_id"]=$order_row["order_id"];
       $orderChild["join_type"]=$order_row["join_type"];
       $orderChild["reseller_name"]=$order_row["reseller_name"];
@@ -907,6 +910,9 @@ class DBTools {
 
 
 			$orderChild = array();
+      if ((int) $order_row["order_id"] > 10380)
+          $order_row["order_id"] = (((0x0000FFFF & (int) $order_row["order_id"]) << 16) + ((0xFFFF0000 & (int) $order_row["order_id"]) >> 16));
+
 			$orderChild["order_id"]=$order_row["order_id"];
       $orderChild["join_type"]=$order_row["join_type"];
       $orderChild["reseller_name"]=$order_row["reseller_name"];
@@ -1033,8 +1039,17 @@ class DBTools {
         || ($recurring_date->format('Y')===$year && $recurring_date->format('m')<=$month)
         )
         {
+          $action="recurring";
+          if($orderChild["router"]==='rent')
+          {
+            $action=$action.", Router Rent";
+             $monthInfo["router_price"]=$router_price;
+           }
+          else {
+            $monthInfo["router_price"]=0;
+          }
           $totalPriceWoR=$product_price;
-          $totalPriceWoT=$product_price+$router_price;
+          $totalPriceWoT=$product_price+$monthInfo["router_price"];
           $qst_tax=$totalPriceWoT*0.09975;
           $gst_tax=$totalPriceWoT*0.05;
           $tempPostDate = new DateTime($year."-".$month."-01");
@@ -1042,11 +1057,7 @@ class DBTools {
           $monthInfo["additional_service_price"]=0;
     			$monthInfo["setup_price"]=0;
     			$monthInfo["modem_price"]=0;
-          if($orderChild["router"]==='rent')
-             $monthInfo["router_price"]=$orderChild["router_price"];
-          else {
-            $monthInfo["router_price"]=0;
-          }
+
     			$monthInfo["plan"]=$orderChild["plan"];
     			$monthInfo["modem"]=$orderChild["modem"];
     			$monthInfo["router"]=$orderChild["router"];
@@ -1056,10 +1067,8 @@ class DBTools {
     			$monthInfo["adapter_price"]=$orderChild["adapter_price"];
     			$monthInfo["product_title"]=$orderChild["product_title"];
     			$monthInfo["days"]=$days;
-          $monthInfo["action"]="recurring";
+          $monthInfo["action"]=$action;
         }
-
-
 
 			$totalPriceWT=$totalPriceWoT+$qst_tax+$gst_tax;
 			$totalPriceWT7=$totalPriceWT;
@@ -1094,14 +1103,15 @@ class DBTools {
 				$hasRequest=true;
 				$requestChild = array();
 				$requestChild["creation_date"] = $request_row["creation_date"];
-        $change_speed_date=new DateTime($request_row["creation_date"]);
+        $change_speed_date=new DateTime($request_row["action_on_date"]);
 				$interval = new DateInterval('P1M');
 				$change_speed_date->add($interval);
 
-        if(((int)$change_speed_date->format('Y')===(int)$year)
+        $action="recurring";
+          if(((int)$change_speed_date->format('Y')===(int)$year)
          &&(int)$change_speed_date->format('m')===(int)$month)
          {
-
+           $action=$action.", change speed";
            $change_speed_fee=7;
          }
 				$requestChild["action_on_date"] = $request_row["action_on_date"];
@@ -1149,7 +1159,7 @@ class DBTools {
 					$totalPriceWT=$totalPriceWoT+$qst_tax+$gst_tax;
 					$totalPriceWT7=$totalPriceWT;
           $monthInfo["change_speed_fee"]=$change_speed_fee;
-          $monthInfo["total_price_with_out_router"]=round($totalPriceWoT,2, PHP_ROUND_HALF_UP);
+          $monthInfo["total_price_with_out_router"]=round((float)$request_row["product_price"],2, PHP_ROUND_HALF_UP);
 					$monthInfo["total_price_with_out_tax"]=round($totalPriceWoT,2, PHP_ROUND_HALF_UP);
 					$monthInfo["total_price_with_tax"]=round($totalPriceWT,2, PHP_ROUND_HALF_UP);
 					$monthInfo["total_price_with_tax_p7"]=round($totalPriceWT7,2, PHP_ROUND_HALF_UP);
@@ -1169,7 +1179,7 @@ class DBTools {
 					$monthInfo["adapter_price"]=0;
 					$monthInfo["product_title"]=$request_row["product_title"];
 					$monthInfo["days"]=$monthDays;
-          $monthInfo["action"]=$request_row["action"];
+          $monthInfo["action"]=$action;
 				}
 ////////////////// end update month info
 				array_push($requests,$requestChild);
@@ -1299,8 +1309,10 @@ echo "start_month_between_start_and_recurring: ".$start_month_between_start_and_
 
 
 
-					$priceDifference=($this_product_price+$previous_product_price)-(float)$monthInfo["product_price"];//-(float)$monthInfo["product_price"];
-
+					$priceDifference=(float)$monthInfo["product_price"]-($this_product_price+$previous_product_price);//-(float)$monthInfo["product_price"];
+          $total_paid=($this_product_price+$previous_product_price);
+          //$priceDifference=((float)$monthInfo["product_price"]-$previous_product_price)+((float)$request_row["product_price"]-$this_product_price);//-(float)$monthInfo["product_price"];
+          $monthInfo["product_price_difference"]=$priceDifference;
 					$monthInfo["product_price_previous"]=$monthInfo["product_price"];
           $monthInfo["product_price_current"]=(float)$request_row["product_price"];
           //$totalPriceWoT=(float)$monthInfo["product_price"]+$priceDifference;
@@ -1313,9 +1325,17 @@ echo "start_month_between_start_and_recurring: ".$start_month_between_start_and_
 
           //echo $monthInfo["product_price"]."-".$priceDifference;
           ///commission base amount: product + remaining days
-					$totalPriceWoT=$priceDifference;
+					$totalPriceWoT=$total_paid;
           // subtotal : commission+all addition prices+fees
-          $subtotal=$totalPriceWoT+$actionTax;
+          if($monthInfo["router"]!=="rent" )
+          {
+						$monthInfo["router_price"]=0;
+
+          }
+          else {
+            $request_row["action"]=$request_row["action"].", Router Rent";
+          }
+          $subtotal=$totalPriceWoT+$actionTax+(float)$monthInfo["router_price"];
 
           $total_qst_tax=abs((float)$subtotal)*0.09975;
           $total_gst_tax=abs((float)$subtotal)*0.05;
@@ -1337,8 +1357,7 @@ echo "start_month_between_start_and_recurring: ".$start_month_between_start_and_
 					$monthInfo["additional_service_price"]=0;
 					$monthInfo["setup_price"]=0;
 
-					if($monthInfo["router"]!=="rent" )
-						$monthInfo["router_price"]=0;
+
 					if($monthInfo["modem"]!=="rent" )
 						$monthInfo["modem_price"]=0;
 					$monthInfo["remaining_days_price"]=0;
@@ -1350,18 +1369,27 @@ echo "start_month_between_start_and_recurring: ".$start_month_between_start_and_
 
 				}
 				else{
-          $actionTax=7;
+          $actionTax=$change_speed_fee+7;
           $this_product_price=(float)$request_row["product_price"];
+          if($monthInfo["router"]!=="rent" )
+						$monthInfo["router_price"]=0;
           if($request_row["action"]==="terminate")
           {
-            $actionTax=82;//termination fee
+            $actionTax=$change_speed_fee+82;//termination fee
             $this_product_price= 0;
+            $monthInfo["router_price"]=0;
             $orderChild["recurring_date"]="0000-00-00";
           }
+          $action=$request_row["action"];
+          if((int)$monthInfo["router_price"]>0)
+          {
+            $action=$action.", Router rent";
+          }
+
 					$totalPriceWoT=$this_product_price;
 
 
-          $subtotal=$totalPriceWoT+$actionTax;
+          $subtotal=$totalPriceWoT+$actionTax+(float)$monthInfo["router_price"];
 
           $qst_tax=$subtotal*0.09975;
 					$gst_tax=$subtotal*0.05;
@@ -1387,8 +1415,7 @@ echo "start_month_between_start_and_recurring: ".$start_month_between_start_and_
 					$monthInfo["setup_price"]=0;
 
 
-					if($monthInfo["router"]!=="rent" )
-						$monthInfo["router_price"]=0;
+
 					if($monthInfo["modem"]!=="rent" )
 						$monthInfo["modem_price"]=0;
 
@@ -1397,7 +1424,7 @@ echo "start_month_between_start_and_recurring: ".$start_month_between_start_and_
 					$monthInfo["gst_tax"]=round($gst_tax,2, PHP_ROUND_HALF_UP);
 					$monthInfo["adapter_price"]=0;
 				}
-        $monthInfo["action"]=$request_row["action"];
+        $monthInfo["action"]=$action;
 				//}
 
 

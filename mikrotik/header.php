@@ -12,6 +12,16 @@ include_once "dbconfig.php";
         <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
         <link rel="stylesheet" type="text/css" href="https://code.jquery.com/ui/1.12.0/themes/smoothness/jquery-ui.css">
 
+<script src="https://cdn.datatables.net/buttons/1.5.1/js/dataTables.buttons.min.js"></script>
+
+
+<script src="https://cdn.datatables.net/buttons/1.5.1/js/buttons.flash.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.32/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.32/vfs_fonts.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.5.1/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.5.1/js/buttons.print.min.js"></script>
+
         <script src='<?= $site_url ?>/js/script.js'></script>
         <script src='<?= $site_url ?>/js/bootstrap-datetimepicker.min.js'></script>
 
@@ -39,7 +49,7 @@ include_once "dbconfig.php";
                 </div>
                 <div id="navbar" class="navbar-collapse collapse">
                     <ul class="nav navbar-nav">
-                        <li><a href="<?= $site_url ?>/index.php">Routers</a></li>	
+                        <li><a href="<?= $site_url ?>/index.php">Routers</a></li>
                         <li class="dropdown">
                             <a class="dropdown-toggle" data-toggle="dropdown" href="#">Customers
                                 <span class="caret"></span></a>
@@ -49,7 +59,7 @@ include_once "dbconfig.php";
                                 <li><a href="<?= $site_url ?>/terminated_customers.php">Terminated Customers</a></li>
                             </ul>
                         </li>
-                        <li><a href="<?= $site_url ?>/customers.php">Resellers</a></li>	
+                        <li><a href="<?= $site_url ?>/customers.php">Resellers</a></li>
                         <li class="dropdown">
                             <a class="dropdown-toggle" data-toggle="dropdown" href="#">Bills
                                 <span class="caret"></span></a>
@@ -57,7 +67,7 @@ include_once "dbconfig.php";
                                 <li><a href="<?= $site_url ?>/custom_invoice.php">Custom Invoice</a></li>
                                 <li><a href="<?= $site_url ?>/custom_statement.php">Custom Statement</a></li>
                             </ul>
-                        </li>  
+                        </li>
                         <li class="dropdown">
                             <a class="dropdown-toggle" data-toggle="dropdown" href="#">Inventory
                                 <span class="caret"></span></a>

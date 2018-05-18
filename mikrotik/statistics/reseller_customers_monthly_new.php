@@ -7,16 +7,38 @@ $year=isset($_GET["year"])?$_GET["year"]:2018;
 
 <script>
     $(document).ready(function () {
+      var tableTag=$('#resellerTable');
+      var table=tableTag.DataTable( {
+        dom: 'Bfrtip',
+        buttons: [
+            //'copy', 'csv', 'excel', 'pdf', 'print'
+            {
+                extend: 'excel',
+                messageTop: 'The information in this table is copyright to Sirius Cybernetics Corp.'
+            }
+        ],
+        "createdRow": function ( row, data, index ) {
+          //console.log(row);
+          //console.log(data);
+          //console.log(index);
+          $('td', row).eq(8).addClass('bg-success');
+          $('td', row).eq(10).addClass('bg-warning');
+          $('td', row).eq(11).addClass('bg-danger');
+        }
+    } );
         $('.dataTables_empty').html('<div class="loader"></div>');
+
 
         $.getJSON("<?= $api_url ?>orders_by_month_for_reseller.php?reseller_id=<?= $_GET["reseller_id"] ?>&month=<?= $month ?>&year=<?= $year ?>", function (result) {
           var total=0;
           var totalWoR=0;
 					var totalWT=0;
+          var table_header="";
           $.each(result['customers'], function (index, customers) {
 
 					$.each(customers['orders'], function (i, field) {
-            $(".last").html(field["reseller_name"]+"'s Customers")
+            table_header=field["reseller_name"]+"'s Customers";
+            $(".last").html(table_header);
                         var product_price;
                         var product_title;
                         var request_product_price;
@@ -47,7 +69,7 @@ $year=isset($_GET["year"])?$_GET["year"]:2018;
 
 							{
 								product_title=monthInfo["product_title"]+" ("+monthInfo["days"]+" days), "+monthInfo["product_title_2"]+" ("+monthInfo["days_2"]+" days)";
-								product_price=monthInfo["product_price"].toFixed(2)+"$, "+monthInfo["product_price_2"].toFixed(2)+"$";
+								product_price=monthInfo["product_price"].toFixed(2)+"$  ("+monthInfo["product_price_previous"]+"$), "+monthInfo["product_price_2"].toFixed(2)+"$ ("+monthInfo["product_price_current"]+"$)";
 							}
 							/*
 							$(".product-title").html(product_title);
@@ -72,6 +94,7 @@ $year=isset($_GET["year"])?$_GET["year"]:2018;
                   field['start_active_date'],
                   field['join_type'],
                   field['recurring_date'],
+                  product_price,
                   monthInfo["total_price_with_out_router"],
                   monthInfo["action"],
                   monthInfo["total_price_with_out_tax"],
@@ -102,16 +125,50 @@ $year=isset($_GET["year"])?$_GET["year"]:2018;
                     });
 
           });
+          var MyMessageBottom='Total Commission base amount :'+totalWoR.toFixed(2)+'$, '
 
-
+							+'Total Price for subtotal :'+total.toFixed(2)+'$, '
+							+'Total Price for all orders With Tax :'+totalWT.toFixed(2)+'$';
+          var tableOptions={
+            dom: 'Bfrtip',
+            buttons: [
+                //'copy', 'csv', 'excel', 'pdf', 'print'
+                {
+                    extend: 'excel',
+                    className: 'btn btn-success',
+                    messageTop: table_header,
+                    title: table_header,
+                    messageBottom: MyMessageBottom
+                },
+                {
+                  extend: 'pdfHtml5',
+                  orientation: 'landscape',
+                  pageSize: 'LEGAL',
+                  className: 'btn btn-danger',
+                  messageTop: table_header,
+                  title: table_header,
+                  messageBottom: MyMessageBottom
+                }
+            ],
+            "createdRow": function ( row, data, index ) {
+              //console.log(row);
+              //console.log(data);
+              //console.log(index);
+              $('td', row).eq(8).addClass('bg-success');
+              $('td', row).eq(10).addClass('bg-warning');
+              $('td', row).eq(11).addClass('bg-danger');
+            }
+        }
+          tableTag.DataTable().destroy()
+          tableTag.DataTable(tableOptions);
 					$("#totalTable").append('<tr>'
 							+'<td></td>'
-              +'<td colspan="3" class="bg-success">Total Price for all orders </td>'
+              +'<td colspan="3" class="bg-success">Total Commission base amount </td>'
 							+'<td class="bg-success">'+totalWoR.toFixed(2)+'$</td>'
               //+'<td></td>'
 							//+'<td></td>'
 							//+'<td></td>'
-							+'<td colspan="4" class="bg-warning">Total Price for all orders with additional prices</td>'
+							+'<td colspan="4" class="bg-warning">Total Price for subtotal</td>'
 							+'<td class="bg-warning">'+total.toFixed(2)+'$</td>'
 							+'<td colspan="3" class="bg-danger">Total Price for all orders With Tax</td>'
 							+'<td class="bg-danger">'+totalWT.toFixed(2)+'$</td>'
@@ -182,24 +239,24 @@ $year=isset($_GET["year"])?$_GET["year"]:2018;
         </select>
     </div>
     <input type="submit" class="btn btn-default" value="Search">
-    <a href="reseller_customers_monthly_generateXLS.php?reseller_id=<?=$_GET["reseller_id"]?>" class="btn btn-primary">XML</a>
 </form>
 
 
 <br><br>
-<table id="myTable" class="display table table-striped table-bordered">
+<table id="resellerTable" class="display table table-striped table-bordered">
     <thead>
-    <th>ID</th>
-    <th>Full Name</th>
-    <th>Product</th>
-    <th>Payment Method</th>
-    <th>Start Date</th>
-    <th>Join Type</th>
-    <th>Recurring Start</th>
-    <th>Commission base amount</th>
-    <th>Type</th>
-    <th>Subtotal</th>
-    <th>total with Tax </th>
+    <th style="width:5%">ID</th>
+    <th style="width:25%">Full Name</th>
+    <th style="width:15%">Product</th>
+    <th style="width:10%">Payment Method</th>
+    <th style="width:10%">Start Date</th>
+    <th style="width:5%">Join Type</th>
+    <th style="width:10%">Recurring Start</th>
+    <th style="width:5%">Product Price</th>
+    <th style="width:5%">Commission base amount</th>
+    <th style="width:5%">Type</th>
+    <th style="width:5%">Subtotal</th>
+    <th style="width:5%">total with Tax </th>
 </thead>
 <tbody>
 
