@@ -36,6 +36,10 @@ class DBTools {
             die("Connection failed: " . $this->conn_routers->connect_error);
         }
     }
+    
+    public function getConnection() {
+        return $this->conn_routers;
+    } 
 
     public function query($queryString) {
         return $this->query_result = $this->conn_routers->query($queryString);
