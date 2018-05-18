@@ -92,7 +92,7 @@ if (isset($_GET["customer_id"]) /* && isset($_GET["action_on_date"]) */) {
         if ($value == "NULL")
             $values .= "NULL,";
         else
-            $values .= "N'" . $value . "',";
+            $values .= "N'" . mysqli_real_escape_string($dbTools->getConnection(), $value) . "',";
     }
     $query = "INSERT INTO `customer_log`(" . substr($columns, 0, -1) . ") VALUES (" . substr($values, 0, -1) . ")";
 
