@@ -1,4 +1,5 @@
 <?php
+include "../terms.php";
 if (!isset($_GET["do"])) {
     include_once "header.php";
     ?>
@@ -487,6 +488,12 @@ table.totals tr.payment_method {
 	display: none;
 }
 
+font.tax-number{
+    font-size: 7pt;
+    position: absolute;
+    bottom: -1cm;
+}
+
 /* Footer Imprint */
 #footer {
 	position: absolute;
@@ -533,8 +540,8 @@ Statement</h1>
 <table class="order-data-addresses">
 	<tr>
 		<td class="address billing-address">
-                    <!-- <h3>Billing Address:</h3> -->
-                    ' . $_POST["full_name"] . '<br/>' . $_POST["address"] . '								
+                    <!-- <h3>Billing Address:</h3> -->' . '
+                    ' .  $_POST["full_name"] . '<br/>' . $_POST["address"] . '								
                 </td>
 		<td class="address shipping-address">
 					</td>
@@ -589,59 +596,7 @@ $html .= '
 	<tfoot>
 	</tfoot>
 </table>
-
-
-<div id="footer">
-	<p>Website: www.amprotelecom.com | Phone: +1-514-548-2555 | Email: Info@amprotelecom.com</p>
-</div><!-- #letter-footer -->
-
-
-
-
-<style>
-div.break { page-break-before: always; }
-div.terms { text-align: justify;  text-justify: inter-word; }
-</style>
-<div class="break"></div>
-<br/>
-<br/>
-<center><h1>AM PRO TELECOM TERMS AND CONDITIONS</h1></center>
-
-The next following Terms and Conditions will be apply to all AM PRO TELECOM Services.
-<br/><br/><br/>
-<div class="terms">
-
-<h2>Service Charge:</h2><br/>
-The services that we provide are prepaid services. your first payment includes one-time fee, and after that it will be monthly payment depending on the plan that you registered in. you will be responsible to make all the payment in time before the due date. Balance that remain unpaid after the due date will be charged interest  rate of 2% pre month.
-In case of a failure to make payment, AM Pro Telecom have the right to suspend and or terminate your service at any time with or without further notice. To reactivate or re-installation the service you may be charged a reactivation or re-installation fee. 
-<br/><br/><br/>
-
-<h2>Services Installation:</h2><br/>
-you may ask the technician to install the service at your place if the functional jack is available there. In case of there is no or broken functional jake, the technician will instal the service to where a functional jack is available.The technician may or may not connect your modem.you will be responsible to connect devices.
-<br/><br/><br/>
-
-<h2>Cancellation:</h2><br/>
--If you subscribe to one year contract or one year prepaid Internet Service, in case of early cancellation the installation fee that was concede at the registration will be charged back, or a fee of $90  will be charged.
-<br/><br/>
--AM Pro Telecom have all the right to apply your deposit without  notice,in case of any unpaid balances ,and the remaining balance will be sent to you within ten days after return of all the leased equipment in good working condition with complete parts, failure to do so within ten business days after the service stop, you will be charged for the full cost of any equipment that not returned toAM Pro Telecom.
-<br/><br/><br/>
-
-<h2>Moving your Service to another place:</h2><br/>
-There is a fee of $90 will be applied to all our services.
-<br/><br/><br/>
-
-<h2>Limited  Liability:</h2><br/>
-AM Pro Telecom will make every effort to provide hight quality service. however, if the services are interrupted or have lower performed than what expected for more than 72 consecutive hours, AM Pro Telecom&rsquo;s liability will be limited to crediting you the service fee only for the period in question. 
-<br/><br/>
-
-
-</div>
-<div id="footer">
-	<p>Website: www.amprotelecom.com | Phone: +1-514-548-2555 | Email: Info@amprotelecom.com</p>
-</div><!-- #letter-footer -->
-
-</body>
-</html>';
+' . $terms_footer;
 
 
 
