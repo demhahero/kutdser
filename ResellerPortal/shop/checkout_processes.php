@@ -2,6 +2,8 @@
 
 include '../dbconfig.php';
 include 'GlobalOnePaymentXMLTools.php';
+require_once '../../mikrotik/swiftmailer/vendor/autoload.php';
+include 'print_order_class.php';
 
 $mGlobalOnePaymentXMLTools = new GlobalOnePaymentXMLTools();
 
@@ -64,7 +66,7 @@ if ($_GET["do"] == "register") {
         if (!isset($_POST["existed_merchant_reference"])) { // new Customer
             $extra_order_recurring_status = "";
         }
-        
+
         //2- Create new Order
         $result_order = $conn_routers->query("insert into `orders` ("
                 . "`product_id`, "
@@ -180,7 +182,7 @@ if ($_GET["do"] == "register") {
                     . "'" . $is_credit . "', "
                     . "'internet_order'"
                     . ")");
-        } else{
+        } else {
             $result_merchantrefs = $conn_routers->query("insert into `merchantrefs` ("
                     . "`merchantref`, "
                     . "`customer_id`, "
@@ -195,9 +197,41 @@ if ($_GET["do"] == "register") {
                     . "'payment'"
                     . ")");
         }
-        
+
         if ($result_customer && $result_order && $result_order_options && $result_merchantrefs) {
-            echo $order_id."_".(((0x0000FFFF & (int)$order_id) << 16) + ((0xFFFF0000 & (int)$order_id) >> 16));
+            $orid = (((0x0000FFFF & (int) $order_id) << 16) + ((0xFFFF0000 & (int) $order_id) >> 16));
+            echo $order_id . "_" . (((0x0000FFFF & (int) $order_id) << 16) + ((0xFFFF0000 & (int) $order_id) >> 16));
+
+            try {
+                $printOrder = new PrintOrder();
+                file_put_contents('last_order.pdf', $printOrder->output($order_id));
+
+                $to = mysql_real_escape_string($_POST["email"]);
+                $body = "Dear Customer,\nWe would like to thank you for using our services,\nYour order (".$orid.") has been received and your invoice is attached\nTo finalize your order, please read our Terms and Conditions on (https://www.amprotelecom.com/terms-and-conditions/) and agree by replying to this email with 'I agree'\nBest,\nAmProTelecom INC.";
+
+                // Create the Transport
+                $transport = (new Swift_SmtpTransport('mail.amprotelecom.com', 25))
+                        ->setUsername('alialsaffar')
+                        ->setPassword('zOIq6dX$@Pq44M')
+                ;
+
+                // Create the Mailer using your created Transport
+                $mailer = new Swift_Mailer($transport);
+
+                // Create a message
+                $message = (new Swift_Message('AmProTelecom INC. - Your Order'))
+                        ->setFrom(['info@amprotelecom.com' => 'AmProTelecom INC.'])
+                        ->setTo([$to, 'info@amprotelecom.com'])
+                        ->setBody($body)
+                        ->attach(Swift_Attachment::fromPath(__DIR__ . "/last_order.pdf"))
+                ;
+
+                // Send the message
+                $result = $mailer->send($message);
+                
+            } catch (Exception $e) {
+                
+            }
             die();
         } else {
             echo "0";
@@ -207,6 +241,6 @@ if ($_GET["do"] == "register") {
     echo "0";
     die();
 } else if ($_GET["do"] == "updateSubscription") {
-    echo $mGlobalOnePaymentXMLTools->updateSubscription("SS_" . $_POST["merchant_reference"], "SS_" . $_POST["merchant_reference"], "CARD_" . $_POST["merchant_reference"], $_POST["recurring_amount"]);    
+    echo $mGlobalOnePaymentXMLTools->updateSubscription("SS_" . $_POST["merchant_reference"], "SS_" . $_POST["merchant_reference"], "CARD_" . $_POST["merchant_reference"], $_POST["recurring_amount"]);
 }
 ?>
