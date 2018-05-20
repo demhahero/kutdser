@@ -131,7 +131,7 @@ include_once "../header.php";
                                             <?php
                                             $result_modems = $conn_routers->query("select * from `modems` where `reseller_id`='" . $reseller_id . "' and `customer_id`='0'");
                                             while ($row_modem = $result_modems->fetch_assoc()) {
-                                                echo "<option value=\"" . $row_modem["modem_id"] . "\">" . $row_modem["mac_address"] . "</option>";
+                                                echo "<option value=\"" . $row_modem["modem_id"] . "\">" . $row_modem["mac_address"] . "[" . $row_modem["type"] . " | " . $row_modem["serial_number"] . "]" . "</option>";
                                             }
                                             ?>
                                         </select>

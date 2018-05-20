@@ -12,12 +12,16 @@ if (isset($_POST["status"])) {
     if($_POST["actual_installation_date"] != "")
         $order->setActualInstallationDate(new DateTime($_POST["actual_installation_date"]));
     
+    $order->setUpdateDate(new DateTime());
+    $order->setAdminID($admin_id);
     $order->setActualInstallationTimeFrom($_POST["actual_installation_time_from"]);
     $order->setActualInstallationTimeTo($_POST["actual_installation_time_to"]);
     $result = $order->doUpdate();
     if ($result)
         echo "<div class='alert alert-success'>done</div>";
 }
+
+$order = $dbTools->objOrderTools($_GET["order_id"], 2);
 ?>
 
 <title>Order <?= $order->getOrderID(); ?>'s details</title>
@@ -242,7 +246,13 @@ if (isset($_POST["status"])) {
 </div>
 
 <form class="register-form" method="post">
+    <?php
+    $admin_result = $dbTools->query("select * from `admins` where `admin_id`='" . $order->getAdminID() . "'");
+    $admin_row = $dbTools->fetch_assoc($admin_result);
+    ?>
+    <i>Last Update by '<?= $admin_row["username"]; ?>' on <?= $order->getUpdateDate(); ?></i><br/><br/>
     <div class="form-group">
+        
         <label for="email">Status:</label>
         <select  name="status" class="form-control">
             <option <?php if ($order->getStatus() == "sent") echo "selected"; ?> value="sent">Sent</option>

@@ -61,7 +61,9 @@ class OrderTools {
     private $remaining_days_from;
     private $remaining_days_to;
     private $product_id;
-
+    private $admin_id;
+    private $update_date;
+    
     public function __construct($order_id, $objDBTools, $depth = 0, $path = null) {
         if ($depth == 5)
             return;
@@ -85,6 +87,8 @@ class OrderTools {
         $this->creation_date = $order_row["creation_date"];
         $this->status = $order_row["status"];
         $this->product_id = $order_row["product_id"];
+        $this->admin_id = $order_row["admin_id"];
+        $this->update_date = $order_row["update_date"];
         
         $this->getOrderOptions();
 
@@ -150,6 +154,22 @@ class OrderTools {
 
     public function setTerminationDate($termination_date) {
         $this->termination_date = $termination_date;
+    }
+    
+    public function getUpdateDate() {
+        return $this->update_date;
+    }
+
+    public function setUpdateDate($update_date) {
+        $this->update_date = $update_date;
+    }
+    
+    public function getAdminID() {
+        return $this->admin_id;
+    }
+
+    public function setAdminID($admin_id) {
+        $this->admin_id = $admin_id;
     }
     
     public function getStartDate() {
@@ -432,6 +452,8 @@ class OrderTools {
 
     public function doUpdate() {
         $result_order = $this->objDBTools->query("update `orders` set "
+                . "`admin_id`='" . $this->admin_id . "', "
+                . "`update_date`='" . $this->update_date->format("Y-m-d H:i:s") . "', "
                 . "`status`='" . $this->status . "' "
                 . "where `order_id`='" . $this->order_id . "'");
 
