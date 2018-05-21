@@ -61,6 +61,9 @@ class OrderTools {
     private $remaining_days_from;
     private $remaining_days_to;
     private $product_id;
+    private $product_title;
+    private $product_category;
+    private $product_subscription_type;
     private $admin_id;
     private $update_date;
     
@@ -87,6 +90,7 @@ class OrderTools {
         $this->creation_date = $order_row["creation_date"];
         $this->status = $order_row["status"];
         $this->product_id = $order_row["product_id"];
+        $this->product_title = $order_row["product_title"];
         $this->admin_id = $order_row["admin_id"];
         $this->update_date = $order_row["update_date"];
         
@@ -155,6 +159,11 @@ class OrderTools {
     public function setTerminationDate($termination_date) {
         $this->termination_date = $termination_date;
     }
+    
+    public function getProductTitle() {
+        return $this->product_title;
+    }
+
     
     public function getUpdateDate() {
         return $this->update_date;
