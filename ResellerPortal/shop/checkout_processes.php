@@ -67,6 +67,8 @@ if ($_GET["do"] == "register") {
             $extra_order_recurring_status = "";
         }
 
+        $result_product = $conn_routers->query("select * from `products` where `product_id`='" . $product_id . "'");
+        $row_product = $result_product->fetch_assoc();
         //2- Create new Order
         $result_order = $conn_routers->query("insert into `orders` ("
                 . "`product_id`, "
@@ -74,6 +76,9 @@ if ($_GET["do"] == "register") {
                 . "`status`, "
                 . "`reseller_id`, "
                 . "`customer_id`, "
+                . "`product_title`, "
+                . "`product_category`, "
+                . "`product_subscription_type`, "
                 . "`extra_order_recurring_status` "
                 . ") VALUES ("
                 . "'" . $product_id . "',"
@@ -81,6 +86,9 @@ if ($_GET["do"] == "register") {
                 . "'sent', "
                 . "'" . $reseller_id . "', "
                 . "'" . $customer_id . "', "
+                . "'" . $row_product["title"] . "', "
+                . "'" . $row_product["category"] . "', "
+                . "'" . $row_product["subscription_type"] . "', "
                 . "'" . $extra_order_recurring_status . "'"
                 . ")");
 
