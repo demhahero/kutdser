@@ -98,6 +98,14 @@ include_once "dbconfig.php";
                                 <li><a href="<?= $site_url ?>/requests/requests.php">Requests</a></li>
                             </ul>
                         </li>
+                        <li>
+                          <a href="<?= $site_url ?>/expire/expire_soon_orders.php">Expire Soon
+                            <?php
+                            $count = $dbTools->order_expiration_count();
+                            if ($count > 0)
+                                echo "<span id=\"expireCount\" class=\"label label-danger\">" . $count . "</span>";
+                            ?></a>
+                        </li>
                         <li><a href="<?= $site_url ?>/tik_monitoring/customers.php">Support</a></li>
                     </ul>
                     <ul class="nav navbar-nav navbar-right">

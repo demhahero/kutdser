@@ -54,27 +54,31 @@ class DBTools {
     public function objOrderTools($order_id, $depth = 3, $path = null) {
         return new OrderTools($order_id, $this, $depth, $path);
     }
-    
+
     public function objModemTools($modem_id, $depth = 3, $path = null) {
         return new ModemTools($modem_id, $this, $depth, $path);
     }
-    
+
     public function objRouterTools($router_id, $depth = 3, $path = null) {
         return new RouterTools($router_id, $this, $depth, $path);
     }
-    
+
     public function objUpcomingCustomerTools($upcoming_customer_id=null, $depth = 3, $path = null) {
         return new UpcomingCustomerTools($upcoming_customer_id, $this, $depth, $path);
     }
-    
+
     public function objAdminTools($admin_id, $depth = 3, $path = null) {
         return new AdminTools($admin_id, $this, $depth, $path);
     }
-    
+
     public function objRequestTools($request_id = null, $depth = 3, $path = null) {
         return new RequestTools($request_id, $this, $depth, $path);
     }
-
+    public function order_expiration_count(){
+      $query="SELECT count(*) as 'expire_count' FROM `order_expiration_notify` WHERE `seen` = 'no'";
+      $ordersResult = $this->query($query);
+      return $this->fetch_assoc($ordersResult)["expire_count"];
+    }
     public function order_query($queryString, $depth = 3, $path = null) {
         $orders = array();
         $order_result = $this->query($queryString);
@@ -85,10 +89,10 @@ class DBTools {
     }
     public function order_query_api($queryString,$fields,$child=null,$childFields=null,$child2=null,$child2Fields=null,$child3=null,$child3Fields=null) {
         $orders = array();
-        
+
         $this->query("SET CHARACTER SET utf8");
-        
-        
+
+
         $order_result = $this->query($queryString);
         while ($order_row = $this->fetch_assoc($order_result)) {
             $order = array();
@@ -102,7 +106,7 @@ class DBTools {
                 foreach ($childFields as $childKey => $childValue)
                 {
                     $orderChild[$childKey] = $order_row[$childValue];
-                    
+
                 }
                 array_push($orderChildArray,$orderChild);
                 $order[$child] = $orderChildArray;
@@ -113,7 +117,7 @@ class DBTools {
                 foreach ($child2Fields as $childKey => $childValue)
                 {
                     $orderChild[$childKey] = $order_row[$childValue];
-                    
+
                 }
                 array_push($orderChildArray,$orderChild);
                 $order[$child2] = $orderChildArray;
@@ -124,7 +128,7 @@ class DBTools {
                 foreach ($child3Fields as $childKey => $childValue)
                 {
                     $orderChild[$childKey] = $this->conn_routers->real_escape_string($order_row[$childValue]);
-                    
+
                 }
                 array_push($orderChildArray,$orderChild);
                 $order[$child3] = $orderChildArray;
@@ -133,7 +137,7 @@ class DBTools {
         }
         return $orders;
     }
-    
+
     public function customer_query($queryString, $depth = 3, $path= null) {
         $customers = array();
         $customer_result = $this->query($queryString);
@@ -144,15 +148,15 @@ class DBTools {
     }
     public function customer_query_api($queryString,$fields,$child=null,$childFields=null,$child2=null,$child2Fields=null) {
         $customers = array();
-        
+
         $this->query("SET CHARACTER SET utf8");
-        
-        
+
+
         $customers_result = $this->query($queryString);
         while ($customer_row = $this->fetch_assoc($customers_result)) {
             		if(isset($customers[$customer_row['customer_id']]))
             {
-                
+
                 if ($child2 != null) {
                     $customerChildArray = $customers[$customer_row['customer_id']][$child2];
                     $customerChild = array();
@@ -194,8 +198,8 @@ class DBTools {
                     $customers[$customer_row['customer_id']][$child2] = $customerChildArray;
                 }
             }
-            
-            
+
+
         }
         $customersPure = array();
 	foreach($customers as $row){
@@ -211,7 +215,7 @@ class DBTools {
         }
         return $upcoming_customers;
     }
-    
+
     public function request_query($queryString, $depth = 3, $path = null) {
         $requests = array();
         $request_result = $this->query($queryString);
@@ -236,7 +240,7 @@ class DBTools {
                 foreach ($childFields as $childKey => $childValue)
                 {
                     $requestChild[$childKey] = $request_row[$childValue];
-                    
+
                 }
                 array_push($requestChildArray,$requestChild);
                 $request[$child] = $requestChildArray;
@@ -247,7 +251,7 @@ class DBTools {
                 foreach ($child2Fields as $childKey => $childValue)
                 {
                     $requestChild[$childKey] = $request_row[$childValue];
-                    
+
                 }
                 array_push($requestChildArray,$requestChild);
                 $request[$child2] = $requestChildArray;
@@ -258,7 +262,7 @@ class DBTools {
                 foreach ($child3Fields as $childKey => $childValue)
                 {
                     $requestChild[$childKey] = $request_row[$childValue];
-                    
+
                 }
                 array_push($requestChildArray,$requestChild);
                 $request[$child3] = $requestChildArray;
@@ -269,17 +273,17 @@ class DBTools {
                 foreach ($child4Fields as $childKey => $childValue)
                 {
                     $requestChild[$childKey] = $request_row[$childValue];
-                    
+
                 }
                 array_push($requestChildArray,$requestChild);
                 $request[$child4] = $requestChildArray;
             }
-            
+
             array_push($requests,$request);
         }
         return $requests;
     }
-    
+
     public function modem_query($queryString, $depth = 3, $path = null) {
         $modems = array();
         $modem_result = $this->query($queryString);
@@ -304,7 +308,7 @@ class DBTools {
                 foreach ($childFields as $childKey => $childValue)
                 {
                     $modemChild[$childKey] = $modem_row[$childValue];
-                    
+
                 }
                 array_push($modemChildArray,$modemChild);
                 $modem[$child] = $modemChildArray;
@@ -315,12 +319,12 @@ class DBTools {
                 foreach ($child2Fields as $childKey => $childValue)
                 {
                     $modemChild[$childKey] = $modem_row[$childValue];
-                    
+
                 }
                 array_push($modemChildArray,$modemChild);
                 $modem[$child2] = $modemChildArray;
             }
-            
+
             array_push($modems,$modem);
         }
         return $modems;
@@ -333,5 +337,5 @@ class DBTools {
         }
         return $routers;
     }
-   
+
 }
