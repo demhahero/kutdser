@@ -25,8 +25,11 @@ if (
         $customer["customer_id"] = $customer_row["customer_id"];
         $customer["full_name"] = $customer_row["full_name"];
 
-        $orders = $dbTools->orders_by_month($customer_row["customer_id"], $year, $month);
+        //$orders = $dbTools->orders_by_month($customer_row["customer_id"], $year, $month);
+        $ordersMonthly=$dbTools->orders_by_month($customer_row["customer_id"], $year, $month);
+        $ordersYearly=$dbTools->orders_by_month_yearly($customer_row["customer_id"], $year, $month);
 
+        $orders=array_merge($ordersMonthly,$ordersYearly);
         $customer["orders"] = $orders;
 
         array_push($customers, $customer);
