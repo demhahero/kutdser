@@ -21,10 +21,11 @@ include "RouterTools.php";
  */
 class DBTools {
 
-  private $db_host = "localhost";
-  private $db_username = "i3702914_wp1";
-  private $db_password = "D@fH(9@QUrGOC7Ki5&*61]&0";
-  private $db_name = 'routers'; //database name
+    private $db_host = "localhost";
+
+    private $db_username = "root";
+    private $db_password = "";
+    private $db_name = 'router'; //database name
 
     private $conn_routers;
     private $query_result;
