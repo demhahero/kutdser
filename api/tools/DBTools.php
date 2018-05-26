@@ -21,11 +21,10 @@ include "RouterTools.php";
  */
 class DBTools {
 
-    private $db_host = "localhost";
-
-    private $db_username = "root";
-    private $db_password = "";
-    private $db_name = 'router'; //database name
+  private $db_host = "localhost";
+  private $db_username = "i3702914_wp1";
+  private $db_password = "D@fH(9@QUrGOC7Ki5&*61]&0";
+  private $db_name = 'routers'; //database name
 
     private $conn_routers;
     private $query_result;
@@ -1400,14 +1399,22 @@ return $customers;
 			else
 			{
 ///////////////// get month info from order
-			$remaining_days=(int)$start_active_date->format('t')-(int)$start_active_date->format('d');
+			$remaining_days=(int)$start_active_date->format('t')-(int)$start_active_date->format('d')+1;
 			$startSubscriptionYearlyDate=new DateTime($recurring_date->format('Y')."-".$recurring_date->format('m')."-".$recurring_date->format('d'));
 			$interval = new DateInterval('P1Y');
 			$startSubscriptionYearlyDate->sub($interval);
 
 			$yearDays=$recurring_date->diff($startSubscriptionYearlyDate)->days;
-			$oneDayPrice=(float)$orderChild["product_price"]/(int)$yearDays;
-			$remaining_days_price=$oneDayPrice*$remaining_days;
+
+      $oneDayPrice=(float)$orderChild["product_price"]/(int)$yearDays;
+      $oneDayPriceRouter=(float)$orderChild["router_price"]/(int)$yearDays;
+      $oneDayPriceAdditionalPrice=(float)$orderChild["additional_service_price"]/(int)$yearDays;
+
+      $remaining_days_price=$oneDayPrice*$remaining_days;
+      $remaining_days_price_router=$oneDayPriceRouter*$remaining_days;
+      $remaining_days_price_additional_price=$oneDayPriceAdditionalPrice*$remaining_days;
+
+      $remaining_days_price_all=$remaining_days_price+$remaining_days_price_router+$remaining_days_price_additional_price;
 
 			$product_price=(float)$orderChild["product_price"];
 			$additional_service_price=(float)$orderChild["additional_service_price"];
@@ -1425,7 +1432,7 @@ return $customers;
 			echo "</br> router_price: ".$router_price;
 			echo "</br> adapter_price: ".$adapter_price;
 			*/
-      $totalPriceWoR=$remaining_days_price+$product_price;
+      $totalPriceWoR=$remaining_days_price_all+$product_price;
 			$totalPriceWoT=$totalPriceWoR+$additional_service_price+$setup_price+$modem_price+$router_price+$adapter_price;
 
 			$qst_tax=$totalPriceWoT*0.09975;
@@ -1446,7 +1453,7 @@ return $customers;
 			$monthInfo["plan"]=$order_row["plan"];
 			$monthInfo["modem"]=$order_row["modem"];
 			$monthInfo["router"]=$order_row["router"];
-			$monthInfo["remaining_days_price"]=round($remaining_days_price,2, PHP_ROUND_HALF_UP);
+			$monthInfo["remaining_days_price"]=round($remaining_days_price_all,2, PHP_ROUND_HALF_UP);
 			$monthInfo["remaining_days"]=$remaining_days;
 			$monthInfo["qst_tax"]=round($qst_tax,2, PHP_ROUND_HALF_UP);
 			$monthInfo["gst_tax"]=round($gst_tax,2, PHP_ROUND_HALF_UP);
@@ -1866,8 +1873,9 @@ return $customers;
 
 
 			$orderChild = array();
+      $orderChild["displayed_order_id"]=$order_row["order_id"];
       if ((int) $order_row["order_id"] > 10380)
-          $order_row["order_id"] = (((0x0000FFFF & (int) $order_row["order_id"]) << 16) + ((0xFFFF0000 & (int) $order_row["order_id"]) >> 16));
+          $orderChild["displayed_order_id"] = (((0x0000FFFF & (int) $order_row["order_id"]) << 16) + ((0xFFFF0000 & (int) $order_row["order_id"]) >> 16));
 
 			$orderChild["order_id"]=$order_row["order_id"];
       $orderChild["join_type"]=$order_row["join_type"];
@@ -1888,6 +1896,7 @@ return $customers;
 
 			$orderChild["plan"]=$order_row["plan"];
 			$orderChild["modem"]=$order_row["modem"];
+      $orderChild["additional_service"]=$order_row["additional_service"];
 			$orderChild["router"]=$order_row["router"];
 			$orderChild["cable_subscriber"]=$order_row["cable_subscriber"];
 			$orderChild["current_cable_provider"]=$order_row["current_cable_provider"];
@@ -1949,7 +1958,18 @@ return $customers;
 
 			$monthDays=(int)$start_active_date->format('t');
 			$oneDayPrice=(float)$orderChild["product_price"]/(int)$monthDays;
-			$remaining_days_price=$oneDayPrice*$remaining_days;
+			//$remaining_days_price=$oneDayPrice*$remaining_days;
+
+
+      $oneDayPrice=(float)$orderChild["product_price"]/(int)$monthDays;
+      $oneDayPriceRouter=(float)$orderChild["router_price"]/(int)$monthDays;
+      $oneDayPriceAdditionalPrice=(float)$orderChild["additional_service_price"]/(int)$monthDays;
+
+      $remaining_days_price=$oneDayPrice*$remaining_days;
+      $remaining_days_price_router=$oneDayPriceRouter*$remaining_days;
+      $remaining_days_price_additional_price=$oneDayPriceAdditionalPrice*$remaining_days;
+
+      $remaining_days_price_all=$remaining_days_price+$remaining_days_price_router+$remaining_days_price_additional_price;
 
 			$product_price=(float)$orderChild["product_price"];
 			$additional_service_price=(float)$orderChild["additional_service_price"];
@@ -1970,7 +1990,7 @@ return $customers;
 			$days=$recurring_date->diff($start_active_date)->days;
 
       //commission base amount
-      $totalPriceWoR=$remaining_days_price+$product_price;
+      $totalPriceWoR=$remaining_days_price_all+$product_price;
       // subtotal
 			$totalPriceWoT=$totalPriceWoR+$additional_service_price+$setup_price+$modem_price+$router_price+$adapter_price;
 
@@ -1984,7 +2004,7 @@ return $customers;
       $monthInfo["plan"]=$orderChild["plan"];
       $monthInfo["modem"]=$orderChild["modem"];
       $monthInfo["router"]=$orderChild["router"];
-      $monthInfo["remaining_days_price"]=round($remaining_days_price,2, PHP_ROUND_HALF_UP);
+      $monthInfo["remaining_days_price"]=round($remaining_days_price_all,2, PHP_ROUND_HALF_UP);
       $monthInfo["qst_tax"]=round($qst_tax,2, PHP_ROUND_HALF_UP);
       $monthInfo["gst_tax"]=round($gst_tax,2, PHP_ROUND_HALF_UP);
       $monthInfo["adapter_price"]=$orderChild["adapter_price"];
@@ -2004,13 +2024,21 @@ return $customers;
           else {
             $monthInfo["router_price"]=0;
           }
+          if($orderChild["additional_service"]==='yes')
+          {
+            $action=$action.", Additional Service";
+             $monthInfo["additional_service_price"]=$orderChild["additional_service_price"];
+           }
+          else {
+            $monthInfo["additional_service_price"]=0;
+          }
           $totalPriceWoR=$product_price;
-          $totalPriceWoT=$product_price+(float)$monthInfo["router_price"];
+          $totalPriceWoT=$product_price+(float)$monthInfo["router_price"]+(float)$monthInfo["additional_service_price"];
           $qst_tax=$totalPriceWoT*0.09975;
           $gst_tax=$totalPriceWoT*0.05;
           $tempPostDate = new DateTime($year."-".$month."-01");
           $days=(int)$tempPostDate->format( 't' );
-          $monthInfo["additional_service_price"]=0;
+          //$monthInfo["additional_service_price"]=0;
     			$monthInfo["setup_price"]=0;
     			$monthInfo["modem_price"]=0;
 
@@ -2109,20 +2137,37 @@ return $customers;
 				{
 					$totalPriceWoT=(float)$request_row["product_price"]+$change_speed_fee;
 
+          if($orderChild["router"]==='rent')
+          {
+            $action=$action.", Router rent";
+             $monthInfo["router_price"]=(float)$orderChild["router_price"];
+           }
+          else {
+            $monthInfo["router_price"]=0;
+          }
+          if($orderChild["additional_service"]==='yes')
+          {
+            $action=$action.", Additional service";
+             $monthInfo["additional_service_price"]=(float)$orderChild["additional_service_price"];
+           }
+          else {
+            $monthInfo["additional_service_price"]=0;
+          }
+          $subtotal=$totalPriceWoT+(float)$monthInfo["router_price"]+(float)$monthInfo["additional_service_price"];
 					$qst_tax=$totalPriceWoT*0.09975;
 					$gst_tax=$totalPriceWoT*0.05;
 
-					$totalPriceWT=$totalPriceWoT+$qst_tax+$gst_tax;
+					$totalPriceWT=$subtotal+$qst_tax+$gst_tax;
 					$totalPriceWT7=$totalPriceWT;
           $monthInfo["change_speed_fee"]=$change_speed_fee;
           $monthInfo["total_price_with_out_router"]=round((float)$request_row["product_price"],2, PHP_ROUND_HALF_UP);
-					$monthInfo["total_price_with_out_tax"]=round($totalPriceWoT,2, PHP_ROUND_HALF_UP);
+					$monthInfo["total_price_with_out_tax"]=round($subtotal,2, PHP_ROUND_HALF_UP);
 					$monthInfo["total_price_with_tax"]=round($totalPriceWT,2, PHP_ROUND_HALF_UP);
 					$monthInfo["total_price_with_tax_p7"]=round($totalPriceWT7,2, PHP_ROUND_HALF_UP);
 
 
 					$monthInfo["product_price"]=(float)$request_row["product_price"];
-					$monthInfo["additional_service_price"]=0;
+					//$monthInfo["additional_service_price"]=0;
 					$monthInfo["setup_price"]=0;
 
 					if($monthInfo["router"]!=="rent" )
@@ -2250,78 +2295,172 @@ echo "start_month_between_start_and_recurring: ".$start_month_between_start_and_
             $actionTax+=82;//termination fee
             $this_product_price= 0;
             $orderChild["recurring_date"]="0000-00-00";
+            $previous_product_price= (((float)$monthInfo["product_price"])/$monthDays)*$previous_days;
+
+            $paid_qst_tax=abs((float)$monthInfo["product_price"])*0.09975;
+            $paid_gst_tax=abs((float)$monthInfo["product_price"])*0.05;
+            $paid_Tax=$paid_qst_tax+$paid_gst_tax;
+
+            $previous_qst_tax=abs($previous_product_price)*0.09975;
+            $previous_gst_tax=abs($previous_product_price)*0.05;
+            $previous_Tax=$previous_qst_tax+$previous_gst_tax;
+
+
+
+
+  					$priceDifference=(float)$monthInfo["product_price"]-($this_product_price+$previous_product_price);//-(float)$monthInfo["product_price"];
+            $total_paid=($this_product_price+$previous_product_price);
+            //$priceDifference=((float)$monthInfo["product_price"]-$previous_product_price)+((float)$request_row["product_price"]-$this_product_price);//-(float)$monthInfo["product_price"];
+            $monthInfo["product_price_difference"]=$priceDifference;
+  					$monthInfo["product_price_previous"]=$monthInfo["product_price"];
+            $monthInfo["product_price_current"]=0;
+            //$totalPriceWoT=(float)$monthInfo["product_price"]+$priceDifference;
+
+  					$monthInfo["product_price"]=0;
+  					//$monthInfo["product_price_2"]=0;
+
+  					$monthInfo["days"]=$previous_days;
+  					$monthInfo["days_2"]=$this_request_days;
+
+            //echo $monthInfo["product_price"]."-".$priceDifference;
+            ///commission base amount: product + remaining days
+  					$totalPriceWoT=$total_paid;
+            $request_row["action"]="terminated";
+            // subtotal : commission+all addition prices+fees
+            if($monthInfo["router"]!=="rent" )
+            {
+  						$monthInfo["router_price"]=0;
+
+            }
+            else {
+              $monthInfo["router_price"]= (((float)$orderChild["router_price"])/$monthDays)*$previous_days;
+              $request_row["action"]="terminated, Router Rent";
+            }
+
+            if($orderChild["additional_service"]==='yes')
+            {
+               $monthInfo["additional_service_price"]=(((float)$orderChild["additional_service_price"])/$monthDays)*$previous_days;
+               $request_row["action"]="terminated, Router Rent, Additional service";
+             }
+            else {
+              $monthInfo["additional_service_price"]=0;
+            }
+
+            $action=$request_row["action"];
+            $subtotal=$totalPriceWoT+$actionTax+(float)$monthInfo["router_price"]+(float)$monthInfo["additional_service_price"];
+
+            $total_qst_tax=abs((float)$subtotal)*0.09975;
+            $total_gst_tax=abs((float)$subtotal)*0.05;
+            $total_tax=$total_qst_tax +$total_gst_tax;
+
+  					$totalPriceWT=$subtotal+$total_tax;
+  					$totalPriceWT7=$totalPriceWT;
+
+            $monthInfo["change_speed_fee"]=$actionTax;
+
+            $monthInfo["total_price_with_out_router"]=round($totalPriceWoT,2, PHP_ROUND_HALF_UP);
+  					$monthInfo["total_price_with_out_tax"]=round($subtotal,2, PHP_ROUND_HALF_UP);
+  					$monthInfo["total_price_with_tax"]=round($totalPriceWT,2, PHP_ROUND_HALF_UP);
+  					$monthInfo["total_price_with_tax_p7"]=round($totalPriceWT7,2, PHP_ROUND_HALF_UP);
+
+
+  					$monthInfo["product_title_2"]="";
+
+  					//$monthInfo["additional_service_price"]=0;
+  					$monthInfo["setup_price"]=0;
+
+
+  					if($monthInfo["modem"]!=="rent" )
+  						$monthInfo["modem_price"]=0;
+  					$monthInfo["remaining_days_price"]=0;
+  					$monthInfo["qst_tax"]=round($previous_qst_tax,2, PHP_ROUND_HALF_UP);
+  					$monthInfo["gst_tax"]=round($previous_gst_tax,2, PHP_ROUND_HALF_UP);
+            $monthInfo["qst_tax_2"]=round($total_qst_tax,2, PHP_ROUND_HALF_UP);
+            $monthInfo["gst_tax_2"]=round($total_gst_tax,2, PHP_ROUND_HALF_UP);
+  					$monthInfo["adapter_price"]=0;
           }
+          else{
 
-					$previous_product_price= (((float)$monthInfo["product_price"])/$monthDays)*$previous_days;
+  					$previous_product_price= (((float)$monthInfo["product_price"])/$monthDays)*$previous_days;
 
-          $paid_qst_tax=abs((float)$monthInfo["product_price"])*0.09975;
-          $paid_gst_tax=abs((float)$monthInfo["product_price"])*0.05;
-          $paid_Tax=$paid_qst_tax+$paid_gst_tax;
+            $paid_qst_tax=abs((float)$monthInfo["product_price"])*0.09975;
+            $paid_gst_tax=abs((float)$monthInfo["product_price"])*0.05;
+            $paid_Tax=$paid_qst_tax+$paid_gst_tax;
 
-          $previous_qst_tax=abs($previous_product_price)*0.09975;
-          $previous_gst_tax=abs($previous_product_price)*0.05;
-          $previous_Tax=$previous_qst_tax+$previous_gst_tax;
-
-
+            $previous_qst_tax=abs($previous_product_price)*0.09975;
+            $previous_gst_tax=abs($previous_product_price)*0.05;
+            $previous_Tax=$previous_qst_tax+$previous_gst_tax;
 
 
-					$priceDifference=(float)$monthInfo["product_price"]-($this_product_price+$previous_product_price);//-(float)$monthInfo["product_price"];
-          $total_paid=($this_product_price+$previous_product_price);
-          //$priceDifference=((float)$monthInfo["product_price"]-$previous_product_price)+((float)$request_row["product_price"]-$this_product_price);//-(float)$monthInfo["product_price"];
-          $monthInfo["product_price_difference"]=$priceDifference;
-					$monthInfo["product_price_previous"]=$monthInfo["product_price"];
-          $monthInfo["product_price_current"]=(float)$request_row["product_price"];
-          //$totalPriceWoT=(float)$monthInfo["product_price"]+$priceDifference;
 
-					$monthInfo["product_price"]=$previous_product_price;
-					$monthInfo["product_price_2"]=$this_product_price;
 
-					$monthInfo["days"]=$previous_days;
-					$monthInfo["days_2"]=$this_request_days;
+  					$priceDifference=(float)$monthInfo["product_price"]-($this_product_price+$previous_product_price);//-(float)$monthInfo["product_price"];
+            $total_paid=($this_product_price+$previous_product_price);
+            //$priceDifference=((float)$monthInfo["product_price"]-$previous_product_price)+((float)$request_row["product_price"]-$this_product_price);//-(float)$monthInfo["product_price"];
+            $monthInfo["product_price_difference"]=$priceDifference;
+  					$monthInfo["product_price_previous"]=$monthInfo["product_price"];
+            $monthInfo["product_price_current"]=(float)$request_row["product_price"];
+            //$totalPriceWoT=(float)$monthInfo["product_price"]+$priceDifference;
 
-          //echo $monthInfo["product_price"]."-".$priceDifference;
-          ///commission base amount: product + remaining days
-					$totalPriceWoT=$total_paid;
-          // subtotal : commission+all addition prices+fees
-          if($monthInfo["router"]!=="rent" )
-          {
-						$monthInfo["router_price"]=0;
+  					$monthInfo["product_price"]=$previous_product_price;
+  					$monthInfo["product_price_2"]=$this_product_price;
 
+  					$monthInfo["days"]=$previous_days;
+  					$monthInfo["days_2"]=$this_request_days;
+
+            //echo $monthInfo["product_price"]."-".$priceDifference;
+            ///commission base amount: product + remaining days
+  					$totalPriceWoT=$total_paid;
+            // subtotal : commission+all addition prices+fees
+            if($monthInfo["router"]!=="rent" )
+            {
+  						$monthInfo["router_price"]=0;
+
+            }
+            else {
+              $request_row["action"]=$request_row["action"].", Router Rent";
+            }
+            if($orderChild["additional_service"]==='yes')
+            {
+               $monthInfo["additional_service_price"]=(float)$orderChild["additional_service_price"];
+               $request_row["action"]=$request_row["action"].", Additional service";
+             }
+            else {
+              $monthInfo["additional_service_price"]=0;
+            }
+            $action=$request_row["action"];
+            $subtotal=$totalPriceWoT+$actionTax+(float)$monthInfo["router_price"]+(float)$monthInfo["additional_service_price"];
+
+            $total_qst_tax=abs((float)$subtotal)*0.09975;
+            $total_gst_tax=abs((float)$subtotal)*0.05;
+            $total_tax=$total_qst_tax +$total_gst_tax;
+
+  					$totalPriceWT=$subtotal+$total_tax;
+  					$totalPriceWT7=$totalPriceWT;
+
+            $monthInfo["change_speed_fee"]=$actionTax;
+
+            $monthInfo["total_price_with_out_router"]=round($totalPriceWoT,2, PHP_ROUND_HALF_UP);
+  					$monthInfo["total_price_with_out_tax"]=round($subtotal,2, PHP_ROUND_HALF_UP);
+  					$monthInfo["total_price_with_tax"]=round($totalPriceWT,2, PHP_ROUND_HALF_UP);
+  					$monthInfo["total_price_with_tax_p7"]=round($totalPriceWT7,2, PHP_ROUND_HALF_UP);
+
+
+  					$monthInfo["product_title_2"]=$request_row["product_title"];
+
+  					//$monthInfo["additional_service_price"]=0;
+  					$monthInfo["setup_price"]=0;
+
+
+  					if($monthInfo["modem"]!=="rent" )
+  						$monthInfo["modem_price"]=0;
+  					$monthInfo["remaining_days_price"]=0;
+  					$monthInfo["qst_tax"]=round($previous_qst_tax,2, PHP_ROUND_HALF_UP);
+  					$monthInfo["gst_tax"]=round($previous_gst_tax,2, PHP_ROUND_HALF_UP);
+            $monthInfo["qst_tax_2"]=round($total_qst_tax,2, PHP_ROUND_HALF_UP);
+            $monthInfo["gst_tax_2"]=round($total_gst_tax,2, PHP_ROUND_HALF_UP);
+  					$monthInfo["adapter_price"]=0;
           }
-          else {
-            $request_row["action"]=$request_row["action"].", Router Rent";
-          }
-          $subtotal=$totalPriceWoT+$actionTax+(float)$monthInfo["router_price"];
-
-          $total_qst_tax=abs((float)$subtotal)*0.09975;
-          $total_gst_tax=abs((float)$subtotal)*0.05;
-          $total_tax=$total_qst_tax +$total_gst_tax;
-
-					$totalPriceWT=$subtotal+$total_tax;
-					$totalPriceWT7=$totalPriceWT;
-
-          $monthInfo["change_speed_fee"]=$actionTax;
-
-          $monthInfo["total_price_with_out_router"]=round($totalPriceWoT,2, PHP_ROUND_HALF_UP);
-					$monthInfo["total_price_with_out_tax"]=round($subtotal,2, PHP_ROUND_HALF_UP);
-					$monthInfo["total_price_with_tax"]=round($totalPriceWT,2, PHP_ROUND_HALF_UP);
-					$monthInfo["total_price_with_tax_p7"]=round($totalPriceWT7,2, PHP_ROUND_HALF_UP);
-
-
-					$monthInfo["product_title_2"]=$request_row["product_title"];
-
-					$monthInfo["additional_service_price"]=0;
-					$monthInfo["setup_price"]=0;
-
-
-					if($monthInfo["modem"]!=="rent" )
-						$monthInfo["modem_price"]=0;
-					$monthInfo["remaining_days_price"]=0;
-					$monthInfo["qst_tax"]=round($previous_qst_tax,2, PHP_ROUND_HALF_UP);
-					$monthInfo["gst_tax"]=round($previous_gst_tax,2, PHP_ROUND_HALF_UP);
-          $monthInfo["qst_tax_2"]=round($total_qst_tax,2, PHP_ROUND_HALF_UP);
-          $monthInfo["gst_tax_2"]=round($total_gst_tax,2, PHP_ROUND_HALF_UP);
-					$monthInfo["adapter_price"]=0;
 
 				}
 				else{
@@ -2329,11 +2468,13 @@ echo "start_month_between_start_and_recurring: ".$start_month_between_start_and_
           $this_product_price=(float)$request_row["product_price"];
           if($monthInfo["router"]!=="rent" )
 						$monthInfo["router_price"]=0;
+          $monthInfo["product_price"]=(float)$request_row["product_price"];
           if($request_row["action"]==="terminate")
           {
             $actionTax=$change_speed_fee+82;//termination fee
             $this_product_price= 0;
             $monthInfo["router_price"]=0;
+            $monthInfo["product_price"]=0;
             $orderChild["recurring_date"]="0000-00-00";
           }
           $action=$request_row["action"];
@@ -2342,10 +2483,18 @@ echo "start_month_between_start_and_recurring: ".$start_month_between_start_and_
             $action=$action.", Router rent";
           }
 
+          if($orderChild["additional_service"]==='yes')
+          {
+             $monthInfo["additional_service_price"]=(((float)$orderChild["additional_service_price"])/$monthDays)*$previous_days;
+             $action=$action.", additional Service";
+           }
+          else {
+            $monthInfo["additional_service_price"]=0;
+          }
 					$totalPriceWoT=$this_product_price;
 
 
-          $subtotal=$totalPriceWoT+$actionTax+(float)$monthInfo["router_price"];
+          $subtotal=$totalPriceWoT+$actionTax+(float)$monthInfo["router_price"]+(float)$monthInfo["additional_service_price"];
 
           $qst_tax=$subtotal*0.09975;
 					$gst_tax=$subtotal*0.05;
@@ -2360,14 +2509,14 @@ echo "start_month_between_start_and_recurring: ".$start_month_between_start_and_
 					$monthInfo["total_price_with_tax"]=round($totalPriceWT,2, PHP_ROUND_HALF_UP);
 					$monthInfo["total_price_with_tax_p7"]=round($totalPriceWT7,2, PHP_ROUND_HALF_UP);
 
-					$monthInfo["product_price"]=(float)$request_row["product_price"];
+
 
 					$monthInfo["product_title"]=$request_row["product_title"];
 					$monthInfo["days"]=$monthDays;
 
 					$monthInfo["product_title_2"]=$request_row["product_title"];
 
-					$monthInfo["additional_service_price"]=0;
+					//$monthInfo["additional_service_price"]=0;
 					$monthInfo["setup_price"]=0;
 
 
