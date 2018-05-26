@@ -2294,6 +2294,9 @@ echo "start_month_between_start_and_recurring: ".$start_month_between_start_and_
           if($request_row["action"]==="terminate")
           {
             $actionTax+=82;//termination fee
+            //echo $this_action_on_date->format('Y-m-d')."<".$start_active_date->format('Y-m-d')."</br>";
+            if($this_action_on_date<$start_active_date)
+              $actionTax=0;//termination fee
             $this_product_price= 0;
             $orderChild["recurring_date"]="0000-00-00";
             $previous_product_price= (((float)$monthInfo["product_price"])/$monthDays)*$previous_days;
@@ -2473,6 +2476,8 @@ echo "start_month_between_start_and_recurring: ".$start_month_between_start_and_
           if($request_row["action"]==="terminate")
           {
             $actionTax=$change_speed_fee+82;//termination fee
+            if($this_action_on_date<$start_active_date)
+              $actionTax=0;//termination fee
             $this_product_price= 0;
             $monthInfo["router_price"]=0;
             $monthInfo["product_price"]=0;
