@@ -1,5 +1,7 @@
 <?php
 include_once "../header.php";
+$month=isset($_GET["month"])?$_GET["month"]:5;
+$year=isset($_GET["year"])?$_GET["year"]:2018;
 ?>
 
 <?php
@@ -19,7 +21,7 @@ if (isset($_GET["modem_id"])) {
     $(document).ready(function () {
         $('.dataTables_empty').html('<div class="loader"></div>');
 
-        $.getJSON("<?= $api_url ?>orders_by_month_for_customer.php?customer_id=<?= $_GET["customer_id"] ?>&month=<?= $_GET["month"] ?>&year=<?= $_GET["year"] ?>", function (result) {
+        $.getJSON("<?= $api_url ?>orders_by_month_for_customer.php?customer_id=<?= $_GET["customer_id"] ?>&month=<?= $month ?>&year=<?= $year ?>", function (result) {
           var total=0;
           var totalWoR=0;
 					var totalWT=0;
@@ -139,7 +141,39 @@ if (isset($_GET["modem_id"])) {
     <h4>Statistics for month <?= $_GET["month"] ?> year <?= $_GET["year"] ?> </h4>
     <h3 id="customer_header"></h3>
 </div>
+<form class="register-form form-inline" method="get">
+    <input name="customer_id" style="display:none;" value="<?= $_GET["customer_id"] ?>"/>
+    <div class="form-group">
+        <label for="email">Month:</label>
+        <select  name="month" class="form-control">
+            <?php
+            for ($i = 1; $i <= 12; $i++) {
+                if ($month == $i)
+                    echo "<option selected value=\"$i\">$i</option>";
+                else
+                    echo "<option value=\"$i\">$i</option>";
+            }
+            ?>
 
+        </select>
+        <label for="email">Year:</label>
+        <select  name="year" class="form-control">
+            <?php
+            for ($i = 2017; $i <= 2020; $i++) {
+                if ($year == $i)
+                    echo "<option selected value=\"$i\">$i</option>";
+                else
+                    echo "<option value=\"$i\">$i</option>";
+            }
+            ?>
+
+        </select>
+    </div>
+    <input type="submit" class="btn btn-default" value="Search">
+</form>
+
+
+<br><br>
 <h5>Month Info</h5>
 <!--
 <table class="display table table-striped table-bordered">
