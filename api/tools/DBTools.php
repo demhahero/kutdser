@@ -161,7 +161,7 @@ class DBTools {
                 $orderChild = array();
                 foreach ($childFields as $childKey => $childValue)
                 {
-                    $orderChild[$childKey] = $order_row[$childValue];
+                    $orderChild[$childKey] = $this->conn_routers->real_escape_string($order_row[$childValue]);
 
                 }
                 array_push($orderChildArray,$orderChild);
@@ -172,7 +172,7 @@ class DBTools {
                 $orderChild = array();
                 foreach ($child2Fields as $childKey => $childValue)
                 {
-                    $orderChild[$childKey] = $order_row[$childValue];
+                    $orderChild[$childKey] = $this->conn_routers->real_escape_string($order_row[$childValue]);
 
                 }
                 array_push($orderChildArray,$orderChild);

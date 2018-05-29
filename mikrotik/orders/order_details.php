@@ -23,7 +23,42 @@ if (isset($_POST["status"])) {
 
 $order = $dbTools->objOrderTools($_GET["order_id"], 2);
 ?>
+<script>
+    $(document).ready(function () {
+        $('.dataTables_empty').html('<div class="loader"></div>');
 
+        $.getJSON("<?=$api_url?>order_api.php?order_id=<?=$_GET["order_id"]?>", function (result) {
+            $.each(result, function (i, field) {
+                $(".displyed-order-id").html(field['displayed_order_id']);
+                $(".customer-full-name").html(field['customer'][0]['full_name']);
+                $(".customer-address").html(field['customer'][0]['address']+field['customer'][0]['city']+" "+
+                        field['customer'][0]['address_line_1']+" "+field['customer'][0]['address_line_2']+" "+
+                        field['customer'][0]['postal_code']);
+                $(".customer-email").html(field['customer'][0]['email']);
+                $(".customer-phone").html(field['customer'][0]['phone']);
+                $(".customer-note").html(field['customer'][0]['note']);
+                $(".product-title").html(field['product_title']);
+                $(".plan").html(field['plan']);
+                $(".creation-date").html(field['creation_date']);
+                $(".status").html(field['status']);
+                $(".router").html(field['router']);
+                $(".modem").html(field['modem']);
+                $(".additional-service").html(field['additional_service']);
+                $(".completion").html(field['completion']);
+                $(".reseller-full-name").html(field['reseller'][0]['full_name']);
+                $(".installation-date-1").html(field['installation_date_1']);
+                $(".installation-time-1").html(field['installation_time_1']);
+                $(".installation-date-2").html(field['installation_date_2']);
+                $(".installation-time-2").html(field['installation_time_2']);
+                $(".installation-date-3").html(field['installation_date_3']);
+                $(".installation-time-3").html(field['installation_time_3']);
+                $(".subscription-ref").html("SS_"+field['merchantref'][0]["merchantref"]);
+                $(".subscription-card-ref").html("CARD_"+field['merchantref'][0]["merchantref"]);
+                $(".subscription-payment-ref").html("P_"+field['merchantref'][0]["merchantref"]);
+            });
+        });
+    });
+</script>
 <title>Order <?= $order->getOrderID(); ?>'s details</title>
 <div class="page-header">
     <a href="orders.php">Orders</a> 
@@ -42,78 +77,74 @@ $order = $dbTools->objOrderTools($_GET["order_id"], 2);
     <table class="display table table-striped table-bordered">
         <tr>
             <td style="width:20%;">order ID</td>
-            <td><?= $order->getDisplayedID() ?></td>
-        </tr>  
-        <tr>
-            <td style="width:20%;">Termination Date</td>
-            <td><?php if($order->getTerminationDate() != null) echo $order->getTerminationDate()->format("Y-m-d"); ?></td>
-        </tr> 
+            <td class="displyed-order-id"></td>
+        </tr>
         <tr>
             <td>Completion</td>
-            <td>
-                <?= $order->getCompletion() ?>
+            <td class="completion">
+
             </td>
         </tr>
         <tr>
             <td>Customer</td>
-            <td>
-                <?= $order->getCustomer()->getFullName(); ?>
+            <td class="customer-full-name">
+
             </td>
         </tr>
         <tr>
             <td>Customer's Address</td>
-            <td>
-                <?= $order->getCustomer()->getAddress(); ?>
+            <td class="customer-address">
+
             </td>
         </tr>
         <tr>
             <td>Customer's Email</td>
-            <td>
-                <?= $order->getCustomer()->getEmail(); ?>
+            <td class="customer-email">
+
             </td>
         </tr>
         <tr>
             <td>Customer's Phone</td>
-            <td>
-                <?= $order->getCustomer()->getPhone(); ?>
+            <td class="customer-phone">
+
             </td>
         </tr>
         <tr>
             <td>Customer's Note</td>
-            <td>
-                <?= $order->getCustomer()->getNote(); ?>
+            <td class="customer-note">
+
             </td>
         </tr>
         <tr>
             <td>Reseller</td>
-            <td>
-                <?= $order->getReseller()->getFullName(); ?>
+            <td class="reseller-full-name">
+
             </td>
         </tr>
         <tr>
             <td>Creation Date</td>
-            <td><?= $order->getCreationDate()->format("Y-m-d") ?></td>
+            <td class="creation-date"></td>
         </tr>
         <tr>
             <td>Status</td>
-            <td><?= $order->getStatus() ?></td>
+            <td class="status"></td>
         </tr>
         <tr>
-            <td>Product Name</td>
-            <td>
-                <?= $order->getProduct()->getTitle(); ?>
+            <td>Product Title</td>
+            <td class="product-title">
+        
             </td>
         </tr>
         <tr>
-            <td>Plan</td>
-            <td>
-                <?= $order->getPlan() ?>
+            <td >Plan</td>
+            <td class="plan">
+
             </td>
         </tr>
         <tr>
             <td>Modem</td>
-            <td>
-                <?= $order->getModem() ?>
+            <td class="modem">
+  
             </td>
         </tr>
         <?php
@@ -151,8 +182,8 @@ $order = $dbTools->objOrderTools($_GET["order_id"], 2);
         ?>
         <tr>
             <td>Router</td>
-            <td>
-                <?= $order->getRouter() ?>
+            <td class="router">
+      
             </td>
         </tr>
         <?php
@@ -160,20 +191,20 @@ $order = $dbTools->objOrderTools($_GET["order_id"], 2);
         ?>
         <tr>
             <td>Cable subscriber</td>
-            <td>
-                <?= $order->getCableSubscriber() ?>
+            <td class="cable-subscriber">
+          
             </td>
         </tr>
         <tr>
             <td>Current cable provider</td>
-            <td>
-                <?= $order->getCurrentCableProvider() ?>
+            <td class="current-cable-provider">
+             
             </td>
         </tr>
         <tr>
             <td>Cancellation date</td>
-            <td>
-                <?= $order->getCancellationDate() ?>
+            <td class="cancellation-date">
+
             </td>
         </tr>
         <?php
@@ -181,38 +212,38 @@ $order = $dbTools->objOrderTools($_GET["order_id"], 2);
         ?>
         <tr>
             <td>installation date 1</td>
-            <td>
-                <?= $order->getInstallationDate1() ?>
+            <td class="installation-date-1">
+     
             </td>
         </tr>
         <tr>
             <td>installation time 1</td>
-            <td>
-                <?= $order->getInstallationTime1() ?>
+            <td class="installation-time-1">
+            
             </td>
         </tr>
         <tr>
             <td>installation date 2</td>
-            <td>
-                <?= $order->getInstallationDate2() ?>
+            <td class="installation-date-2">
+         
             </td>
         </tr>
         <tr>
             <td>installation time 2</td>
-            <td>
-                <?= $order->getInstallationTime2() ?>
+            <td class="installation-time-2">
+    
             </td>
         </tr>
         <tr>
             <td>installation date 3</td>
-            <td>
-                <?= $order->getInstallationDate3() ?>
+            <td class="installation-date-3">
+         
             </td>
         </tr>
         <tr>
             <td>installation time 3</td>
-            <td>
-                <?= $order->getInstallationTime3() ?>
+            <td class="installation-time-3">
+
             </td>
         </tr>
         <?php
@@ -220,26 +251,26 @@ $order = $dbTools->objOrderTools($_GET["order_id"], 2);
         ?>
         <tr>
             <td>additional service</td>
-            <td>
-                <?= $order->getAdditionalService() ?>
+            <td class="additional-service">
+
             </td>
         </tr> 
         <tr>
             <td>Subscription Ref</td>
-            <td style="background-color: gray;">
-                <?="SS_" . $order->getCustomer()->getMerchant()->getMerchantRef()?>
+            <td  class="subscription-ref" style="background-color: gray;">
+           
             </td>
         </tr>
         <tr>
             <td>Secure Card Ref</td>
-            <td style="background-color: gray;">
-                <?="CARD_" . $order->getCustomer()->getMerchant()->getMerchantRef()?>
+            <td  class="subscription-card-ref" style="background-color: gray;">
+         
             </td>
         </tr>
         <tr>
             <td>Payment Ref</td>
-            <td style="background-color: gray;">
-                <?="P_" . $order->getCustomer()->getMerchant()->getMerchantRef()?>
+            <td  class="subscription-payment-ref" style="background-color: gray;">
+  
             </td>
         </tr>             	
     </table>
