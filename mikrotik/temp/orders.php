@@ -8,6 +8,7 @@ include_once "../header.php";
 
         $.getJSON("<?=$api_url?>orders_api.php", function (result) {
             $.each(result['orders'], function (i, field) {
+                if(field['order_id'] < 10000)
                 table.row.add([
                     field['displayed_order_id'],
                     field['customer']["0"]["customer_id"],

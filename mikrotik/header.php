@@ -96,6 +96,7 @@ include_once "dbconfig.php";
                                 <li><a href="<?= $site_url ?>/customers/resellers.php">Resellers</a></li>
                                 <li><a href="<?= $site_url ?>/upcoming_customers/upcoming_customers.php">Upcoming Customers</a></li>
                                 <li><a href="<?= $site_url ?>/requests/requests.php">Requests</a></li>
+                                <li><a href="<?= $site_url ?>/customers/going_to_merge.php">Merges</a></li>
                             </ul>
                         </li>
                         <li>

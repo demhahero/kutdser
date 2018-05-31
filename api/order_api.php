@@ -71,7 +71,7 @@ FROM `orders`
 inner JOIN `order_options` on `order_options`.`order_id`= `orders`.`order_id` 
 inner JOIN `customers` on `orders`.`customer_id`=`customers`.`customer_id` 
 INNER JOIN `customers` resellers on resellers.`customer_id` = `orders`.`reseller_id` 
-INNER JOIN `merchantrefs` on `merchantrefs`.`customer_id` = `orders`.`customer_id` 
+INNER JOIN `merchantrefs` on `merchantrefs`.`customer_id` = `orders`.`customer_id` and type!='payment' 
 where `orders`.`order_id`='" . $order_id . "'"
         , $fields
         , "customer", $childFields
