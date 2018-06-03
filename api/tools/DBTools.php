@@ -517,7 +517,7 @@ private function fill_order_price_details_2($orderChild,$year,$month){
 
             }
             $recurring_price=$totalPriceWoT+(float)$request_row["router_price"];
-            $monthInfo["recurring_price"]=round($recurring_price+$recurring_price*0.0975+$recurring_price*0.05,2, PHP_ROUND_HALF_UP);
+            $monthInfo["recurring_price"]=round($recurring_price+$recurring_price*0.09975+$recurring_price*0.05,2, PHP_ROUND_HALF_UP);
 
   					$qst_tax=$totalPriceWoT*0.09975;
   					$gst_tax=$totalPriceWoT*0.05;
@@ -3268,7 +3268,7 @@ $customers = $this->query("SELECT customers.customer_id,resellers.customer_id as
         return $routers;
     }
 
-    public function tik_monitoring_query_api($queryString, $fields, $child = null, $childFields = null, $child2 = null, $child2Fields = null, $child3 = null, $child3Fields = null) {
+    public function tik_monitoring_query_api($queryString, $fields, $child = null, $childFields = null, $child2 = null, $child2Fields = null, $child3 = null, $child3Fields = null, $child4 = null, $child4Fields = null) {
         $customers = array();
 
         $this->query("SET CHARACTER SET utf8");
@@ -3318,6 +3318,15 @@ $customers = $this->query("SELECT customers.customer_id,resellers.customer_id as
                     }
                     array_push($customerChildArray, $customerChild);
                     $customers[$customer_row['customer_id']][$child3] = $customerChildArray;
+                }
+                if ($child4 != null) {
+                    $customerChildArray = array();
+                    $customerChild = array();
+                    foreach ($child4Fields as $childKey => $childValue) {
+                        $customerChild[$childKey] = $customer_row[$childValue];
+                    }
+                    array_push($customerChildArray, $customerChild);
+                    $customers[$customer_row['customer_id']][$child4] = $customerChildArray;
                 }
             }
         }

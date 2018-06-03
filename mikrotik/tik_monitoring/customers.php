@@ -39,7 +39,8 @@ $html = curl_exec($c);
                     router_mac_address,
                     ip_address,
                     plan,
-                    field["address"]
+                    field["address"],
+                    field['merchantref'][0]['merchantref']
                 ]).draw(false);
             });
         });
@@ -84,6 +85,7 @@ $html = curl_exec($c);
     <th style="width: 12%">IP</th>
     <th style="width: 10%">Plan</th>
     <th>Address</th>
+    <th>Merchant Ref</th>
 </thead>
 <tbody>
 </tbody>
