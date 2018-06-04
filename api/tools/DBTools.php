@@ -403,7 +403,7 @@ private function fill_order_price_details_2($orderChild,$year,$month){
             }
             $totalPriceWoR=$product_price;
             $recurring_price=$product_price+(float)$monthInfo["router_price"];
-            $monthInfo["recurring_price"]=round($recurring_price+$recurring_price*0.0975+$recurring_price*0.05,2, PHP_ROUND_HALF_UP);
+            $monthInfo["recurring_price"]=round($recurring_price+$recurring_price*0.09975+$recurring_price*0.05,2, PHP_ROUND_HALF_UP);
 
             $totalPriceWoT=$product_price+(float)$monthInfo["router_price"];
             $qst_tax=$totalPriceWoT*0.09975;
@@ -661,7 +661,7 @@ private function fill_order_price_details_2($orderChild,$year,$month){
               $this_product_price= 0;
               $orderChild["recurring_date"]="0000-00-00";
               $recurring_price=0;
-              $monthInfo["recurring_price"]=round($recurring_price+$recurring_price*0.0975+$recurring_price*0.05,2, PHP_ROUND_HALF_UP);
+              $monthInfo["recurring_price"]=round($recurring_price+$recurring_price*0.09975+$recurring_price*0.05,2, PHP_ROUND_HALF_UP);
 
             }
 
@@ -705,7 +705,7 @@ private function fill_order_price_details_2($orderChild,$year,$month){
               $request_row["action"]=$request_row["action"].", Router Rent";
             }
             $recurring_price=(float)$request_row["product_price"]+(float)$monthInfo["router_price"];
-            $monthInfo["recurring_price"]=round($recurring_price+$recurring_price*0.0975+$recurring_price*0.05,2, PHP_ROUND_HALF_UP);
+            $monthInfo["recurring_price"]=round($recurring_price+$recurring_price*0.09975+$recurring_price*0.05,2, PHP_ROUND_HALF_UP);
 
             $subtotal=$totalPriceWoT+$actionTax+(float)$monthInfo["router_price"];
 
@@ -752,7 +752,7 @@ private function fill_order_price_details_2($orderChild,$year,$month){
               $monthInfo["router_price"]=0;
               $orderChild["recurring_date"]="0000-00-00";
               $recurring_price=0;
-              $monthInfo["recurring_price"]=round($recurring_price+$recurring_price*0.0975+$recurring_price*0.05,2, PHP_ROUND_HALF_UP);
+              $monthInfo["recurring_price"]=round($recurring_price+$recurring_price*0.09975+$recurring_price*0.05,2, PHP_ROUND_HALF_UP);
 
             }
             $action=$request_row["action"];
@@ -764,7 +764,7 @@ private function fill_order_price_details_2($orderChild,$year,$month){
   					$totalPriceWoT=$this_product_price;
 
             $recurring_price=$totalPriceWoT+(float)$monthInfo["router_price"];
-            $monthInfo["recurring_price"]=round($recurring_price+$recurring_price*0.0975+$recurring_price*0.05,2, PHP_ROUND_HALF_UP);
+            $monthInfo["recurring_price"]=round($recurring_price+$recurring_price*0.09975+$recurring_price*0.05,2, PHP_ROUND_HALF_UP);
 
             $subtotal=$totalPriceWoT+$actionTax+(float)$monthInfo["router_price"];
 
@@ -836,7 +836,7 @@ private function fill_order_price_details_2($orderChild,$year,$month){
                 $recurring_price=(float)$monthInfo["product_price"]+(float)$monthInfo["router_price"];
               }
 
-              $monthInfo["recurring_price"]=round($recurring_price+$recurring_price*0.0975+$recurring_price*0.05,2, PHP_ROUND_HALF_UP);
+              $monthInfo["recurring_price"]=round($recurring_price+$recurring_price*0.09975+$recurring_price*0.05,2, PHP_ROUND_HALF_UP);
 
               $monthInfo["total_price_with_out_router"]=0;
     					$monthInfo["total_price_with_out_tax"]=0;

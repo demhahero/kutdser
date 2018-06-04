@@ -11,8 +11,8 @@ include_once "../header.php";
                 table.row.add([
                     field['customer_name'],
                     field['reseller_name'],
-                    field['orders'][0]['product_title'],
-                    field['orders'][1]['product_title'],
+                    '<a target="_blank" href="<?= $site_url ?>/orders/print_order.php?order_id='+field['orders'][0]['order_id']+'">'+field['orders'][0]['product_title']+'<a>',
+                    '<a target="_blank" href="<?= $site_url ?>/orders/print_order.php?order_id='+field['orders'][1]['order_id']+'">'+field['orders'][1]['product_title']+'<a>',
                     field['orders'][0]['monthInfo']['recurring_price'],
                     field['orders'][1]['monthInfo']['recurring_price'],
                     parseFloat(field['orders'][0]['monthInfo']['recurring_price'])+parseFloat(field['orders'][1]['monthInfo']['recurring_price']),
