@@ -1970,8 +1970,11 @@ return $customers;
       $remaining_days_price=$oneDayPrice*$remaining_days;
       $remaining_days_price_router=$oneDayPriceRouter*$remaining_days;
       $remaining_days_price_additional_price=$oneDayPriceAdditionalPrice*$remaining_days;
-
-      $remaining_days_price_all=$remaining_days_price+$remaining_days_price_router+$remaining_days_price_additional_price;
+      if((int)$start_active_date->format('d')===1)
+        $remaining_days_price_all=0;
+        else {
+          $remaining_days_price_all=$remaining_days_price+$remaining_days_price_router+$remaining_days_price_additional_price;
+        }
 
 			$product_price=(float)$orderChild["product_price"];
 			$additional_service_price=(float)$orderChild["additional_service_price"];
