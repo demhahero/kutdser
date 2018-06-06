@@ -2092,17 +2092,20 @@ return $customers;
 				$hasRequest=true;
 				$requestChild = array();
 				$requestChild["creation_date"] = $request_row["creation_date"];
+        $action="recurring";
+        /*
         $change_speed_date=new DateTime($request_row["action_on_date"]);
 				$interval = new DateInterval('P1M');
 				$change_speed_date->add($interval);
 
-        $action="recurring";
+
           if(((int)$change_speed_date->format('Y')===(int)$year)
          &&(int)$change_speed_date->format('m')===(int)$month)
          {
            $action=$action.", change speed";
            $change_speed_fee=7;
          }
+         */
 				$requestChild["action_on_date"] = $request_row["action_on_date"];
 				$requestChild["verdict_date"] = $request_row["verdict_date"];
 				$requestChild["verdict"] = $request_row["verdict"];
@@ -2291,13 +2294,13 @@ echo "start_month_between_start_and_recurring: ".$start_month_between_start_and_
           7- calualte the difference in tax prices.
           */
           //echo "hi";
-          $actionTax=$change_speed_fee;//change speed fee
+          $actionTax=7;//change speed fee
 					$this_request_days=$monthDays-(int)$this_action_on_date->format('d')+1;
 					$previous_days=$monthDays-$this_request_days;
           $this_product_price= (((float)$request_row["product_price"])/$monthDays)*$this_request_days;
           if($request_row["action"]==="terminate")
           {
-            $actionTax+=82;//termination fee
+            $actionTax=82;//termination fee
             //echo $this_action_on_date->format('Y-m-d')."<".$start_active_date->format('Y-m-d')."</br>";
             if($this_action_on_date<$start_active_date)
               $actionTax=0;//termination fee
