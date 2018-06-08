@@ -793,7 +793,7 @@ $('#updateForm').submit(function( event ) {
   {
     $('#modal2').modal('show');
     $.post( "<?=$api_url?>update_order_api.php", $( "#updateForm" ).serialize() , function (result) {
-    debugger;
+    
       $('#modal2').modal('hide');
       if(result.updated)
       {
@@ -805,8 +805,9 @@ $('#updateForm').submit(function( event ) {
       }
     }, 'json').fail(function(jqXHR, textStatus, errorThrown) {
       $('#modal2').modal('hide');
-      debugger;
-       console.log(errorThrown); });;
+
+       //console.log(errorThrown);
+     });
   }
 
 })

@@ -101,7 +101,7 @@ $(document).ready(function () {
     }
     $("select[name=\"customer_id\"] option:first").attr("selected", "selected");
 
-    // Step show event 
+    // Step show event
     $("#smartwizard").on("showStep", function (e, anchorObject, stepNumber, stepDirection, stepPosition) {
         //alert("You are on step "+stepNumber+" now");
         if (stepPosition === 'first') {
@@ -128,7 +128,7 @@ $(document).ready(function () {
 
     var temp_content = null;
     var last_temp = "internet";
-    //Select Internet product 
+    //Select Internet product
     $(".product-internet").click(function () {
         product_type = "internet";
         //if 1st time, remove phone form and save it in temp_content
@@ -229,12 +229,12 @@ $(document).ready(function () {
             return true;
         }
     }
-    
+
     //Set 1st product is monthly by default and disable yearly existed customers.
     $("select[name=\"product\"] option:first").attr("selected", "selected");
     $("select[name=\"customer_id\"] option[type=\"monthly\"]").prop('disabled', false);
-    $("select[name=\"customer_id\"] option[type=\"yearly\"]").prop('disabled', true);  
-    
+    $("select[name=\"customer_id\"] option[type=\"yearly\"]").prop('disabled', true);
+
     $("select[name=\"product\"]").change(function () {
         //If yearly, disable monthly existed customers
         if ($("select[name=\"product\"] option:selected").attr("type") == "yearly") {
@@ -317,20 +317,32 @@ $(document).ready(function () {
             var gst_tax = 0;
             var qst_tax = 0;
             var additional_service = 0;
+            var has_discount=false;
+            var free_modem=false;
+            var free_setup=false;
+            var free_router=false;
+
 
             //Get product price
+            has_discount = $("input[name=\"has_discount\"]").val()==='yes';
+            free_modem = $("input[name=\"free_modem\"]").val()==='yes';
+            free_setup = $("input[name=\"free_setup\"]").val()==='yes';
+            free_router = $("input[name=\"free_router\"]").val()==='yes';
             product_price = parseFloat($("select[name=\"product\"] option:selected").attr("price"));
 
             //If rent modem
             if ($("input[name=\"options[modem]\"]:checked").val() == "rent") {
                 modem_cost = 59.90;
-
+                if(has_discount && free_modem)
+                modem_cost=0;
                 //Deposit has no tax
                 //value_has_no_tax = modem_cost;
             }
 
             if ($("input[name=\"options[router]\"]:checked").val() == "rent") { //If rent router
                 router_cost = 2.90;
+                if(has_discount && free_router)
+                router_cost=0;
             } else if ($("input[name=\"options[router]\"]:checked").val() == "buy_hap_ac_lite") { //if buy hap ac lite
                 router_cost = 74.00;
             } else if ($("input[name=\"options[router]\"]:checked").val() == "buy_hap_mini") { //if buy hap mini
@@ -354,11 +366,13 @@ $(document).ready(function () {
                         installation_transfer_cost = 19.90;
                     else
                         installation_transfer_cost = 60.00;
+
+                    if(has_discount && free_setup)
+                    installation_transfer_cost=0;
                 }
             }
-            
-            //NOTICE: Have to be changed later
-            installation_transfer_cost = 0;
+
+
 
             //if transfer
             if ($("input[name=\"options[cable_subscriber]\"]:checked").val() == "yes") {
@@ -368,7 +382,7 @@ $(document).ready(function () {
 
                 //Calculate the number of days in this month
                 var days_in_month = parseInt(daysInMonth(start_date.getMonth(), start_date.getYear()));
-                
+
                 //Calculate the remaining days in this month
                 remainigDays = days_in_month - start_date.getDate() + 1;
             } else { //if new installation
@@ -382,8 +396,8 @@ $(document).ready(function () {
                 //Calculate the remaining days in this month
                 remainigDays = days_in_month - start_date.getDate() + 1;
             }
-            
-            
+
+
 
             //If 1st day of month, pay 1 month only.
             if (parseInt(start_date.getDate()) == 1) {
@@ -419,7 +433,7 @@ $(document).ready(function () {
             var monthNames = ["January", "February", "March", "April", "May", "June",
                 "July", "August", "September", "October", "November", "December"
             ];
-            
+
             //if first day, don't show remaining days from to
             if (parseInt(start_date.getDate()) != 1) {
                 $("div.order_details span.remaining-days-from-to").html("From: " + start_date.getDate() + "/" + monthNames[start_date.getMonth()] + " To " + days_in_month + "/" + monthNames[start_date.getMonth()]);
@@ -464,7 +478,7 @@ $(document).ready(function () {
             }
             //NOTICE: Have to be changed later
             adapter_price = 0;
-            
+
             //If transfer
             if ($("input[name=\"options[you_have_phone_number]\"]:checked").val() == "yes") {
                 transfer_price = 15;

@@ -18,11 +18,22 @@ $mGlobalOnePaymentXMLTools = new GlobalOnePaymentXMLTools();
   //
  */
 $product_id = intval($_POST["product"]);
+$has_discount = $_POST['has_discount']==='yes';
+$free_modem = $_POST['free_modem']==='yes';
+$free_setup = $_POST['free_setup']==='yes';
+$free_router = $_POST['free_router']==='yes';
+
+
+$_POST["options"]["free_modem"] = $_POST['free_modem'];
+$_POST["options"]["free_router"] = $_POST['free_router'];
+$_POST["options"]["free_setup"] = $_POST['free_setup'];
+$_POST["options"]["discount"] = 0;
 
 //if user selects phone change product type to phone
 $product_type = "internet";
 if ($product_id == 619 || $product_id == 654 || $product_id == 653 || $product_id == 661)
     $product_type = "phone";
+
 
 //If it is internet product
 if ($product_type == "internet") {
@@ -38,28 +49,30 @@ if ($product_type == "internet") {
 
     //Get product info
     $subscription_period_type = "MONTHLY";
-    $sql_product = "SELECT
-        wpp.ID,
-        wpp.post_title,
-        wppm.meta_key AS FIELD,
-        wppm.meta_value AS VALUE,
-        wppm.*
-      FROM wp_posts AS wpp
-        LEFT JOIN wp_postmeta AS wppm
-          ON wpp.ID = wppm.post_id
-      WHERE wpp.post_type = 'product'
-            AND (wppm.meta_key = '_regular_price')
-            AND wpp.id='" . $product_id . "'
-      ORDER BY wpp.ID ASC, FIELD ASC, wppm.meta_id DESC;";
+    $sql="SELECT * FROM `products` INNER JOIN `reseller_discounts`
+      on `products`.`product_id`=`reseller_discounts`.`product_id`
+      WHERE `reseller_discounts`.`reseller_id`='" . $reseller_id . "'
+      and `products`.`product_id`='".$product_id."'";
+    $result_product = $dbTools->query($sql);
 
-    $result_product = $conn_wordpress->query($sql_product);
+    if($result_product->num_rows ==0)
+    $result_product = $dbTools->query("SELECT * FROM `products` where `products`.`product_id`='".$product_id."'");
+
 
     if ($result_product->num_rows > 0) {
         $row_product = $result_product->fetch_assoc();
-        if (strpos($row_product["post_title"], 'Yearly') !== false) { // Check they type of payment (yearly or monthly)
+        if (strpos($row_product["subscription_type"], 'yearly') !== false) { // Check they type of payment (yearly or monthly)
             $subscription_period_type = "YEARLY";
         }
-        $product_price = $row_product["VALUE"];
+        $product_price = $row_product["price"];
+
+        if($has_discount && isset($row_product["discount"]) && (int)$row_product["discount"] > 0)
+        {
+          $_POST["options"]["discount"] = $row_product["discount"];
+          $product_price=(float)$row_product['price']-((float)$row_product['price']*(((float)$row_product['discount']/100)));
+          $product_price=round($product_price,2);
+        }
+
     }
 
     $total_price = 0;
@@ -73,25 +86,31 @@ if ($product_type == "internet") {
     $qst_tax = 0;
     $additional_service = 0;
 
+
+
     //If rent modem
     if ($_POST["options"]["modem"] == "rent") {
         $modem_cost = 59.90;
 
+        if($has_discount && $free_modem)
+        $modem_cost=0;
         //Deposit has no tax
         //$value_has_no_tax = $modem_cost;
     }
 
     if ($_POST["options"]["router"] == "rent") { //If rent router
         $router_cost = 2.90;
+        if($has_discount && $free_router)
+        $router_cost=0;
     } else if ($_POST["options"]["router"] == "buy_hap_ac_lite") { //if buy hap ac lite
         $router_cost = 74.00;
     } else if ($_POST["options"]["router"] == "buy_hap_mini") { //if buy hap mini
         $router_cost = 39.90;
     }
-    
+
 
 //Check additional service
-    if ($_POST["options"]["additional_service"] == "yes") {
+    if (isset($_POST["options"]["additional_service"]) && $_POST["options"]["additional_service"] == "yes") {
         $additional_service = 5;
     }
 
@@ -103,9 +122,10 @@ if ($product_type == "internet") {
             else
                 $installation_transfer_cost = 60.00;
         }
+        if($has_discount && $free_setup)
+        $installation_transfer_cost=0;
     }
-    //NOTICE: Have to be changed later
-    $installation_transfer_cost = 0;
+
 
     //get number of days in this month
     $days_in_month = cal_days_in_month(CAL_GREGORIAN, $start_date->format('m'), $start_date->format('Y'));
@@ -160,31 +180,32 @@ if ($product_type == "internet") {
     $start_date = new DateTime();
 
     //Get product info
-    $subscription_period_type = "MONTHLY";
-    $sql_product = "SELECT
-        wpp.ID,
-        wpp.post_title,
-        wppm.meta_key AS FIELD,
-        wppm.meta_value AS VALUE,
-        wppm.*
-      FROM wp_posts AS wpp
-        LEFT JOIN wp_postmeta AS wppm
-          ON wpp.ID = wppm.post_id
-      WHERE wpp.post_type = 'product'
-            AND (wppm.meta_key = '_regular_price')
-            AND wpp.id='" . $product_id . "'
-      ORDER BY wpp.ID ASC, FIELD ASC, wppm.meta_id DESC;";
 
-    $result_product = $conn_wordpress->query($sql_product);
+    $subscription_period_type = "MONTHLY";
+    $sql="SELECT * FROM `products` INNER JOIN `reseller_discounts`
+      on `products`.`product_id`=`reseller_discounts`.`product_id`
+      WHERE `reseller_discounts`.`reseller_id`='" . $reseller_id . "'
+      and `products`.`product_id`='".$product_id."'";
+    $result_product = $dbTools->query($sql);
+
+    if($result_product->num_rows ==0)
+    $result_product = $dbTools->query("SELECT * FROM `products` where `products`.`product_id`='".$product_id."'");
+
 
     if ($result_product->num_rows > 0) {
         $row_product = $result_product->fetch_assoc();
-        if (strpos($row_product["post_title"], '1 year') !== false) { // Check they type of payment (yearly or monthly)
+        if (strpos($row_product["subscription_type"], 'yearly') !== false) { // Check they type of payment (yearly or monthly)
             $subscription_period_type = "YEARLY";
         }
-        $product_price = $row_product["VALUE"];
-    }
+        $product_price = $row_product["price"];
+        if($has_discount && isset($row_product["discount"]) && (int)$row_product["discount"] > 0)
+        {
+          $_POST["options"]["discount"] = $row_product["discount"];
+          $product_price=(float)$row_product['price']-((float)$row_product['price']*(((float)$row_product['discount']/100)));
+          $product_price=round($product_price,2);
+        }
 
+    }
     $total_price = 0;
     $price_of_remaining_days = 0;
     $transfer_cost = 0;
@@ -622,7 +643,7 @@ if ($_POST["card_type"] != "cache_on_delivery") {
             <strong>Failed!</strong> Error occurred, please call the administrator for more information.<br/>
             <span class="failed-reason"></span>
         </div>
-    </div>    
+    </div>
 
 </center>
 

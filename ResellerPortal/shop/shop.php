@@ -1,5 +1,27 @@
 <?php
 include_once "../header.php";
+$dbTools->query("SET CHARACTER SET utf8");
+
+$reseller = $dbTools->query("SELECT `has_discount`,`free_modem`,`free_router`,`free_setup`,`full_name` FROM `customers` WHERE `customer_id` = '" . $reseller_id . "'");
+$reseller_row=$dbTools->fetch_assoc($reseller);
+$has_discount= ($reseller_row['has_discount']==="yes"?TRUE:FALSE);
+$free_modem= ($reseller_row['free_modem']==="yes"?TRUE:FALSE);
+$free_router= ($reseller_row['free_router']==="yes"?TRUE:FALSE);
+$free_setup= ($reseller_row['free_setup']==="yes"?TRUE:FALSE);
+
+
+
+$products = $dbTools->query("SELECT * FROM `products` INNER JOIN `reseller_discounts` on `products`.`product_id`=`reseller_discounts`.`product_id` WHERE `reseller_discounts`.`reseller_id`='" . $reseller_id . "'");
+
+if($products->num_rows ==0)
+$products = $dbTools->query("SELECT * FROM `products`");
+$products_rows=[];
+while($products_row=$dbTools->fetch_assoc($products))
+{
+  array_push($products_rows,$products_row);
+}
+
+
 ?>
 
 <!-- Include SmartWizard CSS -->
@@ -30,6 +52,10 @@ include_once "../header.php";
     }
 </style>
 <form class="" action="checkout.php" method="post">
+  <input type ="hidden" name="has_discount" value="<?= $reseller_row['has_discount']?>"/>
+  <input type ="hidden" name="free_router" value="<?= $reseller_row['free_router']?>"/>
+  <input type ="hidden" name="free_modem" value="<?= $reseller_row['free_modem']?>"/>
+  <input type ="hidden" name="free_setup" value="<?= $reseller_row['free_setup']?>"/>
     <!-- SmartWizard html -->
     <div id="smartwizard">
         <ul>
@@ -58,30 +84,31 @@ include_once "../header.php";
                                 <div class="panel-heading">Speed</div>
                                 <div class="panel-body">
                                     <select name="product" class="form-control">
-                                        <option price='29.9' value='383' type="monthly">Internet 5 Mbps ($29.9)</option>
-                                        <option price='34.9' value='335' type="monthly">Internet 10 Mbps ($34.9)</option>	
-                                        <option price='39.9' value='380' type="monthly">Internet 15 Mbps ($39.9)</option>	
-                                        <option price='44.9' value='381' type="monthly">Internet 20 Mbps ($44.9)</option>	
-                                        <option price='49.9' value='414' type="monthly">Internet 30 Mbps ($49.9)</option>	
-                                        <option price='59.9' value='416' type="monthly">Internet 60 Mbps ($59.9)</option>	
-                                        <option price='79.9' value='418' type="monthly">Internet 120 Mbps ($79.9)</option>	
-                                        <option price='99.9' value='419' type="monthly">Internet 200 Mbps ($99.9)</option>	
-                                        <option price='159.9' value='420' type="monthly">Internet 940 Mbps ($159.9)</option>		
-                                        <option price='322.92' value='687' type="yearly">Internet 5 Mbps Yearly ($322.92)</option>	
-                                        <option price='376.9' value='689' type="yearly">Internet 10 Mbps Yearly ($376.9)</option>	
-                                        <option price='430.9' value='690' type="yearly">Internet 15 Mbps Yearly ($430.9)</option>	
-                                        <option price='484.9' value='692' type="yearly">Internet 20 Mbps Yearly ($484.9)</option>	
-                                        <option price='538.9' value='694' type="yearly">Internet 30 Mbps Yearly ($538.9)</option>	
-                                        <option price='646.9' value='695' type="yearly">Internet 60 Mbps Yearly ($646.9)</option>	
-                                        <option price='754.9' value='696' type="yearly">Internet 120 Mbps Yearly ($754.9)</option>	
-                                        <option price='970.9' value='697' type="yearly">Internet 200 Mbps Yearly ($970.9)</option>	
-                                        <option price='1998.9' value='698' type="yearly">Internet 940 Mbps Yearly ($1998.9)</option>	
+                                      <?php foreach ($products_rows as $product):
+                                          if ($product['category']==="internet"){
+                                            $price=$product['price'];
+                                            $title=$product['title'];
+
+                                            if($has_discount && isset($product['discount']) && (int)$product['discount']>0)
+                                            {
+
+                                              $price=(float)$product['price']-((float)$product['price']*(((float)$product['discount']/100)));
+                                              $price=round($price,2);
+                                              $title=$product['title']." (with discount ".$product['discount']."%)";
+
+                                            }
+
+                                            ?>
+                                        <option price='<?= $price?>' value='<?= $product['product_id']?>' type="<?= $product['subscription_type']?>"> <?= $title." (".$price."$)"?></option>
+                                      <?php }
+                                      endforeach; ?>
+
                                     </select>
                                 </div>
                             </div>
                             </p>
                         </div>
-                    </div>	
+                    </div>
                     <div class="row" style="width:100% !important;">
                         <div class="col-sm-12" >
                             <p class="rounded form-row form-row-wide custom_check-service-availabilty  ">
@@ -95,7 +122,7 @@ include_once "../header.php";
                             </div>
                             </p>
                         </div>
-                    </div>	
+                    </div>
                     <div class="row" style="width:100% !important;">
                         <div class="col-sm-12" >
                             <p class="rounded form-row form-row-wide custom_modem  ">
@@ -103,16 +130,18 @@ include_once "../header.php";
                                 <div class="panel-heading">Plan</div>
                                 <div class="panel-body">
                                     <label class="radio-inline">
-                                        <input type="radio" checked  class="input-text plan plan-monthly custom-options custom_field" data-price="" name="options[plan]" value="monthly" />Monthly Payment ($60.00 New Installation Fees <b>OR</b> $19.90 Transfer Fees for <span style="color:red;">current Cable subscriber</span>)<br/>
-                                    </label><br/>	
-                                    <label class="radio-inline">	
+                                        <input type="radio" checked  class="input-text plan plan-monthly custom-options custom_field" data-price="" name="options[plan]" value="monthly" />Monthly Payment ($60.00 New Installation Fees <b>OR</b> $19.90 Transfer Fees for <span style="color:red;">current Cable subscriber</span>)
+                                        <?= $free_setup?" <span style='color:green;'>you have a limited offer, now these fees are free for you  </span>":""?>
+                                        <br/>
+                                    </label><br/>
+                                    <label class="radio-inline">
                                         <input type="radio" class="input-text plan plan-monthly-2 custom-options custom_field" data-price="" name="options[plan]" value="yearly"   />Yearly Contract, Payment Monthly (Free Installation)<br/>
                                     </label><br/>
                                 </div>
                             </div>
                             </p>
                         </div>
-                    </div>	
+                    </div>
                     <div class="row" style="width:100% !important;">
                         <div class="col-sm-6" >
                             <p class="rounded form-row form-row-wide custom_modem  ">
@@ -121,6 +150,7 @@ include_once "../header.php";
                                 <div class="panel-body">
                                     <label class="radio-inline">
                                         <input type="radio" class="input-text modem custom-options custom_field" data-price="60" name="options[modem]" value="rent" />Free Rent Modem ($59.90 deposit)
+                                        <?= $free_modem? "<span style='color:green'> you have a limited offer free modem deposit</span>":""?>
                                     </label>
                                     <br/>
                                     <label class="radio-inline">
@@ -137,7 +167,7 @@ include_once "../header.php";
                                         </select>
                                     </div>
                                     <br/>
-                                    <label class="radio-inline">		
+                                    <label class="radio-inline">
                                         <input type="radio" class="input-text modem-off modem custom-options custom_field" data-price="20" name="options[modem]" value="own_modem" />I have my own modem
                                     </label><br/><br/>
                                     <div class="modem-info">
@@ -157,14 +187,15 @@ include_once "../header.php";
                                 <div class="panel-heading">Router</div>
                                 <div class="panel-body">
                                     <label class="radio-inline">
-                                        <input type="radio" class="input-text custom-options custom_field rent-router" data-price="2.90" name="options[router]" value="rent" />Rent WIFI Router MikroTik Hap Series ($2.90)<br/>
-                                    </label><br/>	
-                                    <label class="radio-inline">	
+                                        <input type="radio" class="input-text custom-options custom_field rent-router" data-price="2.90" name="options[router]" value="rent" />Rent WIFI Router MikroTik Hap Series ($2.90)
+                                         <?= $free_router?"<span style='color:green;'>you have limited offer free rounter rent</span>":""?><br/>
+                                    </label><br/>
+                                    <label class="radio-inline">
                                         <input type="radio" class="input-text custom-options custom_field" data-price="74.00" name="options[router]" value="buy_hap_ac_lite"   />Buy WIFI Router MikroTik Hap ac lite ($74.00)<br/>
-                                    </label><br/>	
-                                    <label class="radio-inline">	
+                                    </label><br/>
+                                    <label class="radio-inline">
                                         <input type="radio" class="input-text custom-options custom_field" data-price="39.90" name="options[router]" value="buy_hap_mini"   />Buy WIFI Router MikroTik Hap mini ($39.90)<br/>
-                                    </label><br/>		
+                                    </label><br/>
                                     <label class="radio-inline">
                                         <input type="radio" class="input-text router-off custom-options custom_field" data-price="0" name="options[router]" value="dont_need" />I don't need a router
                                     </label>
@@ -182,7 +213,7 @@ include_once "../header.php";
                                     <label class="radio-inline">
                                         <input type="radio" class="subscriber subscriber-on input-text custom-options custom_field" data-price="0" name="options[cable_subscriber]" value="yes" />Yes<br/>
                                     </label><br/>
-                                    <label class="radio-inline">		
+                                    <label class="radio-inline">
                                         <input type="radio" class="subscriber subscriber-off input-text custom-options custom_field" data-price="0" name="options[cable_subscriber]" value="no" />No<br/>
                                     </label>
                                     </br>
@@ -254,7 +285,7 @@ include_once "../header.php";
                                             <input type="radio" class="input-text custom-options custom_field" data-price="0" name="options[installation_time_1]" value="after 5:00 PM" />after 5:00 PM
                                         </label>
                                         <label class="radio-inline small">
-                                            <input type="radio" class="input-text custom-options custom_field" data-price="0" name="options[installation_time_1]" value="All Day " />All Day  
+                                            <input type="radio" class="input-text custom-options custom_field" data-price="0" name="options[installation_time_1]" value="All Day " />All Day
                                         </label><br>
                                         <b>2nd choice</b>
                                         <div class="date2">
@@ -273,7 +304,7 @@ include_once "../header.php";
                                             <input type="radio" class="input-text custom-options custom_field" data-price="0" name="options[installation_time_2]" value="after 5:00 PM " />after 5:00 PM
                                         </label>
                                         <label class="radio-inline small">
-                                            <input type="radio" class="input-text custom-options custom_field" data-price="0" name="options[installation_time_2]" value="All Day " />All Day  
+                                            <input type="radio" class="input-text custom-options custom_field" data-price="0" name="options[installation_time_2]" value="All Day " />All Day
                                         </label><br>
                                         <b>3rd choice</b>
                                         <div class="date3">
@@ -292,7 +323,7 @@ include_once "../header.php";
                                             <input type="radio" class="input-text custom-options custom_field" data-price="0" name="options[installation_time_3]" value="after 5:00 PM " />after 5:00 PM
                                         </label>
                                         <label class="radio-inline small">
-                                            <input type="radio" class="input-text custom-options custom_field" data-price="0" name="options[installation_time_3]" value="All Day " />All Day  
+                                            <input type="radio" class="input-text custom-options custom_field" data-price="0" name="options[installation_time_3]" value="All Day " />All Day
                                         </label><br>
                                     </label>
                                 </div>
@@ -301,7 +332,7 @@ include_once "../header.php";
                             </p>
                         </div>
 
-                    </div>    
+                    </div>
                     <div class="row" style="width:100% !important;">
                         <div class="col-sm-6" >
                             <p class="rounded form-row form-row-wide custom_check-service-availabilty  ">
@@ -323,10 +354,24 @@ include_once "../header.php";
                                 <div class="panel-heading">Phone</div>
                                 <div class="panel-body">
                                     <select name="product" class="form-control">
-                                        <option price='10' value='619' type="monthly">Canadian Phone ($10.0)</option>
-                                        <option price='15' value='654' type="monthly">Canada & US Phone ($15.0)</option>
-                                        <option price='100' value='653' type="yearly">Canada Phone – 1 year ($100.0)</option>	
-                                        <option price='120' value='661' type="yearly">Canada & US Phone – 1 year ($120.0)</option>		
+                                      <?php foreach ($products_rows as $product):
+                                          if ($product['category']==="phone"){
+                                            $price=$product['price'];
+                                            $title=$product['title'];
+
+                                            if($has_discount && isset($product['discount']) && (int)$product['discount']>0)
+                                            {
+
+                                              $price=(float)$product['price']-((float)$product['price']*(((float)$product['discount']/100)));
+                                              $price=round($price,2);
+                                              $title=$product['title']." (with discount ".$product['discount']."%)";
+
+                                            }
+
+                                            ?>
+                                        <option price='<?= $price?>' value='<?= $product['product_id']?>' type="<?= $product['subscription_type']?>"> <?= $title." (".$price."$)"?></option>
+                                      <?php }
+                                      endforeach; ?>
                                     </select>
                                 </div>
                             </div>
@@ -341,10 +386,10 @@ include_once "../header.php";
                                 <div class="panel-body">
                                     <label class="radio-inline">
                                         <input type="radio" class="input-text plan custom-options custom_field" data-price="" name="options[adapter]" value="my_own" />I have my own Phone Adapter<br/>
-                                    </label><br/>	
-                                    <label class="radio-inline">	
+                                    </label><br/>
+                                    <label class="radio-inline">
                                         <input type="radio" checked class="input-text plan custom-options custom_field" data-price="" name="options[adapter]" value="buy_Cisco_SPA112"   />Buy Cisco SPA112 2-Port Phone Adapter ($59.90)<br/>
-                                    </label><br/>	
+                                    </label><br/>
                                 </div>
                             </div>
                             <input type="hidden" name="options[product_type]" value="phone" />
@@ -357,14 +402,14 @@ include_once "../header.php";
                                 <div class="panel-body">
                                     <label class="radio-inline">
                                         <input type="radio" class="phone-subscriber input-text plan plan-monthly custom-options custom_field" data-price="" name="options[you_have_phone_number]" value="yes" />Transfer current number ($15)<br/>
-                                    </label><br/>	
+                                    </label><br/>
                                     <label class="current-phone-subscriber">
                                         Your current phone number:<br/>
                                         <input type="text" class="input-text plan plan-monthly custom-options custom_field" data-price="" name="options[current_phone_number]" value="" /><br/>
                                     </label><br/>
-                                    <label class="radio-inline">	
+                                    <label class="radio-inline">
                                         <input type="radio" checked class="phone-subscriber new-number input-text plan custom-options custom_field" data-price="" name="options[you_have_phone_number]" value="no"   />New phone number<br/>
-                                    </label><br/>	
+                                    </label><br/>
                                 </div>
                             </div>
                             </p>
@@ -378,13 +423,13 @@ include_once "../header.php";
                                         Please select your province:<br/>
                                         <select name="options[phone_province]" class="input-text plan plan-monthly custom-options custom_field">
                                             <option value='ON'>ONTARIO (ON)</option><option value='QC'>QUEBEC (QC)</option><option value='AB'>ALBERTA (AB)</option><option value='BC'>BRITISH COLUMBIA (BC)</option><option value='MB'>MANITOBA (MB)</option><option value='NS'>NOVA-SCOTIA (NS)</option><option value='NL'>NEWFOUNDLAND (NL)</option>                </select>
-                                    </label><br/>	
+                                    </label><br/>
 
                                 </div>
                             </div>
                             </p>
                         </div>
-                    </div>	
+                    </div>
                 </div>
             </div>
             <div id="step-3" class="">
@@ -453,7 +498,7 @@ include_once "../header.php";
                         <li class="list-group-item">Tax Fees (QST 9.975%) <span class="badge qst-cost"></span></li>
                         <li class="list-group-item">Tax Fees (GST 5%) <span class="badge gst-cost"></span></li>
                         <li class="list-group-item">Total <span class="badge total"></span></li>
-                    </ul> 
+                    </ul>
                 </div>
                 <br/>
                 <br/>
@@ -490,15 +535,16 @@ include_once "../header.php";
                 <br/>
                 <input type="submit" class="btn btn-primary btn-block btn-lg checkout-button"  value="Checkout!">
                 <br/>
-            </div>     
+            </div>
 
         </div>
     </div>
+
 </form>
 
 <script type="text/javascript">
 
-</script> 
+</script>
 <?php
 include_once "../footer.php";
 ?>
