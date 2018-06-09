@@ -6,19 +6,16 @@ include_once "../header.php";
     $(document).ready(function () {
         $('.dataTables_empty').html('<div class="loader"></div>');
 
-        $.getJSON("<?=$api_url?>customers_api.php", function (result) {
-            $.each(result['customers'], function (i, field) {
-                table.row.add([
-                    field['customer_id'],
-                    field['full_name'],
-                    field['reseller'][0]['full_name'],
-                    field['phone'],    
-                    field['email'], 
-                    '<a href="customer_orders.php?customer_id='+field['customer_id']+'">Invoices</a>',
-                    '<a href="customer_orders.php?customer_id='+field['customer_id']+'">Orders</a>',
-                    '<a href="customer_by_month.php?customer_id='+field['customer_id']+'&month=4&year=2018">status</a>'
-                ]).draw(false);
-            });
+        $('#myTable2').DataTable({
+            "bProcessing": true,
+            "serverSide": true,
+            "ajax": {
+                url: "<?= $api_url ?>customers_api.php", // json datasource
+                type: "post", // type of method  , by default would be get
+                error: function () {  // error handling code
+                    $("#employee_grid_processing").css("display", "none");
+                }
+            }
         });
     });
 </script>
@@ -50,7 +47,7 @@ include_once "../header.php";
 <div class="page-header">
     <a class="last" href="">Customers</a>    
 </div>
-<table id="myTable" class="display table table-striped table-bordered">
+<table id="myTable2" class="display table table-striped table-bordered">
     <thead>
     <th style="width: 10%">ID</th>
     <th style="width: 20%">Full Name</th>

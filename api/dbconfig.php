@@ -8,8 +8,8 @@ date_default_timezone_set('America/New_York');
 include "tools/DBTools.php";
 $dbTools = new DBTools();
 
-$site_url="http://localhost/kutdser/api";
-$api_url = "http://localhost/kutdser/api/";
+$site_url="http://localhost/kutdser-master/mikrotik";
+$api_url = "http://localhost/kutdser-master/api/";
 
 $servername = "localhost";
 $username = "root";

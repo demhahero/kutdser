@@ -97,6 +97,8 @@ include_once "dbconfig.php";
                                 <li><a href="<?= $site_url ?>/upcoming_customers/upcoming_customers.php">Upcoming Customers</a></li>
                                 <li><a href="<?= $site_url ?>/requests/requests.php">Requests</a></li>
                                 <li><a href="<?= $site_url ?>/customers/going_to_merge.php">Merges</a></li>
+                                <li><a href="<?= $site_url ?>/statistics/orders_between_two_dates.php?date1=2018-04-01&date2=2018-06-01">Orders over duration</a></li>
+                                <li><a href="<?= $site_url ?>/statistics/orders_by_new_transfer.php?date1=2018-04-01&date2=2018-06-01&cable_subscriber=yes">Orders New/Transfer</a></li>
                             </ul>
                         </li>
                         <li>
