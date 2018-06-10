@@ -26,7 +26,7 @@ if (isset($_GET["date1"])) {
                             field['creation_date'],
                             field['status'],
                             field['cable_subscriber'],
-                            "<a target='_blank' href='<?= $site_url ?>/orders/print_order.php?order_id=" + field['order_id'] + "'><img src='<?= $site_url ?>/img/print-icon.png' style='width: 25px;' /></a>"
+                            "<a  class=\"btn btn-primary btn-xs\" target='_blank' href='<?= $site_url ?>/orders/print_order.php?order_id=" + field['order_id'] + "'><i class=\"fa fa-print\"></i> Print </a>"
                         ]).draw(false);
                     });
                 });

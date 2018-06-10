@@ -54,9 +54,7 @@ include_once "../header.php";
     <th style="width: 20%">Reseller</th>
     <th style="width: 10%">Phone</th>
     <th style="width: 20%">Email</th>
-    <th style="width: 5%">Invoices</th>
-    <th style="width: 5%">Orders</th>
-    <th style="width: 5%">Monthly</th>
+    <th style="width: 20%">Invoices</th>
 </thead>
 <tbody>
 </tbody>

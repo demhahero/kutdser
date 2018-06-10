@@ -16,8 +16,7 @@ $columns = array(
     3 => '`orders`.product_title',
     4 => '`orders`.creation_date',
     5 => '`orders`.status',
-    6 => '`order_options`.`cable_subscriber`',
-    7 => 'print'
+    6 => 'print'
 );
 
 $where = $sqlTot = $sqlRec = "";
@@ -76,14 +75,13 @@ while ($row = mysqli_fetch_array($queryRecords)) {
         $displayed_order_id = $row["order_id"];
     
     $data[0] = '<a href="order_details.php?order_id=' . $row['order_id'] . '" >' . $displayed_order_id . '</a>';
-    $data[1] = '<a href="' . $site_url . '/edit_customer.php?customer_id=' . $row['customer_id'] . '">' . $row['customer_name'] . '</a>';
-    $data[2] = '<a href="' . $site_url . '/edit_customer.php?customer_id=' . $row['reseller_id'] . '">' . $row['reseller_name'] . '</a>';
+    $data[1] = $row['customer_name'];
+    $data[2] = $row['reseller_name'];
     $data[3] = $row['product_title'];
     $data[4] = $row['creation_date'];
     $data[5] = $row['status'];
-    $data[6] = $row['cable_subscriber'];
-    $data[7] = '<a target="_blank" href="' . $site_url . '/orders/print_order.php?order_id=' 
-            . $row['order_id'] . '" ><img src="' . $site_url . '/img/print-icon.png" style="width: 25px;" /></a>';
+    $data[6] = '<a target="_blank" href="' . $site_url . '/orders/print_order.php?order_id=' 
+            . $row['order_id'] . '" class="btn btn-primary btn-xs"><i class="fa fa-print"></i> Print </a>';
     $all_data[] = $data;
 }
 

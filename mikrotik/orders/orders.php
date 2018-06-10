@@ -56,7 +56,6 @@ include_once "../header.php";
     <th style="width: 15%">Product</th>
     <th style="width: 15%">Date</th>
     <th style="width: 5%">Status</th>
-    <th style="width: 5%">C.S.</th>
     <th style="width: 10%">Print</th>
 </thead>
 <tbody>
