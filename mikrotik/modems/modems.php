@@ -15,21 +15,21 @@ if (isset($_GET["modem_id"])) {
 ?>
 
 <script>
-    $(document).ready(function () {
-        $('.dataTables_empty').html('<div class="loader"></div>');
+$(document).ready(function () {
+    $('.dataTables_empty').html('<div class="loader"></div>');
 
-        $.getJSON("<?=$api_url?>modems_api.php", function (result) {
-            $.each(result['modems'], function (i, field) {
-                table.row.add([
-                    field['modem_id'],
-                    field['mac_address'],
-                    field['reseller'][0]['full_name'],
-                    field['customer'][0]['full_name'],
-                    '<a href="edit_modem.php?modem_id='+field['modem_id']+'"><img title="Edit" width="30px" src="<?= $site_url ?>/img/edit-icon.png" /></a><a class="check-alert" href="modems.php?do=delete&modem_id='+field['modem_id']+'"><img title="Remove" width="30px" src="<?= $site_url ?>/img/delete-icon.png" /></a>'
-                ]).draw(false);
-            });
-        });
+    $('#myTable2').DataTable({
+        "bProcessing": true,
+        "serverSide": true,
+        "ajax": {
+            url: "<?= $api_url ?>modems_api.php", // json datasource
+            type: "post", // type of method  , by default would be get
+            error: function () {  // error handling code
+                $("#myTable2").css("display", "none");
+            }
+        }
     });
+});
 </script>
 <style>
     .loader {
@@ -57,12 +57,12 @@ if (isset($_GET["modem_id"])) {
 
 <title>Modems</title>
 <div class="page-header">
-    <h4>Modems</h4>    
+    <h4>Modems</h4>
 </div>
-<a href="create_modem.php" class="btn btn-primary">+ Create</a> 
+<a href="create_modem.php" class="btn btn-primary">+ Create</a>
 
 <br><br>
-<table id="myTable"  class="display table table-striped table-bordered">
+<table id="myTable2"  class="display table table-striped table-bordered">
     <thead>
     <th style="width: 5%;">ID</th>
     <th style="width: 25%;">MAC Address</th>
@@ -70,7 +70,7 @@ if (isset($_GET["modem_id"])) {
     <th style="width: 30%;">Customer</th>
     <th style="width: 12%;">Functions</th>
 </thead>
-<tbody>	
+<tbody>
 </tbody>
 </table>
 
