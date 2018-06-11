@@ -24,7 +24,7 @@ include_once "../header.php";
         ?>
         <tr>
             <td style="width: 5%;"><?=$customer->getCustomerID()?></td>
-            <td style="width: 40%;"><?=$customer->getFullName()?></td>
+            <td style="width: 40%;"><a href="<?=$site_url?>/edit_customer.php?customer_id=<?=$customer->getCustomerID()?>"><?=$customer->getFullName()?></a></td>
             <td style="width: 15%;"><?=$customer->getPhone()?></td>
             <td style="width: 25%;"><?=$customer->getEmail()?></td>
             <td style="width: 5%;">

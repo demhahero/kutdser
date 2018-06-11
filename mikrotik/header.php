@@ -70,6 +70,8 @@ include_once "dbconfig.php";
                                         <ul class="nav child_menu">
                                             <li><a href="<?= $site_url ?>/customers/customers.php">Customers</a></li>
                                             <li><a href="<?= $site_url ?>/requests/requests.php">Requests</a></li>
+                                            <li><a href="<?= $site_url ?>/upcoming_customers/upcoming_customers.php">Upcoming Customers</a></li>
+                                            <li><a href="<?= $site_url ?>/expire/expire_soon_orders.php">Expire Soon</a></li>
                                         </ul>
                                     </li>
                                     
@@ -83,12 +85,20 @@ include_once "dbconfig.php";
                                     <li><a><i class="fa fa-sitemap"></i>Resellers<span class="fa fa-chevron-down"></span></a>
                                         <ul class="nav child_menu">
                                             <li><a href="<?= $site_url ?>/customers/resellers.php">Resellers</a></li>
+                                            <li><a href="<?= $site_url ?>/custom_invoice.php">Custom Invoice</a></li>
+                                            <li><a href="<?= $site_url ?>/custom_statement.php">Custom Statement</a></li>
                                         </ul>
                                     </li>
                                     <li><a><i class="fa fa-bar-chart-o"></i> Data Presentation <span class="fa fa-chevron-down"></span></a>
                                         <ul class="nav child_menu">
                                             <li><a href="<?= $site_url ?>/statistics/orders_between_two_dates.php?date1=2018-04-01&date2=2018-06-01">Orders over duration</a></li>
                                             <li><a href="<?= $site_url ?>/statistics/orders_by_new_transfer.php?date1=2018-04-01&date2=2018-06-01&cable_subscriber=yes">Orders New/Transfer</a></li>
+                                        </ul>
+                                    </li>
+                                    <li><a><i class="fa fa-inbox"></i> Inventory <span class="fa fa-chevron-down"></span></a>
+                                        <ul class="nav child_menu">
+                                            <li><a href="<?= $site_url ?>/modems/modems.php">Modems</a></li>
+                                            <li><a href="<?= $site_url ?>/routers/routers.php">Routers</a></li>
                                         </ul>
                                     </li>
                                     <li><a><i class="fa fa-support"></i> Support <span class="fa fa-chevron-down"></span></a>

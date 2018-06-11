@@ -260,19 +260,19 @@ $order = $dbTools->objOrderTools($_GET["order_id"], 2);
         </tr> 
         <tr>
             <td>Subscription Ref</td>
-            <td  class="subscription-ref" style="background-color: gray;">
+            <td  class="subscription-ref" style="font-weight: bold;">
            
             </td>
         </tr>
         <tr>
             <td>Secure Card Ref</td>
-            <td  class="subscription-card-ref" style="background-color: gray;">
+            <td  class="subscription-card-ref" style="font-weight: bold;">
          
             </td>
         </tr>
         <tr>
             <td>Payment Ref</td>
-            <td  class="subscription-payment-ref" style="background-color: gray;">
+            <td  class="subscription-payment-ref" style="font-weight: bold;">
   
             </td>
         </tr>             	
