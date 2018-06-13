@@ -27,8 +27,8 @@ $sqlTot = "SELECT `modems`.modem_id,`modems`.customer_id,`modems`.mac_address,
     `customers`.`full_name` as 'customer_name'
 FROM `modems`
 
-inner JOIN `customers` on `modems`.`customer_id`=`customers`.`customer_id`
-INNER JOIN `customers` resellers on resellers.`customer_id` = `modems`.`reseller_id` ";
+LEFT JOIN `customers` on `modems`.`customer_id`=`customers`.`customer_id`
+LEFT JOIN `customers` resellers on resellers.`customer_id` = `modems`.`reseller_id` ";
 
 $sqlRec = $sqlTot;
 

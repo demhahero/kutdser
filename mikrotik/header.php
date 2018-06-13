@@ -27,12 +27,21 @@ include_once "dbconfig.php";
         <!-- jquery-ui -->
         <link rel="stylesheet" type="text/css" href="https://code.jquery.com/ui/1.12.0/themes/smoothness/jquery-ui.css">
         
-    <!-- jQuery -->
-    <script src="<?= $site_url ?>/gentelella/vendors/jquery/dist/jquery.min.js"></script>
-    <!-- Bootstrap -->
-    <script src="<?= $site_url ?>/gentelella/vendors/bootstrap/dist/js/bootstrap.min.js"></script>
-    <!-- jQuery-UI -->
-    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+        <!-- jQuery -->
+        <script src="<?= $site_url ?>/gentelella/vendors/jquery/dist/jquery.min.js"></script>
+        <!-- Bootstrap -->
+        <script src="<?= $site_url ?>/gentelella/vendors/bootstrap/dist/js/bootstrap.min.js"></script>
+        <!-- jQuery-UI -->
+        <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+        
+        <!-- Print Excel and PDF for datatables -->
+        <script src="https://cdn.datatables.net/buttons/1.5.1/js/dataTables.buttons.min.js"></script>
+        <script src="https://cdn.datatables.net/buttons/1.5.1/js/buttons.flash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.32/pdfmake.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.32/vfs_fonts.js"></script>
+        <script src="https://cdn.datatables.net/buttons/1.5.1/js/buttons.html5.min.js"></script>
+        <script src="https://cdn.datatables.net/buttons/1.5.1/js/buttons.print.min.js"></script>
     </head>
 
     <body class="nav-md">
