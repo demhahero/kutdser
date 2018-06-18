@@ -84,7 +84,7 @@ else if (isset($_POST["order_id"])) {
         "verdict" => "",
         "verdict_date" => "",
         "action_on_date" => "",
-        //"product_price"=>"",
+        "modem_mac_address"=>"",
         "note" => "",
             //"product_title"=>"",
             //"product_category"=>"",
@@ -106,6 +106,7 @@ else if (isset($_POST["order_id"])) {
         "product_title" => "",
         "product_category" => "",
         "product_subscription_type" => "",
+        "modem_mac_address"=>"",
     );
 
     if (!isset($_POST["product_id"])) {
@@ -116,7 +117,17 @@ else if (isset($_POST["order_id"])) {
     foreach ($PostFields as $key => $value) {
         if (isset($_POST[$key])) {
             $InsertFieldValues[$key] = $_POST[$key];
-        } else if ($key === "verdict" || $key === "verdict_date" || $key === "action_value" || $key === "admin_id" || $key === "note" || $key === "product_title" || $key === "product_category" || $key === "product_price" || $key === "product_subscription_type" || $key === "creation_date") {
+        } else if ($key === "verdict"
+                || $key === "verdict_date"
+                || $key === "action_value"
+                || $key === "admin_id"
+                || $key === "note"
+                || $key === "product_title"
+                || $key === "product_category"
+                || $key === "product_price"
+                || $key === "product_subscription_type"
+                || $key === "creation_date"
+                || $key === "modem_mac_address") {
             $InsertFieldValues[$key] = "";
         } else {
             echo "{\"inserted\" :false,\"error\" :\"error: not all values sent in POST\"}";
@@ -142,14 +153,14 @@ else if (isset($_POST["order_id"])) {
         $InsertFieldValues["product_category"] = $product_row["category"];
         $InsertFieldValues["product_subscription_type"] = $product_row["subscription_type"];
     }
-    
+
     $InsertFieldValues["action_value"] = "0";
     $InsertFieldValues["verdict_date"] = "NULL";
     $InsertFieldValues["admin_id"] = "0";
-    
+
     $creation_date = new DateTime();
     $InsertFieldValues["action_on_date"] = $action_on_date->format('Y-m-d H:i:s');
-    
+
     $InsertFieldValues["creation_date"] = $creation_date->format('Y-m-d H:i:s');
 
     $columns = "";

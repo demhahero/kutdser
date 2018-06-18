@@ -56,8 +56,9 @@ if (isset($_POST["action"])) {
             var reseller_id = "<?= $reseller_id ?>";
             var action_value = $("select[name=\"product_id\"]").val();
             var action = $("select[name=\"action\"]").val();
+            var modem_mac_address = $("input[name=\"modem_mac_address\"]").val();
             var product_id = $("select[name=\"product_id\"]").val();
-            $.post("<?= $api_url ?>insert_requests_api.php", {order_id: order_id, action: action, product_id: product_id, action_on_date: action_on_date, note: note, reseller_id: reseller_id}, function (data, status) {
+            $.post("<?= $api_url ?>insert_requests_api.php", {order_id: order_id, action: action, product_id: product_id, action_on_date: action_on_date,modem_mac_address:modem_mac_address, note: note, reseller_id: reseller_id}, function (data, status) {
                 data = $.parseJSON(data);
                 if (data.inserted == true){
                     alert("Request sent");
@@ -96,29 +97,34 @@ if (isset($_POST["action"])) {
         <select name="action" class="form-control">
             <option value="change_speed">Change speed</option>
             <option value="terminate">Terminate</option>
-        </select> 
+        </select>
     </div>
     <div class="form-group">
         <label>Action on date:</label>
-        <input readonly="" name="action_on_date" type="text" class="form-control datepicker" /> 
+        <input readonly="" name="action_on_date" type="text" class="form-control datepicker" />
     </div>
     <div class="form-group action-value">
         <label>Speed:</label>
         <select name="product_id" class="form-control">
             <option price='29.9' value='383'>Internet 5 Mbps ($29.9)</option>
-            <option price='34.9' value='335'>Internet 10 Mbps ($34.9)</option>	
-            <option price='39.9' value='380'>Internet 15 Mbps ($39.9)</option>	
-            <option price='44.9' value='381'>Internet 20 Mbps ($44.9)</option>	
-            <option price='49.9' value='414'>Internet 30 Mbps ($49.9)</option>	
-            <option price='59.9' value='416'>Internet 60 Mbps ($59.9)</option>	
-            <option price='79.9' value='418'>Internet 120 Mbps ($79.9)</option>	
-            <option price='99.9' value='419'>Internet 200 Mbps ($99.9)</option>	
+            <option price='34.9' value='335'>Internet 10 Mbps ($34.9)</option>
+            <option price='39.9' value='380'>Internet 15 Mbps ($39.9)</option>
+            <option price='44.9' value='381'>Internet 20 Mbps ($44.9)</option>
+            <option price='49.9' value='414'>Internet 30 Mbps ($49.9)</option>
+            <option price='59.9' value='416'>Internet 60 Mbps ($59.9)</option>
+            <option price='79.9' value='418'>Internet 120 Mbps ($79.9)</option>
+            <option price='99.9' value='419'>Internet 200 Mbps ($99.9)</option>
             <option price='159.9' value='420'>Internet 940 Mbps ($159.9)</option>
-        </select> 
+        </select>
+    </div>
+    <div class="form-group action-value">
+        <label>New Modem Mac Address (optional):</label>
+        <input type="text" name="modem_mac_address" class="form-control"/>
+
     </div>
     <div class="form-group">
         <label>Note:</label>
-        <textarea name="note" class="form-control"></textarea> 
+        <textarea name="note" class="form-control"></textarea>
     </div>
     <input type="submit" class="btn btn-default submit"  value="Send">
 </form>
