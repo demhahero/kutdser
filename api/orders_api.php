@@ -75,7 +75,7 @@ while ($row = mysqli_fetch_array($queryRecords)) {
         $displayed_order_id = $row["order_id"];
     
     $data[0] = '<a href="order_details.php?order_id=' . $row['order_id'] . '" >' . $displayed_order_id . '</a>';
-    $data[1] = $row['customer_name'];
+    $data[1] = '<a href="' . $site_url . '/customers/customer_details.php?customer_id='.$row['customer_id'].'">'.$row['customer_name'].'</a>';
     $data[2] = $row['reseller_name'];
     $data[3] = $row['product_title'];
     $data[4] = $row['creation_date'];

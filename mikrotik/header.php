@@ -108,6 +108,7 @@ include_once "dbconfig.php";
                                         <ul class="nav child_menu">
                                             <li><a href="<?= $site_url ?>/modems/modems.php">Modems</a></li>
                                             <li><a href="<?= $site_url ?>/routers/routers.php">Routers</a></li>
+                                            <li><a href="<?= $site_url ?>/index.php">Routers (user/pass)</a></li>
                                         </ul>
                                     </li>
                                     <li><a><i class="fa fa-support"></i> Support <span class="fa fa-chevron-down"></span></a>
