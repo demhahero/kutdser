@@ -123,11 +123,7 @@ include_once "dbconfig.php";
                                 <ul class="nav side-menu">
                                     <li><a><i class="fa fa-bug"></i> Additional Pages <span class="fa fa-chevron-down"></span></a>
                                         <ul class="nav child_menu">
-                                            <li><a href="#">E-commerce</a></li>
-                                            <li><a href="#">Projects</a></li>
-                                            <li><a href="#">Project Detail</a></li>
-                                            <li><a href="#">Contacts</a></li>
-                                            <li><a href="#">Profile</a></li>
+                                            <li><a href="<?= $site_url ?>/temp/orders.php">Update Orders</a></li>
                                         </ul>
                                     </li>                
                                     <li><a href="javascript:void(0)"><i class="fa fa-laptop"></i> Landing Page <span class="label label-success pull-right">Coming Soon</span></a></li>

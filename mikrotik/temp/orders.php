@@ -6,20 +6,16 @@ include_once "../header.php";
     $(document).ready(function () {
         $('.dataTables_empty').html('<div class="loader"></div>');
 
-        $.getJSON("<?=$api_url?>orders_api.php", function (result) {
-            $.each(result['orders'], function (i, field) {
-                if(field['order_id'] < 10000)
-                table.row.add([
-                    field['displayed_order_id'],
-                    field['customer']["0"]["customer_id"],
-                    field['reseller']["0"]["customer_id"],
-                    field["product_title"],
-                    field['creation_date'],
-                    field['status'],
-                    field['cable_subscriber'],
-                    "<a target='_blank' href='<?= $site_url ?>/temp/edit_order.php?order_id="+field['order_id']+"&type="+field['product_category']+"'><img src='<?= $site_url ?>/img/edit-icon.png' style='width: 25px;' /></a>"
-                ]).draw(false);
-            });
+        $('#myTable2').DataTable({
+            "bProcessing": true,
+            "serverSide": true,
+            "ajax": {
+                url: "<?= $api_url ?>orders_temp_api.php", // json datasource
+                type: "post", // type of method  , by default would be get
+                error: function () {  // error handling code
+                    $("#employee_grid_processing").css("display", "none");
+                }
+            }
         });
     });
 </script>
@@ -49,10 +45,10 @@ include_once "../header.php";
 
 <title>Orders</title>
 <div class="page-header">
-    <a class="last" href="">Orders</a>
+    <a class="last" href="">Orders</a>    
 </div>
 
-<table id="myTable"  class="display table table-striped table-bordered">
+<table id="myTable2"  class="display table table-striped table-bordered">
     <thead>
     <th style="width: 10%">ID</th>
     <th style="width: 20%">Customer</th>
@@ -60,8 +56,7 @@ include_once "../header.php";
     <th style="width: 15%">Product</th>
     <th style="width: 15%">Date</th>
     <th style="width: 5%">Status</th>
-    <th style="width: 5%">C.S.</th>
-    <th style="width: 10%">Print</th>
+    <th style="width: 10%">edit</th>
 </thead>
 <tbody>
 </tbody>
