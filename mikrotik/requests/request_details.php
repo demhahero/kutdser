@@ -146,9 +146,13 @@ if ($request_row["verdict"] == "") {
                           <?= $request_row['verdict'] ?>
                       </td>
 
-                      <td colspan="2">Verdict Date:</td>
-                      <td colspan="2">
+                      <td >Verdict Date:</td>
+                      <td >
                           <?= $request_row['verdict_date'] ?>
+                      </td>
+                      <td>Modem Mac Address:</td>
+                      <td>
+                          <?= $request_row['modem_mac_address'] ?>
                       </td>
                     </tr>
                     <tr>
@@ -435,6 +439,10 @@ if ($request_row["verdict"] == "") {
                             <?= $last_request_row['product_category'] ?>
                         </td>
                     </tr>
+                    <td>Modem Mac Address:</td>
+                    <td>
+                        <?= $last_request_row['modem_mac_address'] ?>
+                    </td>
                     <tr>
                         <td>Note:</td>
                         <td>
