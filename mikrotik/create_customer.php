@@ -29,21 +29,10 @@ if (isset($_POST["full_name"])) {
 				`address` ,
 				`email`,
 				`phone`,
-				`stripe_id`,
-                                `product_id`,
-                                `start_date`,
                                 `is_reseller`,
                                 `reseller_id`,
-                                `actual_installation_date`,
-                                `actual_installation_time_from`,
-                                `actual_installation_time_to`,
-                                `completion`,
-                                `note`,
-                                `join_type`,
-                                `ip_address`,
                                 `is_new_system`,
-                                `session_id`,
-				`order_id`
+                                `session_id`
 				)
 				VALUES (
             '" . mysql_real_escape_string($_POST["username"]) . "',"
@@ -52,22 +41,11 @@ if (isset($_POST["full_name"])) {
             . " '" . mysql_real_escape_string($_POST["address"]) . "',"
             . " '" . mysql_real_escape_string($_POST["email"]) . "',"
             . " '" . mysql_real_escape_string($_POST["phone"]) . "',"
-            . " '" . mysql_real_escape_string($_POST["stripe_id"]) . "',"
-            . " '" . mysql_real_escape_string($_POST["product_id"]) . "',"
-            . " '" . mysql_real_escape_string($_POST["start_date"]) . "' ,"
             . " '" . mysql_real_escape_string($_POST["is_reseller"]) . "' ,"
             . " '" . mysql_real_escape_string($_POST["reseller_id"]) . "' ,"
-            . " '" . mysql_real_escape_string($_POST["actual_installation_date"]) . "' ,"
-            . " '" . mysql_real_escape_string($_POST["actual_installation_time_from"]) . "' ,"
-            . " '" . mysql_real_escape_string($_POST["actual_installation_time_to"]) . "' ,"
-            . " '" . mysql_real_escape_string($_POST["completion"]) . "' ,"
-            . " '" . mysql_real_escape_string($_POST["note"]) . "' ,"
-            . " '" . mysql_real_escape_string($_POST["join_type"]) . "' ,"
-            . " '" . mysql_real_escape_string($_POST["ip_address"]) . "' ,"
             . " '1' ,"
-            . " '" . random_str(32) . "' ,"
-            . " '" . mysql_real_escape_string($_POST["order_id"]) . "'
-				);");
+            . " '" . random_str(32) . "'"
+            . ");");
     $customer_id = mysql_insert_id();
     if ($result) {
         //header("Location: customers.php");
@@ -111,53 +89,6 @@ $result = $connection->query($sql);
     <div class="form-group">
         <label>Address:</label>
         <textarea type="text" name="address" class="form-control" /></textarea>
-    </div>
-    <div class="form-group">
-        <label>Stripe ID:</label>
-        <input type="text" name="stripe_id" class="form-control" placeholder="Stripe ID"/>
-    </div>
-    <div class="form-group">
-        <label>Order ID:</label>
-        <input type="text" name="order_id" class="form-control" placeholder="order ID"/>
-    </div>
-    <div class="form-group">
-        <label>Product ID:</label>
-        <input type="text" name="product_id" class="form-control" placeholder="product ID"/>
-    </div>
-    <div class="form-group">
-        <label>Joining Date:</label>
-        <input type="text" name="start_date" value="<?= date("Y-m-d") ?>" class="form-control datepicker" placeholder="Joining Date"/>
-    </div>
-    <div class="form-group">
-        <label for="email">Actual Installation Date:</label>
-        <input type="text" name="actual_installation_date" value="<?= date("Y-m-d") ?>" class="form-control datepicker" placeholder="actual installation date"/>
-    </div>
-    <div class="form-group">
-        <label for="email">Actual Installation Time From:</label>
-        <input type="text" name="actual_installation_time_from" value="09:00am" class="form-control" placeholder="actual installation time from"/>
-    </div>
-    <div class="form-group">
-        <label for="email">Actual Installation Time To:</label>
-        <input type="text" name="actual_installation_time_to" value="03:00pm" class="form-control" placeholder="actual installation time to"/>
-    </div>
-    <div class="form-group">
-        <label for="email">Completion:</label>
-        <input type="text" name="completion" value="" class="form-control" placeholder="Completion"/>
-    </div>
-    <div class="form-group">
-        <label for="email">IP Address:</label>
-        <input type="text" name="ip_address" value="" class="form-control" placeholder="IP Address"/>
-    </div>
-    <div class="form-group">
-        <label for="email">Note:</label>
-        <textarea type="text" name="note" class="form-control" /></textarea>
-    </div>
-    <div class="form-group">
-        <label>Join Type:</label>
-        <select  name="join_type" class="form-control">
-            <option value="new">New</option>
-            <option value="transfer">Transfer</option>
-        </select>
     </div>
     <div class="form-group">
         <label>Is Reseller:</label>

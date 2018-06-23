@@ -88,11 +88,13 @@ include_once "dbconfig.php";
                                         <ul class="nav child_menu">
                                             <li><a href="<?= $site_url ?>/orders/orders.php">Orders</a></li>
                                             <li><a href="<?= $site_url ?>/customers/going_to_merge.php">Merges</a></li>
+                                            <li><a href="<?= $site_url ?>/orders/phones.php">Phones</a></li>
                                         </ul>
                                     </li>
                                     
                                     <li><a><i class="fa fa-sitemap"></i>Resellers<span class="fa fa-chevron-down"></span></a>
                                         <ul class="nav child_menu">
+                                            <li><a href="<?= $site_url ?>/create_customer.php">Create Reseller</a></li>
                                             <li><a href="<?= $site_url ?>/customers/resellers.php">Resellers</a></li>
                                             <li><a href="<?= $site_url ?>/custom_invoice.php">Custom Invoice</a></li>
                                             <li><a href="<?= $site_url ?>/custom_statement.php">Custom Statement</a></li>
