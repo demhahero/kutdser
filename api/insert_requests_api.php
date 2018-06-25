@@ -85,6 +85,10 @@ else if (isset($_POST["order_id"])) {
         "verdict_date" => "",
         "action_on_date" => "",
         "modem_mac_address"=>"",
+        "city"=>"",
+        "address_line_1"=>"",
+        "address_line_2"=>"",
+        "postal_code"=>"",
         "note" => "",
             //"product_title"=>"",
             //"product_category"=>"",
@@ -107,6 +111,10 @@ else if (isset($_POST["order_id"])) {
         "product_category" => "",
         "product_subscription_type" => "",
         "modem_mac_address"=>"",
+        "city"=>"",
+        "address_line_1"=>"",
+        "address_line_2"=>"",
+        "postal_code"=>"",
     );
 
     if (!isset($_POST["product_id"])) {
@@ -127,9 +135,17 @@ else if (isset($_POST["order_id"])) {
                 || $key === "product_price"
                 || $key === "product_subscription_type"
                 || $key === "creation_date"
+                || $key === "address_line_2"
                 || $key === "modem_mac_address") {
             $InsertFieldValues[$key] = "";
-        } else {
+        }else if (isset($_POST["action"]) && $_POST["action"] !== "moving"
+                && ($key === "address_line_1"
+                    || $key === "city"
+                    || $key === "postal_code")
+                  ){
+          $InsertFieldValues[$key] = "";
+        }
+         else {
             echo "{\"inserted\" :false,\"error\" :\"error: not all values sent in POST\"}";
             exit();
         }

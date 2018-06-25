@@ -9,6 +9,10 @@ $year=isset($_GET["year"])?$_GET["year"]:2018;
     $(document).ready(function () {
       var tableTag=$('#resellerTable');
       var table=tableTag.DataTable( {
+        "drawCallback": function( settings ) {
+            //alert( 'DataTables has redrawn the table' );
+            $('[data-toggle="tooltip"]').tooltip();
+        },
         dom: 'Bfrtip',
         buttons: [
             //'copy', 'csv', 'excel', 'pdf', 'print'
@@ -83,6 +87,23 @@ $year=isset($_GET["year"])?$_GET["year"]:2018;
 							$(".gst_tax").html(monthInfo["gst_tax"]);
 							$(".total-price").html(monthInfo["total_price"]);
 							*/
+              var discountText=" ";
+
+              if(field['discount']!=="0")
+                discountText+="Product discount "+field['discount']+"%,";
+              if(field['free_router']==="yes")
+                discountText+="Free Router,";
+              if(field['free_modem']==="yes")
+                discountText+="Free Modem,";
+              if(field['free_setup']==="yes")
+                discountText+="Free Setup,";
+              discountText=discountText.substring(0, discountText.length-1);
+              var tooltipTex='</br><button type="button" class="btn btn-secondary" data-toggle="tooltip" data-html="true" title="'+discountText+'">'
+                                  +'<i class="fa fa-tags"></i>'
+                                +'</button>';
+              if(discountText.length===0){
+                tooltipTex="";
+              }
               totalWoR+= parseFloat(monthInfo["total_price_with_out_router"]);
 							total+= parseFloat(monthInfo["total_price_with_out_tax"]);
 							totalWT+= parseFloat(monthInfo["total_price_with_tax_p7"]);
@@ -96,7 +117,7 @@ $year=isset($_GET["year"])?$_GET["year"]:2018;
                   field['recurring_date'],
                   product_price,
                   monthInfo["total_price_with_out_router"],
-                  monthInfo["action"],
+                  monthInfo["action"]+tooltipTex,
                   monthInfo["total_price_with_out_tax"],
                   monthInfo["total_price_with_tax_p7"]
               ]).draw(false);
@@ -269,6 +290,8 @@ $year=isset($_GET["year"])?$_GET["year"]:2018;
 <p id="total_price_with_out_router"></p>
 <p id="total_price_with_out_tax"></p>
 <p id="total_price_with_tax_p7"></p>
+
+
 <?php
 //echo "Total without tax:" . number_format((float) $total_without_tax, 2, '.', '') . "$";
 //echo "<br>";

@@ -3,6 +3,7 @@ include_once "../header.php";
 ?>
 
 <?php
+$dbTools->query("SET CHARACTER SET utf8");
 $request_id = intval($_GET["request_id"]);
 
 // get request info and reseller info
@@ -36,20 +37,48 @@ else if($request_order_row["product_category"]==="internet"){
   }
 }
 
+
 /// get last approved request for this order if exist;
 $last_request_query="SELECT `request_id`, reseller.`customer_id`, `admins`.`username`
 ,reseller.`full_name`, `requests`.`order_id`, `creation_date`, `action`, `action_value`,`admins`.`admin_id`, `verdict`, `verdict_date`, `action_on_date`, `product_price`, `requests`.`note`, `product_title`, `product_category`, `product_subscription_type`, `modem_mac_address`
 FROM `requests`
 INNER JOIN `customers` as reseller on `reseller`.`customer_id`= `requests`.`reseller_id`
 LEFT JOIN `admins` on `admins`.`admin_id`=`requests`.`admin_id`
-WHERE `requests`.`order_id`=".$request_row['order_id']." and verdict='approve' ORDER BY action_on_date DESC LIMIT 1 OFFSET 1";
+WHERE `requests`.`order_id`=".$request_row['order_id']." and `requests`.`action_on_date` < N'".$request_row['action_on_date']."' and verdict='approve' ORDER BY action_on_date DESC LIMIT 1";
+
 $last_request=$dbTools->query($last_request_query);
 $last_request_row=$dbTools->fetch_assoc($last_request);
+
+
+$product_price=$request_order_row['product_price'];
+$product_title=$request_order_row['product_title'];
+$product_category=$request_order_row['product_category'];
+$product_subscription_type=$request_order_row['product_subscription_type'];
+if(sizeof($last_request_row)>0){
+  $product_price=$last_request_row['product_price'];
+  $product_title=$last_request_row['product_title'];
+  $product_category=$last_request_row['product_category'];
+  $product_subscription_type=$last_request_row['product_subscription_type'];
+}
 
 
 if (isset($_POST["verdict"])) {
 
 
+  if($_POST["action"]==="moving"){
+    $verdict_date = new DateTime();
+
+    $query_update_request="UPDATE `requests` SET
+    `admin_id`=N'".$admin_id."',
+    `verdict`=N'".$_POST["verdict"]."',
+    `verdict_date`=N'".$verdict_date->format('Y-m-d')."',
+    `product_price`=N'".$product_price."',
+    `product_title`=N'".$product_title."',
+    `product_category`=N'".$product_category."',
+    `product_subscription_type`=N'".$product_subscription_type."'
+    WHERE `requests`.`request_id`=".$_POST["request_id"];
+    $request_result = $dbTools->query($query_update_request);
+  }else{
     $verdict_date = new DateTime();
 
     $query_update_request="UPDATE `requests` SET
@@ -58,9 +87,24 @@ if (isset($_POST["verdict"])) {
     `verdict_date`=N'".$verdict_date->format('Y-m-d')."'
     WHERE `requests`.`request_id`=".$_POST["request_id"];
     $request_result = $dbTools->query($query_update_request);
+  }
+
 
     if ($request_result) {
-        echo "<script>window.location.href = \"" . $site_url . "/requests/requests.php\";</script>";
+        if($_POST["verdict"]==="approve" && $_POST["action"]==="moving")
+        {
+          $query_update_order="UPDATE `orders` SET
+          `status`=N'sent'
+          WHERE `orders`.`order_id`=".$_POST["order_id"];
+          $order_result = $dbTools->query($query_update_order);
+          if ($order_result) {
+            echo "<script>window.location.href = \"" . $site_url . "/requests/requests.php\";</script>";
+          }
+        }
+          else{
+            echo "<script>window.location.href = \"" . $site_url . "/requests/requests.php\";</script>";
+          }
+
     }
 }
 
@@ -79,12 +123,11 @@ if (isset($_POST["verdict"])) {
 if ($request_row["verdict"] == "") {
     ?>
     <form class="register-form" method="post">
-        <div class="form-group">
-            <label for="email">Note:</label>
-            <?= $request_row['note'] ?>
-        </div>
+
         <div class="form-group">
           <input type="hidden" name="request_id" value="<?=$request_id?>"/>
+          <input type="hidden" name="action" value="<?=$request_row["action"]?>"/>
+          <input type="hidden" name="order_id" value="<?=$request_row["order_id"]?>"/>
             <label for="email">Verdict:</label>
             <select  name="verdict" class="form-control">
                 <option  value="approve">approve</option>
@@ -96,12 +139,12 @@ if ($request_row["verdict"] == "") {
     <?php
 } else
 {
+    if($request_row["action"] === "moving" && $request_row["verdict"] === "approve"){
     ?>
-    <div class="form-group">
-        <label for="email">Note:</label>
-        <?= $request_row["note"] ?>
-    </div>
 
+    <a target="_blank" href="<?= $site_url?>/requests/print_request.php?order_id=
+            <?= $request_row["order_id"] ?>" class="btn btn-primary btn-xs"><i class="fa fa-print"></i> Print Invoice </a>
+    <?PHP }?>
     <div>
         <table class="display table table-striped table-bordered">
             <tr>

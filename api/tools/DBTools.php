@@ -1191,7 +1191,7 @@ return $customers;
 
         $this->query("SET CHARACTER SET utf8");
 
-    $query="SELECT
+    $query="SELECT orders.order_id as id,
         orders.*,order_options.*,merchantrefs.*
         ,resellers.full_name as 'reseller_name',`customers`.`full_name` as 'customer_name'
         from orders
@@ -1208,15 +1208,23 @@ return $customers;
 
 		while ($order_row = $this->fetch_assoc($ordersResult)) {
 			$monthsInfo=array();
+
 			$tempPostDate = new DateTime($year."-".$month."-01");
 			$postDate = new DateTime($year."-".$month."-".$tempPostDate->format( 't' ));
 
 
 			$orderChild = array();
+      $order_row["order_id"]=$order_row["id"];
       if ((int) $order_row["order_id"] > 10380)
           $order_row["order_id"] = (((0x0000FFFF & (int) $order_row["order_id"]) << 16) + ((0xFFFF0000 & (int) $order_row["order_id"]) >> 16));
 
 			$orderChild["order_id"]=$order_row["order_id"];
+      /// discount fields
+      $orderChild["discount"]=$order_row["discount"];
+      $orderChild["free_router"]=$order_row["free_router"];
+      $orderChild["free_modem"]=$order_row["free_modem"];
+      $orderChild["free_setup"]=$order_row["free_setup"];
+      ///////////
       $orderChild["join_type"]=$order_row["join_type"];
       $orderChild["reseller_name"]=$order_row["reseller_name"];
       $orderChild["customer_name"]=$order_row["customer_name"];
@@ -1708,6 +1716,10 @@ return $customers;
       {
         $fees=82;
       }
+      else if($productPrices[sizeof($productPrices)-1]["action_previous"]==="moving")
+      {
+        $fees=82;
+      }
       else if($productPrices[sizeof($productPrices)-1]["action_previous"]==="change_speed")
       {
         $fees=7;
@@ -1852,13 +1864,13 @@ return $customers;
 
         $this->query("SET CHARACTER SET utf8");
 
-    $query="SELECT
+    $query="SELECT orders.order_id as id,
         orders.*,order_options.*,merchantrefs.*
         ,resellers.full_name as 'reseller_name',`customers`.`full_name` as 'customer_name'
         from orders
         INNER JOIN `customers` on `orders`.`customer_id`=`customers`.`customer_id`
         INNER JOIN `customers` resellers on resellers.`customer_id` = `orders`.`reseller_id`
-        INNER join order_options on orders.order_id= order_options.order_id
+        Left join order_options on orders.order_id= order_options.order_id
         LEFT join merchantrefs on orders.order_id= merchantrefs.order_id
         where product_subscription_type='monthly' and
   		orders.customer_id=".$customer_id;
@@ -1875,11 +1887,19 @@ return $customers;
 
 
 			$orderChild = array();
+      $order_row["order_id"]=$order_row["id"];
       $orderChild["displayed_order_id"]=$order_row["order_id"];
-      if ((int) $order_row["order_id"] > 10380)
-          $orderChild["displayed_order_id"] = (((0x0000FFFF & (int) $order_row["order_id"]) << 16) + ((0xFFFF0000 & (int) $order_row["order_id"]) >> 16));
+      $order_id=$order_row["order_id"];
+      if ((int) $order_id > 10380)
+          $orderChild["displayed_order_id"] = (((0x0000FFFF & (int) $order_id) << 16) + ((0xFFFF0000 & (int) $order_id) >> 16));
 
 			$orderChild["order_id"]=$order_row["order_id"];
+      /// discount fields
+      $orderChild["discount"]=$order_row["discount"];
+      $orderChild["free_router"]=$order_row["free_router"];
+      $orderChild["free_modem"]=$order_row["free_modem"];
+      $orderChild["free_setup"]=$order_row["free_setup"];
+      ///////////
       $orderChild["join_type"]=$order_row["join_type"];
       $orderChild["reseller_name"]=$order_row["reseller_name"];
       $orderChild["customer_name"]=$order_row["customer_name"];
@@ -2080,11 +2100,13 @@ return $customers;
 
 			//if($requestResult->num_rows===0)
 			//{
-				$requestResult = $this->query("SELECT * from requests where
-				order_id=".$order_row["order_id"]."
+        $requestQuery="SELECT * from requests where
+				order_id=".$orderChild["order_id"]."
 				and (year(action_on_date) <".$year."
 				or (year(action_on_date) =".$year." and month(action_on_date) <".$month." ))
-				and verdict = 'approve' order by action_on_date DESC LIMIT 1");
+				and verdict = 'approve' order by action_on_date DESC LIMIT 1";
+				$requestResult = $this->query($requestQuery);
+
 			//}
 			$requests=array();
 			$hasRequest=false;
@@ -2390,7 +2412,66 @@ echo "start_month_between_start_and_recurring: ".$start_month_between_start_and_
             $monthInfo["gst_tax_2"]=round($total_gst_tax,2, PHP_ROUND_HALF_UP);
   					$monthInfo["adapter_price"]=0;
           }
-          else{
+          else if($request_row["action"]==="moving"){
+            $actionTax=82;
+            $this_product_price=(float)$request_row["product_price"];
+            if($monthInfo["router"]!=="rent" )
+  						$monthInfo["router_price"]=0;
+            $monthInfo["product_price"]=(float)$request_row["product_price"];
+
+            $action="recurring, ".$request_row["action"];
+            if((int)$monthInfo["router_price"]>0)
+            {
+              $action=$action.", Router rent";
+            }
+
+            if($orderChild["additional_service"]==='yes')
+            {
+               $monthInfo["additional_service_price"]=(((float)$orderChild["additional_service_price"])/$monthDays)*$previous_days;
+               $action=$action.", additional Service";
+             }
+            else {
+              $monthInfo["additional_service_price"]=0;
+            }
+  					$totalPriceWoT=$this_product_price;
+
+
+            $subtotal=$totalPriceWoT+$actionTax+(float)$monthInfo["router_price"]+(float)$monthInfo["additional_service_price"];
+
+            $qst_tax=$subtotal*0.09975;
+  					$gst_tax=$subtotal*0.05;
+
+  					$totalPriceWT=$subtotal+$qst_tax+$gst_tax;
+  					$totalPriceWT7=$totalPriceWT;
+
+            $monthInfo["change_speed_fee"]=$actionTax;
+
+            $monthInfo["total_price_with_out_router"]=round($totalPriceWoT,2, PHP_ROUND_HALF_UP);
+  					$monthInfo["total_price_with_out_tax"]=round($subtotal,2, PHP_ROUND_HALF_UP);
+  					$monthInfo["total_price_with_tax"]=round($totalPriceWT,2, PHP_ROUND_HALF_UP);
+  					$monthInfo["total_price_with_tax_p7"]=round($totalPriceWT7,2, PHP_ROUND_HALF_UP);
+
+
+
+  					$monthInfo["product_title"]=$request_row["product_title"];
+  					$monthInfo["days"]=$monthDays;
+
+  					$monthInfo["product_title_2"]=$request_row["product_title"];
+
+  					//$monthInfo["additional_service_price"]=0;
+  					$monthInfo["setup_price"]=0;
+
+
+
+  					if($monthInfo["modem"]!=="rent" )
+  						$monthInfo["modem_price"]=0;
+
+  					$monthInfo["remaining_days_price"]=0;
+  					$monthInfo["qst_tax"]=round($qst_tax,2, PHP_ROUND_HALF_UP);
+  					$monthInfo["gst_tax"]=round($gst_tax,2, PHP_ROUND_HALF_UP);
+  					$monthInfo["adapter_price"]=0;
+          }
+          else{///////// if change speed
 
   					$previous_product_price= (((float)$monthInfo["product_price"])/$monthDays)*$previous_days;
 
@@ -2413,8 +2494,8 @@ echo "start_month_between_start_and_recurring: ".$start_month_between_start_and_
             $monthInfo["product_price_current"]=(float)$request_row["product_price"];
             //$totalPriceWoT=(float)$monthInfo["product_price"]+$priceDifference;
 
-  					$monthInfo["product_price"]=$previous_product_price;
-  					$monthInfo["product_price_2"]=$this_product_price;
+  					$monthInfo["product_price"]=round($previous_product_price,2, PHP_ROUND_HALF_UP);
+  					$monthInfo["product_price_2"]=round($this_product_price,2, PHP_ROUND_HALF_UP);
 
   					$monthInfo["days"]=$previous_days;
   					$monthInfo["days_2"]=$this_request_days;

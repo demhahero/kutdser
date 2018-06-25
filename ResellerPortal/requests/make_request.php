@@ -40,11 +40,17 @@ if (isset($_POST["action"])) {
 
 <script>
     $(document).ready(function () {
+      $(".moving-field").hide();
         $("select[name=\"action\"]").change(function () {
             if (this.value == "change_speed") {
                 $(".action-value").show();
             } else {
                 $(".action-value").hide();
+            }
+            if (this.value == "moving") {
+                $(".moving-field").show();
+            } else {
+                $(".moving-field").hide();
             }
         });
 
@@ -57,15 +63,38 @@ if (isset($_POST["action"])) {
             var action_value = $("select[name=\"product_id\"]").val();
             var action = $("select[name=\"action\"]").val();
             var modem_mac_address = $("input[name=\"modem_mac_address\"]").val();
+            //// moving fields
+            var city = $("input[name=\"city\"]").val();
+            var address_line_1 = $("input[name=\"address_line_1\"]").val();
+            var address_line_2 = $("input[name=\"address_line_2\"]").val();
+            var postal_code = $("input[name=\"postal_code\"]").val();
+
             var product_id = $("select[name=\"product_id\"]").val();
-            $.post("<?= $api_url ?>insert_requests_api.php", {order_id: order_id, action: action, product_id: product_id, action_on_date: action_on_date,modem_mac_address:modem_mac_address, note: note, reseller_id: reseller_id}, function (data, status) {
+            $.post("<?= $api_url ?>insert_requests_api.php",
+            {
+               order_id: order_id,
+               action: action,
+               product_id: product_id,
+               action_on_date: action_on_date,
+               modem_mac_address:modem_mac_address,
+               city:city,
+               address_line_1:address_line_1,
+               address_line_2:address_line_2,
+               postal_code:postal_code,
+               note: note,
+               reseller_id: reseller_id}, function (data, status) {
                 data = $.parseJSON(data);
                 if (data.inserted == true){
                     alert("Request sent");
                     location.href = "requests.php";
                 }
-                else
-                    alert("Error, try again");
+                else{
+                  if(data.error!=="null")
+                  alert(data.error);
+                  else
+                  alert("Error, try again");
+                }
+
             });
             return false;
         });
@@ -96,12 +125,33 @@ if (isset($_POST["action"])) {
         <label>Action:</label>
         <select name="action" class="form-control">
             <option value="change_speed">Change speed</option>
+            <option value="moving">Moving</option>
             <option value="terminate">Terminate</option>
         </select>
     </div>
     <div class="form-group">
         <label>Action on date:</label>
         <input readonly="" name="action_on_date" type="text" class="form-control datepicker" />
+    </div>
+    <div class="form-group moving-field">
+        <label>City:</label>
+        <input type="text" name="city" class="form-control"/>
+
+    </div>
+    <div class="form-group moving-field">
+        <label>New Address:</label>
+        <input type="text" name="address_line_1" class="form-control"/>
+
+    </div>
+    <div class="form-group moving-field">
+        <label>New Address 2 (optional):</label>
+        <input type="text" name="address_line_2" class="form-control"/>
+
+    </div>
+    <div class="form-group moving-field">
+        <label>Postal Code:</label>
+        <input type="text" name="postal_code" class="form-control"/>
+
     </div>
     <div class="form-group action-value">
         <label>Speed:</label>
