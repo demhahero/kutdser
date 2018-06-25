@@ -40,7 +40,7 @@ if (isset($_POST["action"])) {
 
 <script>
     $(document).ready(function () {
-      $(".moving-field").hide();
+        $(".moving-field").hide();
         $("select[name=\"action\"]").change(function () {
             if (this.value == "change_speed") {
                 $(".action-value").show();
@@ -71,32 +71,38 @@ if (isset($_POST["action"])) {
 
             var product_id = $("select[name=\"product_id\"]").val();
             $.post("<?= $api_url ?>insert_requests_api.php",
-            {
-               order_id: order_id,
-               action: action,
-               product_id: product_id,
-               action_on_date: action_on_date,
-               modem_mac_address:modem_mac_address,
-               city:city,
-               address_line_1:address_line_1,
-               address_line_2:address_line_2,
-               postal_code:postal_code,
-               note: note,
-               reseller_id: reseller_id}, function (data, status) {
+                    {
+                        order_id: order_id,
+                        action: action,
+                        product_id: product_id,
+                        action_on_date: action_on_date,
+                        modem_mac_address: modem_mac_address,
+                        city: city,
+                        address_line_1: address_line_1,
+                        address_line_2: address_line_2,
+                        postal_code: postal_code,
+                        note: note,
+                        reseller_id: reseller_id}, function (data, status) {
                 data = $.parseJSON(data);
-                if (data.inserted == true){
+                if (data.inserted == true) {
                     alert("Request sent");
                     location.href = "requests.php";
-                }
-                else{
-                  if(data.error!=="null")
-                  alert(data.error);
-                  else
-                  alert("Error, try again");
+                } else {
+                    if (data.error !== "null")
+                        alert(data.error);
+                    else
+                        alert("Error, try again");
                 }
 
             });
             return false;
+        });
+
+        $.getJSON("<?= $api_url ?>insert_requests_api.php?order_id=<?= $order_id ?>&do=product_list", function (result) {
+            $.each(result['products'], function (i, field) {
+                $("select.product-list").append("<option price='" + field['price'] + "' value='"
+                        + field['product_id'] + "'>" + field['title'] + " (" + field['price'] + ")</option>");
+            });
         });
     });
 </script>
@@ -155,16 +161,7 @@ if (isset($_POST["action"])) {
     </div>
     <div class="form-group action-value">
         <label>Speed:</label>
-        <select name="product_id" class="form-control">
-            <option price='29.9' value='383'>Internet 5 Mbps ($29.9)</option>
-            <option price='34.9' value='335'>Internet 10 Mbps ($34.9)</option>
-            <option price='39.9' value='380'>Internet 15 Mbps ($39.9)</option>
-            <option price='44.9' value='381'>Internet 20 Mbps ($44.9)</option>
-            <option price='49.9' value='414'>Internet 30 Mbps ($49.9)</option>
-            <option price='59.9' value='416'>Internet 60 Mbps ($59.9)</option>
-            <option price='79.9' value='418'>Internet 120 Mbps ($79.9)</option>
-            <option price='99.9' value='419'>Internet 200 Mbps ($99.9)</option>
-            <option price='159.9' value='420'>Internet 940 Mbps ($159.9)</option>
+        <select name="product_id" class="product-list form-control">
         </select>
     </div>
     <div class="form-group action-value">

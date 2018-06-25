@@ -48,7 +48,7 @@ function checkRequest($order_id, $dbTools) {
     return $start_active_date;
 }
 
-if (isset($_GET["order_id"]) /* && isset($_GET["action_on_date"]) */) {
+if (isset($_GET["order_id"]) && !isset($_GET['do'])) {
     include_once "dbconfig.php";
 
     //$action_on_dateString=$_GET["action_on_date"];
@@ -59,6 +59,27 @@ if (isset($_GET["order_id"]) /* && isset($_GET["action_on_date"]) */) {
     $start_active_date = checkRequest($order_id, $dbTools);
     if ($start_active_date)
         echo "{\"start_active_date\" :\"" . $start_active_date . "\",\"error\" :\"null\"}";
+}
+else if (isset($_GET["order_id"]) && isset($_GET['do']) == "product_list") {
+    include_once "dbconfig.php";
+    
+    $dbTools->query("SET CHARACTER SET utf8");
+    
+    $getOrder = $dbTools->query("SELECT * from orders inner join order_options on orders.order_id= order_options.order_id where  orders.order_id=" . $_GET["order_id"]);
+    $order_row = $dbTools->fetch_assoc($getOrder);
+    
+    $getProducts = $dbTools->query("SELECT * from `products` where `subscription_type`='".$order_row["product_subscription_type"]."' "
+            . "and `category`='".$order_row["product_category"]."' and `status`='active' "
+            . "and `title` != '".$order_row["product_title"]."'");
+    $products = array();
+    while($product_row = $dbTools->fetch_assoc($getProducts)){
+        $products[] = $product_row;
+    }
+
+    $json = json_encode($products);
+    
+    echo "{\"products\" :", $json, ",\"error\" :\"null\"}";
+    die();
 }
 else if (isset($_POST["order_id"])) {
 
