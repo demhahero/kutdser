@@ -8,7 +8,10 @@ $request_id = intval($_GET["request_id"]);
 
 // get request info and reseller info
 $query="SELECT `request_id`, reseller.`customer_id`, `admins`.`username`
-,reseller.`full_name`, `requests`.`order_id`, `creation_date`, `action`, `action_value`,`admins`.`admin_id`, `verdict`, `verdict_date`, `action_on_date`, `product_price`, `requests`.`note`, `product_title`, `product_category`, `product_subscription_type`, `modem_mac_address`
+,reseller.`full_name`, `requests`.`order_id`, `creation_date`, `action`,
+ `action_value`,`admins`.`admin_id`, `verdict`, `verdict_date`, `action_on_date`,
+ `product_price`, `requests`.`note`, `product_title`, `product_category`,
+ `product_subscription_type`, `modem_mac_address`,`requests`.`city`,`requests`.`address_line_1`,`requests`.`address_line_2`,`requests`.`postal_code`
 FROM `requests`
 INNER JOIN `customers` as reseller on `reseller`.`customer_id`= `requests`.`reseller_id`
 LEFT JOIN `admins` on `admins`.`admin_id`=`requests`.`admin_id`
@@ -40,10 +43,14 @@ else if($request_order_row["product_category"]==="internet"){
 
 /// get last approved request for this order if exist;
 $last_request_query="SELECT `request_id`, reseller.`customer_id`, `admins`.`username`
-,reseller.`full_name`, `requests`.`order_id`, `creation_date`, `action`, `action_value`,`admins`.`admin_id`, `verdict`, `verdict_date`, `action_on_date`, `product_price`, `requests`.`note`, `product_title`, `product_category`, `product_subscription_type`, `modem_mac_address`
+,reseller.`full_name`, `requests`.`order_id`, `creation_date`, `action`,
+ `action_value`,`admins`.`admin_id`, `verdict`, `verdict_date`, `action_on_date`,
+ `product_price`, `requests`.`note`, `product_title`, `product_category`,
+ `product_subscription_type`, `modem_mac_address`,`requests`.`city`,`requests`.`address_line_1`,`requests`.`address_line_2`,`requests`.`postal_code`
 FROM `requests`
 INNER JOIN `customers` as reseller on `reseller`.`customer_id`= `requests`.`reseller_id`
 LEFT JOIN `admins` on `admins`.`admin_id`=`requests`.`admin_id`
+
 WHERE `requests`.`order_id`=".$request_row['order_id']." and `requests`.`action_on_date` < N'".$request_row['action_on_date']."' and verdict='approve' ORDER BY action_on_date DESC LIMIT 1";
 
 $last_request=$dbTools->query($last_request_query);
@@ -169,64 +176,87 @@ if ($request_row["verdict"] == "") {
                   if(sizeof($request_row)>0){
                   ?>
                   <tr>
-                      <td>Action:</td>
+                      <td class=" bg-success">Action:</td>
                       <td>
                           <?= $request_row['action'] ?>
                       </td>
 
-                      <td>Action On Date:</td>
+                      <td class=" bg-success">Action On Date:</td>
                       <td>
                           <?= $request_row['action_on_date'] ?>
                       </td>
-
-                      <td>Admin:</td>
-                      <td>
-                          <?= $request_row['username'] ?>
-                      </td>
-
-                      <td>Verdict:</td>
-                      <td >
-                          <?= $request_row['verdict'] ?>
-                      </td>
-
-                      <td >Verdict Date:</td>
+                      <td class=" bg-success">Verdict Date:</td>
                       <td >
                           <?= $request_row['verdict_date'] ?>
                       </td>
-                      <td>Modem Mac Address:</td>
-                      <td>
-                          <?= $request_row['modem_mac_address'] ?>
+
+
+                      <td class=" bg-success">Verdict:</td>
+                      <td >
+                          <?= $request_row['verdict'] ?>
                       </td>
                     </tr>
                     <tr>
-                      <td>Reseller Name:</td>
+                      <td class=" bg-success">Admin:</td>
+                      <td>
+                          <?= $request_row['username'] ?>
+                      </td>
+                      <td class=" bg-success">Reseller Name:</td>
                       <td>
                           <?= $request_row['full_name'] ?>
                       </td>
+                      <td class=" bg-success">Modem Mac Address:</td>
+                      <td>
+                          <?= $request_row['modem_mac_address'] ?>
+                      </td>
+                      <td class=" bg-success">Note:</td>
+                      <td>
+                          <?= $request_row['note'] ?>
+                      </td>
 
-                      <td>Product Name:</td>
+
+
+                    </tr>
+                    <tr>
+                      <td class=" bg-success">Product Name:</td>
                       <td>
                           <?= $request_row['product_title'] ?>
                       </td>
-
-                      <td>Product price:</td>
+                      <td class=" bg-success">Product price:</td>
                       <td>
                           <?= $request_row['product_price'] ?>
                       </td>
 
-                      <td>Product Type:</td>
+                      <td class=" bg-success">Product Type:</td>
                       <td>
                           <?= $request_row['product_subscription_type'] ?>
                       </td>
 
-                      <td>Product Category:</td>
+                      <td class=" bg-success">Product Category:</td>
                       <td>
                           <?= $request_row['product_category'] ?>
                       </td>
 
-                      <td>Note:</td>
+
+
+                    </tr>
+                    <tr>
+                      <td class=" bg-success">City:</td>
                       <td>
-                          <?= $request_row['note'] ?>
+                          <?= $request_row['city'] ?>
+                      </td>
+                      <td class=" bg-success">Address Line 1:</td>
+                      <td>
+                          <?= $request_row['address_line_1'] ?>
+                      </td>
+
+                      <td class=" bg-success">Address Line 2:</td>
+                      <td>
+                          <?= $request_row['address_line_2'] ?>
+                      </td>
+                      <td class=" bg-success">Postal Code:</td>
+                      <td>
+                          <?= $request_row['postal_code'] ?>
                       </td>
                   </tr>
                   <?PHP }
@@ -423,73 +453,93 @@ if ($request_row["verdict"] == "") {
                     if(sizeof($last_request_row)>0){
                     ?>
                     <tr>
-                        <td>Action:</td>
+                        <td class=" bg-success">Action:</td>
                         <td>
                             <?= $last_request_row['action'] ?>
                         </td>
-                    </tr>
-                    <tr>
-                        <td>Action On Date:</td>
+
+                        <td class=" bg-success">Action On Date:</td>
                         <td>
                             <?= $last_request_row['action_on_date'] ?>
                         </td>
-                    </tr>
-                    <tr>
-                        <td>Admin:</td>
+                      </tr>
+                      <tr>
+                        <td class=" bg-success">Verdict Date:</td>
+                        <td >
+                            <?= $last_request_row['verdict_date'] ?>
+                        </td>
+
+
+                        <td class=" bg-success">Verdict:</td>
+                        <td >
+                            <?= $last_request_row['verdict'] ?>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td class=" bg-success">Admin:</td>
                         <td>
                             <?= $last_request_row['username'] ?>
                         </td>
-                    </tr>
-                    <tr>
-                        <td>Verdict:</td>
-                        <td>
-                            <?= $last_request_row['verdict'] ?>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Verdict Date:</td>
-                        <td>
-                            <?= $last_request_row['verdict_date'] ?>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Reseller Name:</td>
+                        <td class=" bg-success">Reseller Name:</td>
                         <td>
                             <?= $last_request_row['full_name'] ?>
                         </td>
-                    </tr>
-                    <tr>
-                        <td>Product Name:</td>
+                      </tr>
+                      <tr>
+                        <td class=" bg-success">Modem Mac Address:</td>
+                        <td>
+                            <?= $last_request_row['modem_mac_address'] ?>
+                        </td>
+                        <td class=" bg-success">Note:</td>
+                        <td>
+                            <?= $last_request_row['note'] ?>
+                        </td>
+
+
+
+                      </tr>
+                      <tr>
+                        <td class=" bg-success">Product Name:</td>
                         <td>
                             <?= $last_request_row['product_title'] ?>
                         </td>
-                    </tr>
-                    <tr>
-                        <td>Product price:</td>
+                        <td class=" bg-success">Product price:</td>
                         <td>
                             <?= $last_request_row['product_price'] ?>
                         </td>
-                    </tr>
-                    <tr>
-                        <td>Product Type:</td>
+                      </tr>
+                      <tr>
+                        <td class=" bg-success">Product Type:</td>
                         <td>
                             <?= $last_request_row['product_subscription_type'] ?>
                         </td>
-                    </tr>
-                    <tr>
-                        <td>Product Category:</td>
+
+                        <td class=" bg-success">Product Category:</td>
                         <td>
                             <?= $last_request_row['product_category'] ?>
                         </td>
-                    </tr>
-                    <td>Modem Mac Address:</td>
-                    <td>
-                        <?= $last_request_row['modem_mac_address'] ?>
-                    </td>
-                    <tr>
-                        <td>Note:</td>
+
+
+
+                      </tr>
+                      <tr>
+                        <td class=" bg-success">City:</td>
                         <td>
-                            <?= $last_request_row['note'] ?>
+                            <?= $last_request_row['city'] ?>
+                        </td>
+                        <td class=" bg-success">Address Line 1:</td>
+                        <td>
+                            <?= $last_request_row['address_line_1'] ?>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td class=" bg-success">Address Line 2:</td>
+                        <td>
+                            <?= $last_request_row['address_line_2'] ?>
+                        </td>
+                        <td class=" bg-success">Postal Code:</td>
+                        <td>
+                            <?= $last_request_row['postal_code'] ?>
                         </td>
                     </tr>
                     <?PHP }
