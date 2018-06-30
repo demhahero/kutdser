@@ -25,7 +25,7 @@ class DBTools {
 
     private $db_username = "root";
     private $db_password = "";
-    private $db_name = 'router'; //database name
+    private $db_name = 'routers_2018_05_22'; //database name
 
     private $conn_routers;
     private $query_result;
@@ -388,10 +388,8 @@ private function fill_order_price_details_2($orderChild,$year,$month){
         $monthInfo["product_title"]=$orderChild["product_title"];
         $monthInfo["days"]=$days;
         $monthInfo["action"]="order";
-        if($recurring_date->format('Y')<$year
-          || ($recurring_date->format('Y')===$year && $recurring_date->format('m')<=$month)
-          )
-          {
+
+
             $action="recurring";
             if($orderChild["router"]==='rent')
             {
@@ -424,7 +422,6 @@ private function fill_order_price_details_2($orderChild,$year,$month){
       			$monthInfo["product_title"]=$orderChild["product_title"];
       			$monthInfo["days"]=$days;
             $monthInfo["action"]=$action;
-          }
 
   			$totalPriceWT=$totalPriceWoT+$qst_tax+$gst_tax;
   			$totalPriceWT7=$totalPriceWT;
@@ -455,6 +452,7 @@ private function fill_order_price_details_2($orderChild,$year,$month){
   			//}
   			$requests=array();
   			$hasRequest=false;
+
   			while ($request_row = $this->fetch_assoc($requestResult)) {
   				$hasRequest=true;
   				$requestChild = array();
@@ -966,7 +964,7 @@ public function customers_need_merge_monthly($year,$month) {
 
       $this->query("SET CHARACTER SET utf8");
 
-  $query="SELECT
+  $query="SELECT orders.order_id as id,
       orders.*,order_options.*,merchantrefs.*
       ,resellers.full_name as 'reseller_name',`customers`.`full_name` as 'customer_name'
       from orders
@@ -982,6 +980,7 @@ public function customers_need_merge_monthly($year,$month) {
 
   $order_rows=array();
   while ($order_row = $this->fetch_assoc($ordersResult)) {
+    $order_row['order_id']=$order_row['id'];
       array_push($order_rows,$order_row);
     }
     $customers=array();
