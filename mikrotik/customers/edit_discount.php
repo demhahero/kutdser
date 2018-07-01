@@ -186,7 +186,7 @@ function discount_change(){
   } , function (result) {
 
 
-    if(result.updated)
+    if(result.updated==="yes")
     {
       $('#message').html('<div class="alert alert-success"><strong>Success!</strong> updated successfully</div>');
     }

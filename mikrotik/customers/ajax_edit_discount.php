@@ -51,10 +51,13 @@ if(isset($_POST["products"]))
 }
 else if (isset($_POST['discount_toggle']))
 {
-  $result=$dbTools->query("UPDATE `customers` SET
+  $query="UPDATE `customers` SET
      `has_discount`=N'yes',
-     `has_discount`=N'".$_POST['discount_toggle']==="true"?"yes":"no"."'
-     WHERE `customer_id`=".$_POST['reseller_id']);
+     `has_discount`=N'".($_POST['discount_toggle']==="true"?"yes":"no")."'
+     WHERE `customer_id`=".$_POST['reseller_id'];
+  $result=$dbTools->query($query);
+
+
      if($result)
        echo "{\"updated\" :\"yes\",\"error\" :null}";
      else
