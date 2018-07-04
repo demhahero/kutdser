@@ -165,6 +165,7 @@ while($products_row=$dbTools->fetch_assoc($products))
                                             }
                                             ?>
                                         </select>
+                                        <input type="checkbox" class="input-text modem custom-options custom_field" data-price="60" name="options[inventory_modem_price]" value="yes" /> Pay modem price ($59.90 deposit)
                                     </div>
                                     <br/>
                                     <label class="radio-inline">

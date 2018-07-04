@@ -331,7 +331,11 @@ $(document).ready(function () {
             product_price = parseFloat($("select[name=\"product\"] option:selected").attr("price"));
 
             //If rent modem
-            if ($("input[name=\"options[modem]\"]:checked").val() == "rent") {
+            if ($("input[name=\"options[inventory_modem_price]\"]").prop('checked') == true)
+            {
+              modem_cost = 59.90;
+            }
+            if ($("input[name=\"options[modem]\"]:checked").val() == "rent" ) {
                 modem_cost = 59.90;
                 if(has_discount && free_modem)
                 modem_cost=0;
