@@ -89,6 +89,13 @@ if ($product_type == "internet") {
 
 
     //If rent modem
+    //If rent modem
+    if ($_POST["options"]["inventory_modem_price"] == "yes") {
+        $modem_cost = 59.90;
+
+        //Deposit has no tax
+        //$value_has_no_tax = $modem_cost;
+    }
     if ($_POST["options"]["modem"] == "rent") {
         $modem_cost = 59.90;
 
