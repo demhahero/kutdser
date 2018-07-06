@@ -66,7 +66,7 @@ $queryRecords = mysqli_query($dbTools->getConnection(), $sqlRec);
 //iterate on results row and create new index array of data
 while ($row = mysqli_fetch_array($queryRecords)) {
     
-    $data[0] = $row['customer_id'];
+    $data[0] = '<a href="edit_customer.php?customer_id='.$row['customer_id'].'">'.$row['customer_id'].'</a>';
     $data[1] = '<a href="customer_details.php?customer_id='.$row['customer_id'].'">'.$row['full_name'].'</a>';
     $data[2] = $row['reseller_name'];
     $data[3] = $row['phone'];
