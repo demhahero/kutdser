@@ -71,7 +71,7 @@ while ($row = mysqli_fetch_array($queryRecords)) {
     $data[2] = $row['reseller_name'];
     $data[3] = $row['phone'];
     $data[4] = $row['email'];
-    $data[5] = '<a href="customer_orders.php?customer_id='.$row['customer_id'].'" class="btn btn-primary btn-xs"><i class="fa fa-file-archive-o"></i> Invoices </a>'
+    $data[5] = '<a href="customer_invoices.php?customer_id='.$row['customer_id'].'" class="btn btn-primary btn-xs"><i class="fa fa-file-archive-o"></i> Invoices </a>'
             . '<a href="customer_orders.php?customer_id='.$row['customer_id'].'" class="btn btn-info btn-xs"><i class="fa fa-credit-card"></i> Orders </a>'
             . '<a href="customer_by_month.php?customer_id='.$row['customer_id'].'" class="btn btn-danger btn-xs"><i class="fa fa-bar-chart"></i> Status </a>';
     $all_data[] = $data;
