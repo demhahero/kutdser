@@ -52,6 +52,12 @@ if (isset($_POST["action"])) {
             } else {
                 $(".moving-field").hide();
             }
+
+            if (this.value == "swap_modem") {
+                $(".swap-modem").show();
+            } else {
+                $(".swap-modem").hide();
+            }
         });
 
         $(".submit").click(function () {
@@ -68,7 +74,10 @@ if (isset($_POST["action"])) {
             var address_line_1 = $("input[name=\"address_line_1\"]").val();
             var address_line_2 = $("input[name=\"address_line_2\"]").val();
             var postal_code = $("input[name=\"postal_code\"]").val();
-
+            
+            //Swap modem
+            var modem_id = $("select[name=\"modem_id\"]").val();
+            
             var product_id = $("select[name=\"product_id\"]").val();
             $.post("<?= $api_url ?>insert_requests_api.php",
                     {
@@ -77,6 +86,7 @@ if (isset($_POST["action"])) {
                         product_id: product_id,
                         action_on_date: action_on_date,
                         modem_mac_address: modem_mac_address,
+                        modem_id: modem_id,
                         city: city,
                         address_line_1: address_line_1,
                         address_line_2: address_line_2,
@@ -133,6 +143,7 @@ if (isset($_POST["action"])) {
             <option value="change_speed">Change speed</option>
             <option value="moving">Moving</option>
             <option value="terminate">Terminate</option>
+            <option value="swap_modem">Swap Modem</option>
         </select>
     </div>
     <div class="form-group">
@@ -167,8 +178,21 @@ if (isset($_POST["action"])) {
     <div class="form-group action-value">
         <label>New Modem Mac Address (optional):</label>
         <input type="text" name="modem_mac_address" class="form-control"/>
-
     </div>
+
+    <div class="form-group action-value swap-modem" style="display: none;">
+        <label>New Modem:</label>
+        <select name="modem_id" class="form-control">
+            <?php
+            $result_modems = $conn_routers->query("select * from `modems` where `reseller_id`='" . $reseller_id . "' and `customer_id`='0'");
+            while ($row_modem = $result_modems->fetch_assoc()) {
+                echo "<option value=\"" . $row_modem["modem_id"] . "\">" . $row_modem["mac_address"] . "[" . $row_modem["type"] . " | " . $row_modem["serial_number"] . "]" . "</option>";
+            }
+            ?>
+        </select>
+    </div>
+
+
     <div class="form-group">
         <label>Note:</label>
         <textarea name="note" class="form-control"></textarea>

@@ -106,6 +106,7 @@ else if (isset($_POST["order_id"])) {
         "verdict_date" => "",
         "action_on_date" => "",
         "modem_mac_address"=>"",
+        "modem_id"=>"",
         "city"=>"",
         "address_line_1"=>"",
         "address_line_2"=>"",
@@ -132,6 +133,7 @@ else if (isset($_POST["order_id"])) {
         "product_category" => "",
         "product_subscription_type" => "",
         "modem_mac_address"=>"",
+        "modem_id"=>"",
         "city"=>"",
         "address_line_1"=>"",
         "address_line_2"=>"",
@@ -156,6 +158,7 @@ else if (isset($_POST["order_id"])) {
                 || $key === "product_price"
                 || $key === "product_subscription_type"
                 || $key === "creation_date"
+                || $key === "modem_id"
                 || $key === "address_line_2"
                 || $key === "modem_mac_address") {
             $InsertFieldValues[$key] = "";
