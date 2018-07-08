@@ -1,5 +1,6 @@
 $(document).ready(function () {
 
+
     var product_type = "internet";
 
     function setupInternetForm() {
@@ -229,15 +230,36 @@ $(document).ready(function () {
             return true;
         }
     }
+    var has_discount_input=$("#has_discount").val();
+    var free_modem_input=$("#free_modem").val();
+    var free_router_input=$("#free_router").val();
+    var free_adapter_input=$("#free_adapter").val();
+    var free_installation_input=$("#free_installation").val();
+    var free_transfer_inpu=$("#free_transfer").val();
 
+    $("#has_discount").val("no");
+    $("#free_modem").val("no");
+    $("#free_router").val("no");
+    $("#free_adapter").val("no");
+    $("#free_installation").val("no");
+    $("#free_transfer").val("no");
     //Set 1st product is monthly by default and disable yearly existed customers.
     $("select[name=\"product\"] option:first").attr("selected", "selected");
     $("select[name=\"customer_id\"] option[type=\"monthly\"]").prop('disabled', false);
     $("select[name=\"customer_id\"] option[type=\"yearly\"]").prop('disabled', true);
 
     $("select[name=\"product\"]").change(function () {
+
         //If yearly, disable monthly existed customers
         if ($("select[name=\"product\"] option:selected").attr("type") == "yearly") {
+
+          $("#has_discount").val(has_discount_input);
+          $("#free_modem").val(free_modem_input);
+          $("#free_router").val(free_router_input);
+          $("#free_adapter").val(free_adapter_input);
+          $("#free_installation").val(free_installation_input);
+          $("#free_transfer").val(free_transfer_inpu);
+
             $("select[name=\"customer_id\"] option[type=\"monthly\"]").prop('disabled', true);
             $("select[name=\"customer_id\"] option[type=\"yearly\"]").prop('disabled', false);
             $("input.plan-monthly").prop('disabled', true); // NO plans if YEALY
@@ -246,6 +268,13 @@ $(document).ready(function () {
             $("input.rent-router").prop('checked', false); // Remove check from rent rounter
         } else { //If monthly, disable yearly existed customers
             //alert(1);
+            $("#has_discount").val("no");
+            $("#has_discount").val("no");
+            $("#free_modem").val("no");
+            $("#free_router").val("no");
+            $("#free_adapter").val("no");
+            $("#free_installation").val("no");
+            $("#free_transfer").val("no");
             $("select[name=\"customer_id\"] option[type=\"yearly\"]").prop('disabled', true);
             $("select[name=\"customer_id\"] option[type=\"monthly\"]").prop('disabled', false);
             $("input.plan-monthly").prop('disabled', false);
@@ -253,6 +282,32 @@ $(document).ready(function () {
             $("input.rent-router").prop('disabled', false);
         }
     });
+
+    //////////// calculate discount only if yealry subscription selected
+
+
+    $("#has_discount").val("no");
+    $('input[type=radio][name=\'options[plan]\']').change(function() {
+        if (this.value == 'yearly') {
+
+            $("#has_discount").val(has_discount_input);
+            $("#free_modem").val(free_modem_input);
+            $("#free_router").val(free_router_input);
+            $("#free_adapter").val(free_adapter_input);
+            $("#free_installation").val(free_installation_input);
+            $("#free_transfer").val(free_transfer_inpu);
+        }
+        else if (this.value == 'monthly') {
+
+          $("#has_discount").val("no");
+          $("#free_modem").val("no");
+          $("#free_router").val("no");
+          $("#free_adapter").val("no");
+          $("#free_installation").val("no");
+          $("#free_transfer").val("no");
+        }
+    });
+
 
     function validateCustomerInformation() {
         if ($("select[name=\"customer_id\"]  option:selected").val() == "0") {
@@ -319,17 +374,29 @@ $(document).ready(function () {
             var additional_service = 0;
             var has_discount=false;
             var free_modem=false;
-            var free_setup=false;
             var free_router=false;
+            var free_adapter=false;
+            var free_installation=false;
+            var free_transfer=false;
 
 
             //Get product price
             has_discount = $("input[name=\"has_discount\"]").val()==='yes';
             free_modem = $("input[name=\"free_modem\"]").val()==='yes';
-            free_setup = $("input[name=\"free_setup\"]").val()==='yes';
             free_router = $("input[name=\"free_router\"]").val()==='yes';
-            product_price = parseFloat($("select[name=\"product\"] option:selected").attr("price"));
+            free_adapter = $("input[name=\"free_adapter\"]").val()==='yes';
+            free_installation = $("input[name=\"free_installation\"]").val()==='yes';
+            free_transfer = $("input[name=\"free_transfer\"]").val()==='yes';
 
+            product_price = parseFloat($("select[name=\"product\"] option:selected").attr("real_price"));
+            if(has_discount)
+              product_price = parseFloat($("select[name=\"product\"] option:selected").attr("price"));
+
+            //product title
+
+            var title=$("select[name=\"product\"] option:selected").attr("data_title")+" "+product_price
+            if(has_discount)
+              var title=$("select[name=\"product\"] option:selected").text();
             //If rent modem
             if ($("input[name=\"options[inventory_modem_price]\"]").prop('checked') == true)
             {
@@ -367,12 +434,19 @@ $(document).ready(function () {
             if ($("select[name=\"product\"] option:selected").text().includes("Yearly") == false) {
                 if ($("input[name=\"options[plan]\"]:checked").val() == "monthly") {
                     if ($("input[name=\"options[cable_subscriber]\"]:checked").val() == "yes")
-                        installation_transfer_cost = 19.90;
+                    {
+                      installation_transfer_cost = 19.90;
+                      if(has_discount && free_transfer)
+                      installation_transfer_cost=0;
+                    }
                     else
-                        installation_transfer_cost = 60.00;
+                    {
+                      installation_transfer_cost = 60.00;
+                      if(has_discount && free_installation)
+                      installation_transfer_cost=0;
+                    }
 
-                    if(has_discount && free_setup)
-                    installation_transfer_cost=0;
+
                 }
             }
 
@@ -457,7 +531,7 @@ $(document).ready(function () {
 
             $("div.order_details span.gst-cost").html("$" + gst_tax.toFixed(2));
 
-            $("div.order_details span.product-name").html($("select[name=\"product\"]:enabled option:selected").text());
+            $("div.order_details span.product-name").html(title);
 
             $("div.order_details span.total").html("$" + total_price.toFixed(2));
         } else if (product_type == "phone") {
@@ -473,15 +547,19 @@ $(document).ready(function () {
             var qst_tax = 0;
             var additional_service = 0;
 
-            //Get product price
-            product_price = parseFloat($("select[name=\"product\"] option:selected").attr("price"));
+            //Get product
+            product_price = parseFloat($("select[name=\"product\"] option:selected").attr("real_price"));
+            if(has_discount)
+              product_price = parseFloat($("select[name=\"product\"] option:selected").attr("price"));
 
             //If buy adapter
             if ($("input[name=\"options[adapter]\"]:checked").val() == "buy_Cisco_SPA112") {
                 adapter_price = 59.90;
+                if(has_discount && free_adapter)
+                adapter_price=0;
             }
             //NOTICE: Have to be changed later
-            adapter_price = 0;
+            //adapter_price = 0;
 
             //If transfer
             if ($("input[name=\"options[you_have_phone_number]\"]:checked").val() == "yes") {
@@ -541,7 +619,7 @@ $(document).ready(function () {
 
             $("div.order_details span.gst-cost").html("$" + gst_tax.toFixed(2));
 
-            $("div.order_details span.product-name").html($("select[name=\"product\"] option:selected").text());
+            $("div.order_details span.product-name").html($("select[name=\"product\"] option:selected").attr("data_title")+" "+product_price);
 
             $("div.order_details span.total").html("$" + total_price.toFixed(2));
         }

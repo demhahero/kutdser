@@ -2,12 +2,14 @@
 include_once "../header.php";
 $dbTools->query("SET CHARACTER SET utf8");
 
-$reseller = $dbTools->query("SELECT `has_discount`,`free_modem`,`free_router`,`free_setup`,`full_name` FROM `customers` WHERE `customer_id` = '" . $reseller_id . "'");
+$reseller = $dbTools->query("SELECT `has_discount`,`free_modem`,`free_router`,`free_adapter`,`free_installation`,`free_transfer`,`full_name` FROM `customers` WHERE `customer_id` = '" . $reseller_id . "'");
 $reseller_row=$dbTools->fetch_assoc($reseller);
 $has_discount= ($reseller_row['has_discount']==="yes"?TRUE:FALSE);
 $free_modem= ($reseller_row['free_modem']==="yes"?TRUE:FALSE);
 $free_router= ($reseller_row['free_router']==="yes"?TRUE:FALSE);
-$free_setup= ($reseller_row['free_setup']==="yes"?TRUE:FALSE);
+$free_adapter= ($reseller_row['free_adapter']==="yes"?TRUE:FALSE);
+$free_installation= ($reseller_row['free_installation']==="yes"?TRUE:FALSE);
+$free_transfer= ($reseller_row['free_transfer']==="yes"?TRUE:FALSE);
 
 
 
@@ -52,10 +54,12 @@ while($products_row=$dbTools->fetch_assoc($products))
     }
 </style>
 <form class="" action="checkout.php" method="post">
-  <input type ="hidden" name="has_discount" value="<?= $reseller_row['has_discount']?>"/>
-  <input type ="hidden" name="free_router" value="<?= $reseller_row['free_router']?>"/>
-  <input type ="hidden" name="free_modem" value="<?= $reseller_row['free_modem']?>"/>
-  <input type ="hidden" name="free_setup" value="<?= $reseller_row['free_setup']?>"/>
+  <input type ="hidden" id="has_discount" name="has_discount" value="<?= $reseller_row['has_discount']?>"/>
+  <input type ="hidden" id="free_router" name="free_router" value="<?= $reseller_row['free_router']?>"/>
+  <input type ="hidden" id="free_modem"  name="free_modem" value="<?= $reseller_row['free_modem']?>"/>
+  <input type ="hidden" id="free_adapter" name="free_adapter" value="<?= $reseller_row['free_adapter']?>"/>
+  <input type ="hidden" id="free_installation" name="free_installation" value="<?= $reseller_row['free_installation']?>"/>
+  <input type ="hidden" id="free_transfer" name="free_transfer" value="<?= $reseller_row['free_transfer']?>"/>
     <!-- SmartWizard html -->
     <div id="smartwizard">
         <ul>
@@ -94,15 +98,17 @@ while($products_row=$dbTools->fetch_assoc($products))
 
                                               $price=(float)$product['price']-((float)$product['price']*(((float)$product['discount']/100)));
                                               $price=round($price,2);
-                                              $title=$product['title']." (with discount ".$product['discount']."%)";
+                                              $discount_duration=$product['discount_duration'];
+                                              $discount_duration=str_replace("_"," ",$discount_duration);
+                                              $discount_duration= ucfirst($discount_duration);
+                                              $title=$product['title']." (".$product['price']." $) (with discount ".$product['discount']."% for ".$discount_duration.")";
 
                                             }
 
                                             ?>
-                                        <option price='<?= $price?>' value='<?= $product['product_id']?>' type="<?= $product['subscription_type']?>"> <?= $title." (".$price."$)"?></option>
+                                        <option real_price='<?=$product['price']?>' data_title='<?= $product['title']?>'  price='<?= $price?>' value='<?= $product['product_id']?>' type="<?= $product['subscription_type']?>"> <?= $title." (".$price."$)"?></option>
                                       <?php }
                                       endforeach; ?>
-
                                     </select>
                                 </div>
                             </div>
@@ -123,6 +129,26 @@ while($products_row=$dbTools->fetch_assoc($products))
                             </p>
                         </div>
                     </div>
+                    <?php
+                    if($has_discount){
+                       ?>
+                    <div class="row" style="width:100% !important;">
+                        <div class="col-sm-12" >
+                            <p class="rounded form-row form-row-wide custom_check-service-availabilty  ">
+                            <div class="panel panel-success">
+                                <div class="panel-heading">Discounts Note:</div>
+                                <div class="panel-body">
+                                    <p class="success">
+                                        All discounts are available on yearly subscription plan only
+                                    </p>
+                                </div>
+                            </div>
+                            </p>
+                        </div>
+                    </div>
+                    <?php
+                    }
+                       ?>
                     <div class="row" style="width:100% !important;">
                         <div class="col-sm-12" >
                             <p class="rounded form-row form-row-wide custom_modem  ">
@@ -131,11 +157,11 @@ while($products_row=$dbTools->fetch_assoc($products))
                                 <div class="panel-body">
                                     <label class="radio-inline">
                                         <input type="radio" checked  class="input-text plan plan-monthly custom-options custom_field" data-price="" name="options[plan]" value="monthly" />Monthly Payment ($60.00 New Installation Fees <b>OR</b> $19.90 Transfer Fees for <span style="color:red;">current Cable subscriber</span>)
-                                        <?= $free_setup?" <span style='color:green;'>you have a limited offer, now these fees are free for you  </span>":""?>
-                                        <br/>
                                     </label><br/>
                                     <label class="radio-inline">
                                         <input type="radio" class="input-text plan plan-monthly-2 custom-options custom_field" data-price="" name="options[plan]" value="yearly"   />Yearly Contract, Payment Monthly (Free Installation)<br/>
+                                        <?= $free_installation?" </br><span style='color:green;' class='discount_offer' >you have a limited offer, now installation fees are free for you  </span>":""?>
+                                        <?= $free_transfer?" </br><span style='color:green;' class='discount_offer'>you have a limited offer, now transfer fees are free for you  </span>":""?>
                                     </label><br/>
                                 </div>
                             </div>
@@ -150,7 +176,7 @@ while($products_row=$dbTools->fetch_assoc($products))
                                 <div class="panel-body">
                                     <label class="radio-inline">
                                         <input type="radio" class="input-text modem custom-options custom_field" data-price="60" name="options[modem]" value="rent" />Free Rent Modem ($59.90 deposit)
-                                        <?= $free_modem? "<span style='color:green'> you have a limited offer free modem deposit</span>":""?>
+                                        <?= $free_modem? "<span style='color:green' class='discount_offer'> you have a limited offer free modem deposit</span>":""?>
                                     </label>
                                     <br/>
                                     <label class="radio-inline">
@@ -189,7 +215,7 @@ while($products_row=$dbTools->fetch_assoc($products))
                                 <div class="panel-body">
                                     <label class="radio-inline">
                                         <input type="radio" class="input-text custom-options custom_field rent-router" data-price="2.90" name="options[router]" value="rent" />Rent WIFI Router MikroTik Hap Series ($2.90)
-                                         <?= $free_router?"<span style='color:green;'>you have limited offer free rounter rent</span>":""?><br/>
+                                        <?= $free_router?" <span style='color:green;' class='discount_offer'>you have a limited offer, now router rent is free for you  </span>":""?>
                                     </label><br/>
                                     <label class="radio-inline">
                                         <input type="radio" class="input-text custom-options custom_field" data-price="74.00" name="options[router]" value="buy_hap_ac_lite"   />Buy WIFI Router MikroTik Hap ac lite ($74.00)<br/>
@@ -365,7 +391,10 @@ while($products_row=$dbTools->fetch_assoc($products))
 
                                               $price=(float)$product['price']-((float)$product['price']*(((float)$product['discount']/100)));
                                               $price=round($price,2);
-                                              $title=$product['title']." (with discount ".$product['discount']."%)";
+                                              $discount_duration=$product['discount_duration'];
+                                              $discount_duration=str_replace("_"," ",$discount_duration);
+                                              $discount_duration= ucfirst($discount_duration);
+                                              $title=$product['title']." (with discount ".$product['discount']."% for ".$discount_duration.")";
 
                                             }
 
@@ -390,6 +419,7 @@ while($products_row=$dbTools->fetch_assoc($products))
                                     </label><br/>
                                     <label class="radio-inline">
                                         <input type="radio" checked class="input-text plan custom-options custom_field" data-price="" name="options[adapter]" value="buy_Cisco_SPA112"   />Buy Cisco SPA112 2-Port Phone Adapter ($59.90)<br/>
+                                        <?= $free_adapter?"<span style='color:green;' class='discount_offer'>you have limited offer free Adapter (CISCO ATA) </span>":""?><br/>
                                     </label><br/>
                                 </div>
                             </div>

@@ -20,14 +20,22 @@ $mGlobalOnePaymentXMLTools = new GlobalOnePaymentXMLTools();
 $product_id = intval($_POST["product"]);
 $has_discount = $_POST['has_discount']==='yes';
 $free_modem = $_POST['free_modem']==='yes';
-$free_setup = $_POST['free_setup']==='yes';
 $free_router = $_POST['free_router']==='yes';
+$free_adapter = $_POST['free_adapter']==='yes';
+$free_installation = $_POST['free_installation']==='yes';
+$free_transfer = $_POST['free_transfer']==='yes';
 
-
+if(!isset($_POST["options"]["inventory_modem_price"]))
+{
+  $_POST["options"]["inventory_modem_price"]="no";
+}
 $_POST["options"]["free_modem"] = $_POST['free_modem'];
 $_POST["options"]["free_router"] = $_POST['free_router'];
-$_POST["options"]["free_setup"] = $_POST['free_setup'];
+$_POST["options"]["free_adapter"] = $_POST['free_adapter'];
+$_POST["options"]["free_installation"] = $_POST['free_installation'];
+$_POST["options"]["free_transfer"] = $_POST['free_transfer'];
 $_POST["options"]["discount"] = 0;
+$_POST["options"]["discount_duration"] = "three_months";
 
 //if user selects phone change product type to phone
 $product_type = "internet";
@@ -69,6 +77,7 @@ if ($product_type == "internet") {
         if($has_discount && isset($row_product["discount"]) && (int)$row_product["discount"] > 0)
         {
           $_POST["options"]["discount"] = $row_product["discount"];
+          $_POST["options"]["discount_duration"]=$row_product["discount_duration"];
           $product_price=(float)$row_product['price']-((float)$row_product['price']*(((float)$row_product['discount']/100)));
           $product_price=round($product_price,2);
         }
@@ -109,6 +118,7 @@ if ($product_type == "internet") {
         $router_cost = 2.90;
         if($has_discount && $free_router)
         $router_cost=0;
+
     } else if ($_POST["options"]["router"] == "buy_hap_ac_lite") { //if buy hap ac lite
         $router_cost = 74.00;
     } else if ($_POST["options"]["router"] == "buy_hap_mini") { //if buy hap mini
@@ -125,12 +135,19 @@ if ($product_type == "internet") {
     if ($subscription_period_type == "MONTHLY") {
         if ($_POST["options"]["plan"] == "monthly") {
             if ($_POST["options"]["cable_subscriber"] == "yes")
-                $installation_transfer_cost = 19.90;
+            {
+              $installation_transfer_cost = 19.90;
+              if($has_discount && $free_transfer)
+              $installation_transfer_cost=0;
+            }
             else
-                $installation_transfer_cost = 60.00;
+            {
+              $installation_transfer_cost = 60.00;
+              if($has_discount && $free_installation)
+              $installation_transfer_cost=0;
+            }
         }
-        if($has_discount && $free_setup)
-        $installation_transfer_cost=0;
+
     }
 
 
@@ -180,6 +197,8 @@ if ($product_type == "internet") {
     //Calculate recurring amount
     $subscription_recurring_amount = $product_price + $additional_service;
     if ($_POST["options"]["router"] == "rent") { //If rent router, add $2.90 on the recurring amount
+
+        if(!($has_discount && $free_router))
         $subscription_recurring_amount += 2.90;
     }
 } else if ($product_type == "phone") {
@@ -208,6 +227,7 @@ if ($product_type == "internet") {
         if($has_discount && isset($row_product["discount"]) && (int)$row_product["discount"] > 0)
         {
           $_POST["options"]["discount"] = $row_product["discount"];
+          $_POST["options"]["discount_duration"]=$row_product["discount_duration"];
           $product_price=(float)$row_product['price']-((float)$row_product['price']*(((float)$row_product['discount']/100)));
           $product_price=round($product_price,2);
         }
@@ -225,9 +245,11 @@ if ($product_type == "internet") {
     //If rent modem
     if ($_POST["options"]["adapter"] == "buy_Cisco_SPA112") {
         $adapter_cost = 59.90;
+        if($has_discount && $free_adapter)
+        $adapter_cost=0;
     }
     //NOTICE: Have to be changed later
-    $adapter_cost = 0;
+    //$adapter_cost = 0;
 
     //If transfer
     if ($_POST["options"]["you_have_phone_number"] == "yes") {

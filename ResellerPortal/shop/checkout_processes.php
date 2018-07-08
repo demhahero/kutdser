@@ -206,9 +206,12 @@ if ($_GET["do"] == "register") {
                     . "`note`, "
                     . "`modem_modem_type`, "
                     . "`discount`, "
+                    . "`discount_duration`, "
                     . "`free_router`, "
                     . "`free_modem`, "
-                    . "`free_setup`"
+                    . "`free_adapter`, "
+                    . "`free_installation`, "
+                    . "`free_transfer`"
                     . ") VALUES ('"
                     . $order_id . "', "
                     . "'" . $options['plan'] . "', "
@@ -242,9 +245,12 @@ if ($_GET["do"] == "register") {
                     . "'', "
                     . "'" . $options['modem_modem_type'] . "', "
                     . "'" . $options['discount'] . "', "
+                    . "'" . $options['discount_duration'] . "', "
                     . "'" . $options['free_router'] . "', "
                     . "'" . $options['free_modem'] . "', "
-                    . "'" . $options['free_setup'] . "'"
+                    . "'" . $options['free_adapter'] . "', "
+                    . "'" . $options['free_installation'] . "', "
+                    . "'" . $options['free_transfer'] . "'"
                     . ")";
             //3- Add order options
 
