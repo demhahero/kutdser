@@ -555,7 +555,11 @@ Statement</h1>
 					<th>Statement For:</th>
 					<td>' . $_POST["invoice_for"] . '</td>
 				</tr>
-		
+				<tr class="order-date">
+					<th>Statement:</th>
+					<td>' . uniqid() . '</td>
+				</tr>		
+
 							</table>			
 		</td>
 	</tr>

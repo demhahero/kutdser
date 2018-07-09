@@ -283,7 +283,11 @@ $html = $terms_header . '
 					<th>Invoice For:</th>
 					<td>' . $_POST["invoice_for"] . '</td>
 				</tr>
-		
+				<tr class="order-date">
+					<th>Invoice:</th>
+					<td>' . uniqid() . '</td>
+				</tr>
+                                
 							</table>			
 		</td>
 	</tr>

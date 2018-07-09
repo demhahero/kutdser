@@ -52,8 +52,8 @@ $html = $terms_header . '
 					<td>' . date("Y/m/d") . '</td>
 				</tr>
 				<tr class="order-date">
-					<th>Order:</th>
-					<td>#' . $year . "-" . $month . '</td>
+					<th>Invoice:</th>
+					<td>#' . $year . $month . $customer->getCustomerId(). '</td>
 				</tr>
 		
 							</table>			
