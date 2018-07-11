@@ -431,8 +431,11 @@ $(document).ready(function () {
             }
 
             //if NOT yearly payment, check monthly (no contract) for transfer or installation fees.
+            //If user selects 60 or 120, then charge him the setup fees anyways.
             if ($("select[name=\"product\"] option:selected").text().includes("Yearly") == false) {
-                if ($("input[name=\"options[plan]\"]:checked").val() == "monthly") {
+                if ($("input[name=\"options[plan]\"]:checked").val() == "monthly" 
+                        || $("select[name=\"product\"] option:selected").val() == 416
+                        || $("select[name=\"product\"] option:selected").val() == 418) {
                     if ($("input[name=\"options[cable_subscriber]\"]:checked").val() == "yes")
                     {
                       installation_transfer_cost = 19.90;

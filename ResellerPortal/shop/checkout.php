@@ -132,8 +132,11 @@ if ($product_type == "internet") {
     }
 
 //if NOT yearly payment, check monthly (no contract) for transfer or installation fees.
+    //If user selects 60 or 120, then charge him the setup fees anyways.
     if ($subscription_period_type == "MONTHLY") {
-        if ($_POST["options"]["plan"] == "monthly") {
+        if ($_POST["options"]["plan"] == "monthly"
+            || $product_id == 416
+            || $product_id == 418) {
             if ($_POST["options"]["cable_subscriber"] == "yes")
             {
               $installation_transfer_cost = 19.90;
