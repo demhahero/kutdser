@@ -7,29 +7,37 @@ if(isset($_POST["products"]))
   {
     $services["free_modem"]=isset($_POST["services"]["free_modem"])?"yes":"no";
     $services["free_router"]=isset($_POST["services"]["free_router"])?"yes":"no";
-    $services["free_setup"]=isset($_POST["services"]["free_setup"])?"yes":"no";
+    $services["free_adapter"]=isset($_POST["services"]["free_adapter"])?"yes":"no";
+    $services["free_installation"]=isset($_POST["services"]["free_installation"])?"yes":"no";
+    $services["free_transfer"]=isset($_POST["services"]["free_transfer"])?"yes":"no";
   }
   else{
       $services["free_modem"]="no";
       $services["free_router"]="no";
-      $services["free_setup"]="no";
+      $services["free_adapter"]="no";
+      $services["free_installation"]="no";
+      $services["free_transfer"]="no";
   }
   $dbTools->query("UPDATE `customers` SET
      `has_discount`=N'yes',
      `free_modem`=N'".$services["free_modem"]."',
      `free_router`=N'".$services["free_router"]."',
-     `free_setup`=N'".$services["free_setup"]."'
+     `free_adapter`=N'".$services["free_adapter"]."',
+     `free_installation`=N'".$services["free_installation"]."',
+     `free_transfer`=N'".$services["free_transfer"]."'
      WHERE `customer_id`=".$_POST['reseller_id']);
   $products = $dbTools->query("SELECT * FROM `products` INNER JOIN `reseller_discounts` on `products`.`product_id`=`reseller_discounts`.`product_id` WHERE `reseller_discounts`.`reseller_id`='" . $_POST['reseller_id'] . "'");
 
   if($products->num_rows ==0)
   {
     $query="INSERT INTO `reseller_discounts`
-          ( `reseller_id`, `product_id`, `discount`)
+          ( `reseller_id`, `product_id`, `discount`,`discount_duration`)
       VALUES";
       $values="";
+
     foreach ($_POST['products'] as $key => $value) {
-      $values.="(N'".$_POST['reseller_id']."',N'".$key."',N'".$value['discount']."'),";
+
+      $values.="(N'".$_POST['reseller_id']."',N'".$key."',N'".$value['discount']."',N'".$value['discount_duration']."'),";
     }
     $values= substr($values, 0, strlen($values)-1);
     $query.=$values;
@@ -41,7 +49,8 @@ if(isset($_POST["products"]))
       $query="UPDATE `reseller_discounts` SET
       `reseller_id`=N'".$_POST['reseller_id']."',
       `product_id`=N'".$key."',
-      `discount`=N'".$value['discount']."'
+      `discount`=N'".$value['discount']."',
+      `discount_duration`=N'".$value['discount_duration']."'
       WHERE `reseller_discounts_id`=".$value['reseller_discounts_id'];
       $query_result= $dbTools->query($query);
 
@@ -53,7 +62,7 @@ if(isset($_POST["products"]))
 
 
 $reseller_id = intval($_GET["reseller_id"]);
-$reseller = $dbTools->query("SELECT `has_discount`,`free_modem`,`free_router`,`free_setup`,`full_name` FROM `customers` WHERE `customer_id`='" . $reseller_id . "'");
+$reseller = $dbTools->query("SELECT `has_discount`,`free_modem`,`free_router`,`free_adapter`,`free_installation`,`free_transfer`,`full_name` FROM `customers` WHERE `customer_id`='" . $reseller_id . "'");
 $reseller_row=$dbTools->fetch_assoc($reseller);
 
 $products = $dbTools->query("SELECT * FROM `products` INNER JOIN `reseller_discounts` on `products`.`product_id`=`reseller_discounts`.`product_id` WHERE `reseller_discounts`.`reseller_id`='" . $reseller_id . "'");
@@ -103,7 +112,13 @@ else if(isset($query_result) && !$query_result)
             <label><input type="checkbox" name="services[free_router]" value="yes" <?=$reseller_row['free_router']==='yes'?"checked":""?>>Free Router</label>
           </div>
           <div class="checkbox">
-            <label><input type="checkbox" name="services[free_setup]" value="yes" <?=$reseller_row['free_setup']==='yes'?"checked":""?>>Free Setup</label>
+            <label><input type="checkbox" name="services[free_adapter]" value="yes" <?=$reseller_row['free_adapter']==='yes'?"checked":""?>>Free Adapter (Cisco ATA)</label>
+          </div>
+          <div class="checkbox">
+            <label><input type="checkbox" name="services[free_installation]" value="yes" <?=$reseller_row['free_installation']==='yes'?"checked":""?>>Free Installation fees</label>
+          </div>
+          <div class="checkbox">
+            <label><input type="checkbox" name="services[free_transfer]" value="yes" <?=$reseller_row['free_transfer']==='yes'?"checked":""?>>Free Transfer fees</label>
           </div>
         </div>
     </div>
@@ -129,6 +144,7 @@ else if(isset($query_result) && !$query_result)
                     <th>Price</th>
                     <th>Discount %</th>
                     <th>Price after discount</th>
+                    <th>duration</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -154,6 +170,13 @@ else if(isset($query_result) && !$query_result)
                           echo round($price_after_discount,2);
                           ?>
                         </span>
+                      </td>
+                      <td>
+                        <select name="products[<?=$products_row['product_id']?>][discount_duration]" class="form-control">
+                          <option <?=(isset($products_row['discount_duration']) && $products_row['discount_duration'] ==="three_months")?"selected":""?> value="three_months">3 Months </option>
+                          <option <?=(isset($products_row['discount_duration']) && $products_row['discount_duration'] ==="six_months")?"selected":""?> value="six_months">6 Months </option>
+                          <option <?=(isset($products_row['discount_duration']) && $products_row['discount_duration'] ==="one_year")?"selected":""?> value="one_year">1 Year </option>
+                        </select>
                       </td>
                     </tr>
                   <?php
