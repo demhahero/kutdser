@@ -83,7 +83,7 @@ class PrintOrder {
 						</tr>
                                                 <tr class="fee_419">
                                                     <td class="no-borders"></td>
-                                                    <th class="description">Setup Costs</th>
+                                                    <th class="description">Installation Costs</th>
                                                     <td class="price"><span class="totals-price"><span class="woocommerce-Price-amount amount"><span class="woocommerce-Price-currencySymbol">&#36;</span>' . $installation_transfer_cost . '</span></span></td>
 						</tr>
                                                 <tr class="fee_419">
