@@ -12,9 +12,11 @@ $params = $_REQUEST;
 $columns = array(
     0 => 'modem_id',
     1 => 'mac_address',
-    2 => '`resellers`.`full_name`',
-    3 => '`customers`.`full_name`',
-    4 => 'functions'
+    2 => 'type',
+    3 => 'serial_number',
+    4 => '`resellers`.`full_name`',
+    5 => '`customers`.`full_name`',
+    6 => 'functions'
 
 );
 
@@ -22,7 +24,7 @@ $where = $sqlTot = $sqlRec = "";
 
 
 
-$sqlTot = "SELECT `modems`.modem_id,`modems`.customer_id,`modems`.mac_address,
+$sqlTot = "SELECT `modems`.modem_id, `modems`.serial_number, `modems`.type,`modems`.customer_id,`modems`.mac_address,
     resellers.full_name as 'reseller_name',
     `customers`.`full_name` as 'customer_name'
 FROM `modems`
@@ -41,6 +43,8 @@ if (!empty($params['search']['value'])) {
     $where .= " ( customers.full_name LIKE '%" . $params['search']['value'] . "%' ";
     $where .= " OR resellers.full_name LIKE '%" . $params['search']['value'] . "%' ";
     $where .= " OR `modems`.mac_address LIKE '%" . $params['search']['value'] . "%' ";
+    $where .= " OR `modems`.type LIKE '%" . $params['search']['value'] . "%' ";
+    $where .= " OR `modems`.serial_number LIKE '%" . $params['search']['value'] . "%' ";
     $where .= " OR `modems`.modem_id LIKE '%" . $params['search']['value'] . "%' ) ";
 }
 
@@ -74,9 +78,11 @@ while ($row = mysqli_fetch_array($queryRecords)) {
 
     $data[0] = $row['modem_id'];
     $data[1] = $row['mac_address'];
-    $data[2] = $row['reseller_name'];
-    $data[3] = '<a href="'.$site_url.'/edit_customer.php?customer_id='.$row['customer_id'].'">'.$row['customer_name'].'</a>';
-    $data[4] = '<a href="edit_modem.php?modem_id='.$row['modem_id'].'"><img title="Edit" width="30px" src="'.$site_url.'/img/edit-icon.png" /></a><a class="check-alert" href="modems.php?do=delete&modem_id='.$row['modem_id'].'"><img title="Remove" width="30px" src="'.$site_url.'/img/delete-icon.png" /></a>';
+    $data[2] = $row['type'];
+    $data[3] = $row['serial_number'];
+    $data[4] = $row['reseller_name'];
+    $data[5] = '<a href="'.$site_url.'/edit_customer.php?customer_id='.$row['customer_id'].'">'.$row['customer_name'].'</a>';
+    $data[6] = '<a href="edit_modem.php?modem_id='.$row['modem_id'].'"><img title="Edit" width="30px" src="'.$site_url.'/img/edit-icon.png" /></a><a class="check-alert" href="modems.php?do=delete&modem_id='.$row['modem_id'].'"><img title="Remove" width="30px" src="'.$site_url.'/img/delete-icon.png" /></a>';
     $all_data[] = $data;
 }
 

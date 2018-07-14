@@ -65,9 +65,11 @@ $(document).ready(function () {
 <table id="myTable2"  class="display table table-striped table-bordered">
     <thead>
     <th style="width: 5%;">ID</th>
-    <th style="width: 25%;">MAC Address</th>
-    <th style="width: 30%;">Reseller</th>
-    <th style="width: 30%;">Customer</th>
+    <th style="width: 20%;">MAC Address</th>
+    <th style="width: 20%;">Type</th>
+    <th style="width: 20%;">Serial No.</th>
+    <th style="width: 15%;">Reseller</th>
+    <th style="width: 15%;">Customer</th>
     <th style="width: 12%;">Functions</th>
 </thead>
 <tbody>
