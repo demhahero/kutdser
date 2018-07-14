@@ -108,7 +108,10 @@ $year=isset($_GET["year"])?$_GET["year"]:2018;
 							total+= parseFloat(monthInfo["total_price_with_out_tax"]);
 							totalWT+= parseFloat(monthInfo["total_price_with_tax_p7"]);
               table.row.add([
-                  customers['customer_id'],
+                  customers['customer_id']+
+                  '<a target="_blank" href="<?=$site_url?>/orders/print_order.php?order_id=' 
+                          + field["order_id"] + '" class="btn btn-primary btn-xs"><i class="fa fa-print"></i> Print </a>'
+                  ,
                   customers['full_name'],
                   product_title,
                   field['payment_method'],
