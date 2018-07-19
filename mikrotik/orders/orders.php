@@ -7,6 +7,7 @@ include_once "../header.php";
         $('.dataTables_empty').html('<div class="loader"></div>');
 
         $('#myTable2').DataTable({
+            "order": [[ 0, "desc" ]],
             "bProcessing": true,
             "serverSide": true,
             "ajax": {
