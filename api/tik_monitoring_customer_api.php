@@ -7,18 +7,18 @@ $fields = array(
     "address" => "address",
     "email" => "email",
     "full_name" => "full_name",
-    );
+);
 
 
-$childFields=array(
+$childFields = array(
     "customer_id" => "reseller_id",
     "full_name" => "reseller_name",
 );
-$child2Fields=array(
+$child2Fields = array(
     "order_id" => "order_id",
 );
 
-$child3Fields=array(
+$child3Fields = array(
     "modem_id" => "modem_id",
     "mac_address" => "mac_address",
 );
@@ -28,16 +28,27 @@ FROM customers
 INNER JOIN `customers` resellers ON resellers.`customer_id` = customers.`reseller_id`
 LEFT JOIN orders ON orders.customer_id = customers.customer_id
 LEFT JOIN modems ON orders.customer_id = modems.customer_id
-and customers.`customer_id`='".$_GET["customer_id"]."'
+where customers.`customer_id`='" . $_GET["customer_id"] . "'
 "
         , $fields
-        , "reseller",$childFields
-        , "orders",$child2Fields
-        , "modem",$child3Fields);
+        , "reseller", $childFields
+        , "orders", $child2Fields
+        , "modem", $child3Fields);
 
+
+
+$c = curl_init('http://38.104.226.51/ahmed/subscribers_list.php?modems=\'' . $customers[0]["modem"][0]["mac_address"] . '\'');
+curl_setopt($c, CURLOPT_RETURNTRANSFER, true);
+//curl_setopt(... other options you want...)
+
+$html = curl_exec($c);
+$json = json_decode($html);
+if (count($json) > 0) {
+    $customers[0]["info"][0]['router_mac_address'] = $json[0]->router_mac_address;
+    $customers[0]["info"][0]['ip_address'] = $json[0]->ip_address;
+    $customers[0]["info"][0]['plan'] = $json[0]->plan;
+}
 
 $json = json_encode($customers);
-echo "{\"customers\" :" ,$json , "}";
-    
-
+echo "{\"customers\" :", $json, "}";
 ?>

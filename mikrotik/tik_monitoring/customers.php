@@ -2,52 +2,23 @@
 include_once "../header.php";
 ?>
 
-<?php
-$c = curl_init('http://38.104.226.51/ahmed/subscribers_list.php');
-curl_setopt($c, CURLOPT_RETURNTRANSFER, true);
-//curl_setopt(... other options you want...)
-
-$html = curl_exec($c);
-?>
 
 <script>
     $(document).ready(function () {
+
         $('.dataTables_empty').html('<div class="loader"></div>');
-        var subscribers_list = <?= $html ?>;
 
-        $.getJSON("<?= $api_url ?>tik_monitoring_customers_api.php", function (result) {
-
-            $.each(result['customers'], function (i, field) {
-                var ip_address = "";
-                var plan = "";
-                var router_mac_address = "";
-                var mac_address = "";
-                if (field['modem'][0]["mac_address"] != null) {
-                    mac_address = field['modem'][0]["mac_address"];
-                    var subscriber = subscribers_list.find(function (e) {
-                        return e.mac_address == field['modem'][0]["mac_address"].toLowerCase()
-                    });
-
-                    if (subscriber) {
-                        ip_address = subscriber.ip_address;
-                        plan = subscriber.plan;
-                        router_mac_address = subscriber.router_mac_address;
-                    }
+        $('#myTable2').DataTable({
+            "order": [[0, "desc"]],
+            "bProcessing": true,
+            "serverSide": true,
+            "ajax": {
+                url: "<?= $api_url ?>tik_monitoring_customers_api.php", // json datasource
+                type: "post", // type of method  , by default would be get
+                error: function () {  // error handling code
+                    $("#employee_grid_processing").css("display", "none");
                 }
-
-                table.row.add([
-                    "<a target='_blank' href='http://38.104.226.51/ahmed/netflow_graph2.php?ip=" + ip_address + "'>" + field['customer_id'] + "</a>",
-                    "<a href='customer_details.php?customer_id=" + field['customer_id'] + "'>" + field['full_name'] + "</a>",
-                    field['reseller'][0]['full_name'],
-                    field['phone'],
-                    mac_address,
-                    router_mac_address,
-                    ip_address,
-                    plan,
-                    field["address"],
-                    field['merchantref'][0]['merchantref']
-                ]).draw(false);
-            });
+            }
         });
     });
 </script>
@@ -79,7 +50,7 @@ $html = curl_exec($c);
 <div class="page-header">
     <a class="last" href="">Support</a>    
 </div>
-<table id="myTable" class="display table table-striped table-bordered">
+<table id="myTable2" class="display table table-striped table-bordered">
     <thead>
     <th style="width: 5%">ID</th>
     <th style="width: 17%">Full Name</th>

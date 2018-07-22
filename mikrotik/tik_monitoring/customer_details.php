@@ -2,42 +2,26 @@
 include_once "../header.php";
 ?>
 
-<?php
-$c = curl_init('http://38.104.226.51/ahmed/subscribers_list.php');
-curl_setopt($c, CURLOPT_RETURNTRANSFER, true);
-//curl_setopt(... other options you want...)
 
-$html = curl_exec($c);
-?>
 
 <script>
     $(document).ready(function () {
         $('.dataTables_empty').html('<div class="loader"></div>');
-        var subscribers_list = <?= $html ?>;
+    
 
         $.getJSON("<?= $api_url ?>tik_monitoring_customer_api.php?customer_id=<?= $_GET["customer_id"] ?>", function (result) {
 
                     $.each(result['customers'], function (i, field) {
-                        var subscriber = subscribers_list.find(function (e) {
-                            return e.mac_address == field['modem'][0]["mac_address"].toLowerCase()
-                        });
-                        var ip_address = "";
-                        var plan = "";
-                        var router_mac_address = "";
-                        if (subscriber) {
-                            ip_address = subscriber.ip_address;
-                            plan = subscriber.plan;
-                            router_mac_address = subscriber.router_mac_address;
-                        }
+                        
                         $(".customer-id").html(field['customer_id']);
                         $(".full-name").html(field['full_name']);
                         $(".reseller").html(field['reseller'][0]['full_name']);
                         $(".modem-mac").html(field['modem'][0]["mac_address"]);
-                        $(".router-mac").html(router_mac_address);
-                        $(".plan").html(plan);
+                        $(".router-mac").html(field['info'][0]["router_mac_address"]);
+                        $(".plan").html(field['info'][0]["plan"]);
                         $(".address").html(field['address']);
                         $(".phone").html(field['phone']);
-                        $(".ip").html(ip_address);
+                        $(".ip").html(field['info'][0]["ip_address"]);
                     });
                 });
 
