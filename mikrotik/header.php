@@ -12,7 +12,7 @@ include_once "dbconfig.php";
 
 
         <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs-3.3.7/jq-3.2.1/jq-3.2.1/dt-1.10.16/r-2.2.0/datatables.min.css"/>
-        <link rel="stylesheet" href="<?= $site_url ?>/css/bootstrap-datetimepicker.min.css">   
+        <link rel="stylesheet" href="<?= $site_url ?>/css/bootstrap-datetimepicker.min.css">
 
         <!-- Bootstrap -->
         <link href="<?= $site_url ?>/gentelella/vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -23,25 +23,23 @@ include_once "dbconfig.php";
 
         <!-- Custom Theme Style -->
         <link href="<?= $site_url ?>/gentelella/build/css/custom.min.css" rel="stylesheet">
-        
+
         <!-- jquery-ui -->
         <link rel="stylesheet" type="text/css" href="https://code.jquery.com/ui/1.12.0/themes/smoothness/jquery-ui.css">
-        
+
         <!-- jQuery -->
         <script src="<?= $site_url ?>/gentelella/vendors/jquery/dist/jquery.min.js"></script>
         <!-- Bootstrap -->
         <script src="<?= $site_url ?>/gentelella/vendors/bootstrap/dist/js/bootstrap.min.js"></script>
         <!-- jQuery-UI -->
         <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-        
+
         <!-- Print Excel and PDF for datatables -->
-        <script src="https://cdn.datatables.net/buttons/1.5.1/js/dataTables.buttons.min.js"></script>
-        <script src="https://cdn.datatables.net/buttons/1.5.1/js/buttons.flash.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.32/pdfmake.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.32/vfs_fonts.js"></script>
-        <script src="https://cdn.datatables.net/buttons/1.5.1/js/buttons.html5.min.js"></script>
-        <script src="https://cdn.datatables.net/buttons/1.5.1/js/buttons.print.min.js"></script>
+        <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs/jszip-2.5.0/dt-1.10.18/b-1.5.2/b-html5-1.5.2/datatables.min.css"/>
+
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
+        <script type="text/javascript" src="https://cdn.datatables.net/v/bs/jszip-2.5.0/dt-1.10.18/b-1.5.2/b-html5-1.5.2/datatables.min.js"></script>
     </head>
 
     <body class="nav-md">
@@ -83,7 +81,7 @@ include_once "dbconfig.php";
                                             <li><a href="<?= $site_url ?>/expire/expire_soon_orders.php">Expire Soon</a></li>
                                         </ul>
                                     </li>
-                                    
+
                                     <li><a><i class="fa fa-shopping-cart"></i> Order <span class="fa fa-chevron-down"></span></a>
                                         <ul class="nav child_menu">
                                             <li><a href="<?= $site_url ?>/orders/orders.php">Orders</a></li>
@@ -91,7 +89,7 @@ include_once "dbconfig.php";
                                             <li><a href="<?= $site_url ?>/orders/phones.php">Phones</a></li>
                                         </ul>
                                     </li>
-                                    
+
                                     <li><a><i class="fa fa-sitemap"></i>Resellers<span class="fa fa-chevron-down"></span></a>
                                         <ul class="nav child_menu">
                                             <li><a href="<?= $site_url ?>/create_customer.php">Create Reseller</a></li>
@@ -127,7 +125,7 @@ include_once "dbconfig.php";
                                         <ul class="nav child_menu">
                                             <li><a href="<?= $site_url ?>/temp/orders.php">Update Orders</a></li>
                                         </ul>
-                                    </li>                
+                                    </li>
                                     <li><a href="javascript:void(0)"><i class="fa fa-laptop"></i> Landing Page <span class="label label-success pull-right">Coming Soon</span></a></li>
                                 </ul>
                             </div>
@@ -191,7 +189,7 @@ include_once "dbconfig.php";
                                         <span class="badge bg-green"><?=count($orders)?></span>
                                     </a>
                                     <ul id="menu1" class="dropdown-menu list-unstyled msg_list" role="menu">
-                                        
+
                                     </ul>
                                 </li>
                             </ul>
