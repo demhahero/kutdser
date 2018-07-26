@@ -85,7 +85,8 @@ if (isset($_POST["verdict"])) {
         $request_result = $dbTools->query($query_update_request);
     } else {
 
-        if ($_POST["action"] === "swap_modem" && $_POST["verdict"] === "approve") {
+        if (($_POST["action"] === "swap_modem" && $_POST["verdict"] === "approve" )
+            || ($_POST["verdict"] === "approve" && $_POST["action"] === "change_speed" && is_numeric($request_row["modem_id"]) && (int)$request_row["modem_id"] >0)) {
 
             $query_update_request = "update `modems` set `customer_id`='0' "
                     . "where `customer_id`='" . $request_order_row["customer_id"] . "'";
@@ -116,7 +117,8 @@ if (isset($_POST["verdict"])) {
             if ($order_result) {
                 echo "<script>window.location.href = \"" . $site_url . "/requests/requests.php\";</script>";
             }
-        } else {
+        }
+        else {
             echo "<script>window.location.href = \"" . $site_url . "/requests/requests.php\";</script>";
         }
     }

@@ -74,10 +74,10 @@ if (isset($_POST["action"])) {
             var address_line_1 = $("input[name=\"address_line_1\"]").val();
             var address_line_2 = $("input[name=\"address_line_2\"]").val();
             var postal_code = $("input[name=\"postal_code\"]").val();
-            
+
             //Swap modem
             var modem_id = $("select[name=\"modem_id\"]").val();
-            
+
             var product_id = $("select[name=\"product_id\"]").val();
             $.post("<?= $api_url ?>insert_requests_api.php",
                     {
@@ -177,7 +177,16 @@ if (isset($_POST["action"])) {
     </div>
     <div class="form-group action-value">
         <label>New Modem Mac Address (optional):</label>
-        <input type="text" name="modem_mac_address" class="form-control"/>
+        
+        <select name="modem_id" class="form-control">
+            <option value="0" selected>Select Modem</option>
+            <?php
+            $result_modems = $conn_routers->query("select * from `modems` where `reseller_id`='" . $reseller_id . "' and `customer_id`='0'");
+            while ($row_modem = $result_modems->fetch_assoc()) {
+                echo "<option value=\"" . $row_modem["modem_id"] . "\">" . $row_modem["mac_address"] . "[" . $row_modem["type"] . " | " . $row_modem["serial_number"] . "]" . "</option>";
+            }
+            ?>
+        </select>
     </div>
 
     <div class="form-group action-value swap-modem" style="display: none;">
