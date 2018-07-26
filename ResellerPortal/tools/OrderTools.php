@@ -66,6 +66,7 @@ class OrderTools {
     private $product_subscription_type;
     private $admin_id;
     private $update_date;
+    private $vl_number;
     
     public function __construct($order_id, $objDBTools, $depth = 0, $path = null) {
         if ($depth == 5)
@@ -93,6 +94,7 @@ class OrderTools {
         $this->product_title = $order_row["product_title"];
         $this->admin_id = $order_row["admin_id"];
         $this->update_date = $order_row["update_date"];
+        $this->vl_number = $order_row["vl_number"];
         
         $this->getOrderOptions();
 
@@ -179,6 +181,14 @@ class OrderTools {
 
     public function setAdminID($admin_id) {
         $this->admin_id = $admin_id;
+    }
+    
+    public function getVLNumber() {
+        return $this->vl_number;
+    }
+
+    public function setVLNumber($vl_number) {
+        $this->vl_number = $vl_number;
     }
     
     public function getStartDate() {
@@ -463,6 +473,7 @@ class OrderTools {
         $result_order = $this->objDBTools->query("update `orders` set "
                 . "`admin_id`='" . $this->admin_id . "', "
                 . "`update_date`='" . $this->update_date->format("Y-m-d H:i:s") . "', "
+                . "`vl_number`='" . $this->vl_number . "', "
                 . "`status`='" . $this->status . "' "
                 . "where `order_id`='" . $this->order_id . "'");
 

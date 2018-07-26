@@ -16,6 +16,7 @@ if (isset($_POST["status"])) {
     $order->setAdminID($admin_id);
     $order->setActualInstallationTimeFrom($_POST["actual_installation_time_from"]);
     $order->setActualInstallationTimeTo($_POST["actual_installation_time_to"]);
+    $order->setVLNumber($_POST["vl_number"]);
     $result = $order->doUpdate();
     if ($result)
         echo "<div class='alert alert-success'>done</div>";
@@ -332,6 +333,10 @@ $dt = new DateTime();
     <div class="form-group">
         <label for="email">Completion:</label>
         <input type="text" name="completion" value="<?= $order->getCompletion(); ?>" class="form-control" placeholder="Completion"/>
+    </div>
+    <div class="form-group">
+        <label for="email">VL Number:</label>
+        <input type="text" name="vl_number" value="<?= $order->getVLNumber(); ?>" class="form-control" placeholder="VL Number"/>
     </div>
     <div class="form-group">
         <label for="email">Actual installation date:</label>
