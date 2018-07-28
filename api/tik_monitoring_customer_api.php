@@ -21,9 +21,11 @@ $child2Fields = array(
 $child3Fields = array(
     "modem_id" => "modem_id",
     "mac_address" => "mac_address",
+    "ip_address" => "ip_address",
+    "router_mac_address" => "router_mac_address"
 );
 
-$customers = $dbTools->tik_monitoring_query_api("SELECT `customers`.`customer_id` , `customers`.`phone` , customers.address, customers.email, customers.full_name, orders.order_id, resellers.full_name AS 'reseller_name', customers.reseller_id, `modems`.`mac_address`, `modems`.`modem_id`
+$customers = $dbTools->tik_monitoring_query_api("SELECT `customers`.`customer_id` , `customers`.`phone` , customers.address, customers.email, customers.full_name, orders.order_id, resellers.full_name AS 'reseller_name', customers.reseller_id, `modems`.`mac_address`, `modems`.`router_mac_address`, `modems`.`ip_address`, `modems`.`modem_id`
 FROM customers
 INNER JOIN `customers` resellers ON resellers.`customer_id` = customers.`reseller_id`
 LEFT JOIN orders ON orders.customer_id = customers.customer_id
@@ -35,19 +37,6 @@ where customers.`customer_id`='" . $_GET["customer_id"] . "'
         , "orders", $child2Fields
         , "modem", $child3Fields);
 
-
-
-$c = curl_init('http://38.104.226.51/ahmed/subscribers_list.php?modems=\'' . $customers[0]["modem"][0]["mac_address"] . '\'');
-curl_setopt($c, CURLOPT_RETURNTRANSFER, true);
-//curl_setopt(... other options you want...)
-
-$html = curl_exec($c);
-$json = json_decode($html);
-if (count($json) > 0) {
-    $customers[0]["info"][0]['router_mac_address'] = $json[0]->router_mac_address;
-    $customers[0]["info"][0]['ip_address'] = $json[0]->ip_address;
-    $customers[0]["info"][0]['plan'] = $json[0]->plan;
-}
 
 $json = json_encode($customers);
 echo "{\"customers\" :", $json, "}";

@@ -13,10 +13,10 @@ $columns = array(
     1 => '`customers`.`full_name`',
     2 => '`resellers`.`full_name`',
     3 => '`customers`.phone',
-    4 => '`modems`.mac_address',
-    5 => '`router_mac_address',
-    6 => 'ip',
-    7 => 'plan',
+    4 => '`modems`.`mac_address`',
+    5 => '`modems`.`router_mac_address`',
+    6 => '`modems`.`ip_address`',
+    7 => '`vl_number`',
     8 => '`customers`.`address`',
     9 => '`merchantrefs`.`merchantref`'
 );
@@ -27,8 +27,9 @@ $where = $sqlTot = $sqlRec = "";
 
 $sqlTot = "SELECT `merchantrefs`.`merchantref`, `merchantrefs`.`order_id`, 
     `merchantrefs`.`is_credit`, `customers`.`customer_id` , `customers`.`phone` , customers.address, 
-    customers.email, customers.full_name, orders.order_id, resellers.full_name AS 'reseller_name', 
-    customers.reseller_id, `modems`.`mac_address`, `modems`.`modem_id`
+    customers.email, customers.full_name, orders.order_id, resellers.full_name AS 'reseller_name',
+    `orders`.`vl_number`,
+    customers.reseller_id, `modems`.`mac_address`, `modems`.`modem_id`, `modems`.`ip_address`, `modems`.`router_mac_address`
 FROM customers
 INNER JOIN `customers` resellers ON resellers.`customer_id` = customers.`reseller_id`
 LEFT JOIN orders ON orders.customer_id = customers.customer_id
@@ -43,13 +44,16 @@ $sqlRec = $sqlTot;
 // check search value exist
 if (!empty($params['search']['value'])) {
     $where .= " WHERE ";
-    $where .= " ( `customers`.full_name LIKE '%" . $params['search']['value'] . "%' ";
-    $where .= " OR `resellers`.full_name LIKE '%" . $params['search']['value'] . "%' ";
-    $where .= " OR merchantref LIKE '%" . $params['search']['value'] . "%' ";
-    $where .= " OR `customers`.customer_id LIKE '%" . $params['search']['value'] . "%' ";
-    $where .= " OR `customers`.phone LIKE '%" . $params['search']['value'] . "%' ";
-    $where .= " OR `customers`.address LIKE '%" . $params['search']['value'] . "%' ";
-    $where .= " OR `modems`.mac_address LIKE '%" . $params['search']['value'] . "%')  ";
+    $where .= " ( `customers`.`full_name` LIKE '%" . $params['search']['value'] . "%' ";
+    $where .= " OR `resellers`.`full_name` LIKE '%" . $params['search']['value'] . "%' ";
+    $where .= " OR `merchantref` LIKE '%" . $params['search']['value'] . "%' ";
+    $where .= " OR `customers`.`customer_id` LIKE '%" . $params['search']['value'] . "%' ";
+    $where .= " OR `customers`.`phone` LIKE '%" . $params['search']['value'] . "%' ";
+    $where .= " OR `customers`.`address` LIKE '%" . $params['search']['value'] . "%' ";
+    $where .= " OR `orders`.`vl_number` LIKE '%" . $params['search']['value'] . "%' ";
+    $where .= " OR `modems`.`ip_address` LIKE '%" . $params['search']['value'] . "%' ";
+    $where .= " OR `modems`.`router_mac_address` LIKE '%" . $params['search']['value'] . "%' ";
+    $where .= " OR `modems`.`mac_address LIKE` '%" . $params['search']['value'] . "%')  ";
 }
 
 //concatenate search sql if value exist
@@ -83,23 +87,12 @@ while ($row = mysqli_fetch_array($queryRecords)) {
     $data[2] = $row['reseller_name'];
     $data[3] = $row['phone'];
     $data[4] = $row['mac_address'];
-    $data[5] = '';
-    $data[6] = '';
-    $data[7] = '';
+    $data[5] = $row['router_mac_address'];
+    $data[6] = $row['ip_address'];
+    $data[7] = $row['vl_number'];
     $data[8] = $row['address'];
     $data[9] = $row['merchantref'];
     
-    $c = curl_init('http://38.104.226.51/ahmed/subscribers_list.php?modems=\'F81D0F563D79\'');
-    curl_setopt($c, CURLOPT_RETURNTRANSFER, true);
-    //curl_setopt(... other options you want...)
-
-    $html = curl_exec($c);
-    $json = json_decode($html);
-    if(count($json) > 0){
-        $data[5] = $json[0]->router_mac_address;
-        $data[6] = $json[0]->ip_address;
-        $data[7] = $json[0]->plan;
-    }
     $all_data[] = $data;
 }
 

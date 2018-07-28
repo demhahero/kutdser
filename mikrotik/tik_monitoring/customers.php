@@ -59,7 +59,7 @@ include_once "../header.php";
     <th style="width: 13%">Modem MAC</th>
     <th style="width: 13%">Router MAC</th>
     <th style="width: 12%">IP</th>
-    <th style="width: 10%">Plan</th>
+    <th style="width: 10%">VL Number</th>
     <th>Address</th>
     <th>Merchant Ref</th>
 </thead>

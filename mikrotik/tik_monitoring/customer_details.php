@@ -17,11 +17,11 @@ include_once "../header.php";
                         $(".full-name").html(field['full_name']);
                         $(".reseller").html(field['reseller'][0]['full_name']);
                         $(".modem-mac").html(field['modem'][0]["mac_address"]);
-                        $(".router-mac").html(field['info'][0]["router_mac_address"]);
-                        $(".plan").html(field['info'][0]["plan"]);
+                        $(".router-mac").html(field['modem'][0]["router_mac_address"]);
+                     
                         $(".address").html(field['address']);
                         $(".phone").html(field['phone']);
-                        $(".ip").html(field['info'][0]["ip_address"]);
+                        $(".ip").html(field['modem'][0]["ip_address"]);
                     });
                 });
 
