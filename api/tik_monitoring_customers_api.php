@@ -53,7 +53,8 @@ if (!empty($params['search']['value'])) {
     $where .= " OR `orders`.`vl_number` LIKE '%" . $params['search']['value'] . "%' ";
     $where .= " OR `modems`.`ip_address` LIKE '%" . $params['search']['value'] . "%' ";
     $where .= " OR `modems`.`router_mac_address` LIKE '%" . $params['search']['value'] . "%' ";
-    $where .= " OR `modems`.`mac_address LIKE` '%" . $params['search']['value'] . "%')  ";
+    $where .= " OR `modems`.`mac_address` LIKE '%" . $params['search']['value'] . "%')  ";
+    
 }
 
 //concatenate search sql if value exist
@@ -70,7 +71,7 @@ $sqlRec .= " ORDER BY " . $columns[$params['order'][0]['column']] . "   " . $par
 $sqlRec .= " LIMIT " . $params['start'] . " ," . $params['length'];
 
 
-
+echo $sqlRec;
 
 mysqli_query($dbTools->getConnection(), "SET CHARACTER SET utf8");
 $queryTot = mysqli_query($dbTools->getConnection(), $sqlTot);
