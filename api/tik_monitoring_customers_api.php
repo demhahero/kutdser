@@ -31,10 +31,10 @@ $sqlTot = "SELECT `merchantrefs`.`merchantref`, `merchantrefs`.`order_id`,
     `orders`.`vl_number`,
     customers.reseller_id, `modems`.`mac_address`, `modems`.`modem_id`, `modems`.`ip_address`, `modems`.`router_mac_address`
 FROM customers
-INNER JOIN `customers` resellers ON resellers.`customer_id` = customers.`reseller_id`
+LEFT JOIN `customers` resellers ON resellers.`customer_id` = customers.`reseller_id`
 LEFT JOIN orders ON orders.customer_id = customers.customer_id
 LEFT JOIN modems ON orders.customer_id = modems.customer_id
-INNER JOIN `merchantrefs` on `merchantrefs`.`customer_id` = `customers`.`customer_id` and `merchantrefs`.`type`!='payment' ";
+LEFT JOIN `merchantrefs` on `merchantrefs`.`customer_id` = `customers`.`customer_id` and `merchantrefs`.`type`!='payment' ";
 
 $sqlRec = $sqlTot;
 
