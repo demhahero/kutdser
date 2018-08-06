@@ -180,6 +180,10 @@ while($products_row=$dbTools->fetch_assoc($products))
                                     </label>
                                     <br/>
                                     <label class="radio-inline">
+                                        <input type="radio" class="input-text modem custom-options custom_field" data-price="200" name="options[modem]" value="buy" />Business Modem
+                                    </label>
+                                    <br/>
+                                    <label class="radio-inline">
                                         <input type="radio" class="input-text modem custom-options custom_field" data-price="60" name="options[modem]" value="inventory" />Reseller Inventory
                                     </label>
                                     <div class="modem-inventory-list">
@@ -371,6 +375,16 @@ while($products_row=$dbTools->fetch_assoc($products))
                             </div>
                             </p>
                         </div>
+                        <div class="col-sm-6" >
+                            <p class="rounded form-row form-row-wide custom_check-service-availabilty  ">
+                            <div class="panel panel-primary">
+                                <div class="panel-heading">Static IP</div>
+                                <div class="panel-body">
+                                    <input type="checkbox" class="input-text custom-options custom_field" data-price="20" name="options[static_ip]" value="yes" /> Static IP
+                                </div>
+                            </div>
+                            </p>
+                        </div>
                     </div>
                 </div>
                 <div class="phone">
@@ -526,6 +540,7 @@ while($products_row=$dbTools->fetch_assoc($products))
                         <li class="list-group-item">Router cost <span class="badge router-cost"></span></li>
                         <li class="list-group-item">Adapter cost <span class="badge adapter-cost"></span></li>
                         <li class="list-group-item">Additional Service <span class="badge additional-service-cost"></span></li>
+                        <li class="list-group-item">Static IP <span class="badge static-ip-cost"></span></li>
                         <li class="list-group-item">Tax Fees (QST 9.975%) <span class="badge qst-cost"></span></li>
                         <li class="list-group-item">Tax Fees (GST 5%) <span class="badge gst-cost"></span></li>
                         <li class="list-group-item">Total <span class="badge total"></span></li>

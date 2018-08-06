@@ -18,12 +18,13 @@ $router_cost = number_format((float) $order->getRouterPrice(), 2, '.', '');
 $modem_cost = number_format((float) $order->getModemPrice(), 2, '.', '');
 $adapter_cost = number_format((float) $order->getAdapterPrice(), 2, '.', '');
 $additional_service = number_format((float) $order->getAdditionalServicePrice(), 2, '.', '');
+$static_ip = number_format((float) $order->getStaticIpPrice(), 2, '.', '');
 $total_price = number_format((float) $order->getTotalPrice(), 2, '.', '');
 $sub_total = number_format((float) $order->getTotalPrice()-$qst_tax-$gst_tax, 2, '.', '');
 $product_price = number_format((float) $order->getProductPrice(), 2, '.', '');
 
 $html = $terms_header . '
-                    ' . $order->getCustomer()->getFullName() . '<br/>' . $order->getCustomer()->getAddress() . '								
+                    ' . $order->getCustomer()->getFullName() . '<br/>' . $order->getCustomer()->getAddress() . '
                 </td>
 		<td class="address shipping-address">
                     <h3>Reseller:</h3>
@@ -39,8 +40,8 @@ $html = $terms_header . '
 					<th>Order:</th>
 					<td>#' . $order->getDisplayedID() . '</td>
 				</tr>
-		
-							</table>			
+
+							</table>
 		</td>
 	</tr>
 </table>
@@ -68,7 +69,7 @@ $html = $terms_header . '
 		<tr class="no-borders">
 			<td class="no-borders">
 				<div class="customer-notes">
-																			</div>				
+																			</div>
 			</td>
 			<td class="no-borders" colspan="2">
 				<table class="totals">
@@ -103,6 +104,11 @@ $html = $terms_header . '
                                                     <th class="description">Additional Service</th>
                                                     <td class="price"><span class="totals-price"><span class="woocommerce-Price-amount amount"><span class="woocommerce-Price-currencySymbol">&#36;</span>' . $additional_service . '</span></span></td>
 						</tr>
+                                                <tr class="fee_419">
+                                                    <td class="no-borders"></td>
+                                                    <th class="description">Static IP</th>
+                                                    <td class="price"><span class="totals-price"><span class="woocommerce-Price-amount amount"><span class="woocommerce-Price-currencySymbol">&#36;</span>' . $static_ip . '</span></span></td>
+            </tr>
 						<tr class="fee_418">
                                                     <td class="no-borders"></td>
                                                     <th class="description">Tax Fees (GST 5%)</th>

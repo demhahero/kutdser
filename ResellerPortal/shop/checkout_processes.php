@@ -122,8 +122,10 @@ if ($_GET["do"] == "register") {
               ,"modem_serial_number"
               ,"modem_mac_address"
               ,"additional_service"
+              ,"static_ip"
               ,"product_price"
               ,"additional_service_price"
+              ,"static_ip_price"
               ,"setup_price"
               ,"modem_price"
               ,"router_price"
@@ -190,8 +192,10 @@ if ($_GET["do"] == "register") {
                     . "`modem_serial_number`, "
                     . "`modem_mac_address`, "
                     . "`additional_service`, "
+                    . "`static_ip`, "
                     . "`product_price`, "
                     . "`additional_service_price`, "
+                    . "`static_ip_price`, "
                     . "`setup_price`, "
                     . "`modem_price`, "
                     . "`router_price`, "
@@ -229,8 +233,10 @@ if ($_GET["do"] == "register") {
                     . "'" . $options['modem_serial_number'] . "', "
                     . "'" . $options['modem_mac_address'] . "', "
                     . "'" . $options['additional_service'] . "', "
+                    . "'" . $options['static_ip'] . "', "
                     . "'" . $options['product_price'] . "', "
                     . "'" . $options['additional_service_price'] . "', "
+                    . "'" . $options['static_ip_price'] . "', "
                     . "'" . $options['setup_price'] . "', "
                     . "'" . $options['modem_price'] . "', "
                     . "'" . $options['router_price'] . "', "
@@ -294,6 +300,7 @@ if ($_GET["do"] == "register") {
                     . ")");
         }
 
+        
         if ($result_customer && $result_order && $result_order_options && $result_merchantrefs)
         {
             $orid = (((0x0000FFFF & (int) $order_id) << 16) + ((0xFFFF0000 & (int) $order_id) >> 16));

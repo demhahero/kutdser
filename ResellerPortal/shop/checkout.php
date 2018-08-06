@@ -94,6 +94,7 @@ if ($product_type == "internet") {
     $gst_tax = 0;
     $qst_tax = 0;
     $additional_service = 0;
+    $static_ip = 0;
 
 
 
@@ -113,6 +114,9 @@ if ($product_type == "internet") {
         //Deposit has no tax
         //$value_has_no_tax = $modem_cost;
     }
+    if ($_POST["options"]["modem"] == "buy") {
+        $modem_cost = 200;
+    }
 
     if ($_POST["options"]["router"] == "rent") { //If rent router
         $router_cost = 2.90;
@@ -129,6 +133,10 @@ if ($product_type == "internet") {
 //Check additional service
     if (isset($_POST["options"]["additional_service"]) && $_POST["options"]["additional_service"] == "yes") {
         $additional_service = 5;
+    }
+//Check static ip
+    if (isset($_POST["options"]["static_ip"]) && $_POST["options"]["static_ip"] == "yes") {
+        $static_ip = 20;
     }
 
 //if NOT yearly payment, check monthly (no contract) for transfer or installation fees.
@@ -167,9 +175,11 @@ if ($product_type == "internet") {
         if ($subscription_period_type == "YEARLY") { //if yearly payment, divide price by 12 months
             $price_of_remaining_days = (($product_price / 12) / $days_in_month) * $remainingDays;
             $price_of_remaining_days += $additional_service / $days_in_month * $remainingDays; // add additional service fees
+            $price_of_remaining_days += $static_ip / $days_in_month * $remainingDays; // add static ip fees
         } else { // if monthly payment
             $price_of_remaining_days = ($product_price / $days_in_month) * $remainingDays;
             $price_of_remaining_days += $additional_service / $days_in_month * $remainingDays; // add additional service fees
+            $price_of_remaining_days += $static_ip / $days_in_month * $remainingDays; // add static_ip fees
             if ($_POST["options"]["router"] == "rent") { //if rent router, add rent cost of the remaining day
                 $price_of_remaining_days += ($router_cost / $days_in_month) * $remainingDays;
             }
@@ -177,7 +187,7 @@ if ($product_type == "internet") {
     }
 
     //Calculate total price
-    $total_price = $product_price + $price_of_remaining_days + $installation_transfer_cost + $router_cost + $modem_cost + $additional_service;
+    $total_price = $product_price + $price_of_remaining_days + $installation_transfer_cost + $router_cost + $modem_cost + $additional_service + $static_ip;
 
     //Calculate texes
     $qst_tax = ($total_price - $value_has_no_tax) * 0.09975;
@@ -193,12 +203,13 @@ if ($product_type == "internet") {
     $_POST["options"]["modem_price"] = $modem_cost;
     $_POST["options"]["router_price"] = $router_cost;
     $_POST["options"]["additional_service_price"] = $additional_service;
+    $_POST["options"]["static_ip_price"] = $static_ip;
     $_POST["options"]["total_price"] = $total_price;
     $_POST["options"]["qst_tax"] = $qst_tax;
     $_POST["options"]["gst_tax"] = $gst_tax;
 
     //Calculate recurring amount
-    $subscription_recurring_amount = $product_price + $additional_service;
+    $subscription_recurring_amount = $product_price + $additional_service + $static_ip;
     if ($_POST["options"]["router"] == "rent") { //If rent router, add $2.90 on the recurring amount
 
         if(!($has_discount && $free_router))

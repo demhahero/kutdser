@@ -37,9 +37,11 @@ class OrderTools {
     private $modem_mac_address;
     private $modem_modem_type;
     private $additional_service;
+    private $static_ip;
     private $modem_id;
     private $product_price;
     private $additional_service_price;
+    private $static_ip_price;
     private $setup_price;
     private $modem_price;
     private $router_price;
@@ -67,7 +69,7 @@ class OrderTools {
     private $admin_id;
     private $update_date;
     private $vl_number;
-    
+
     public function __construct($order_id, $objDBTools, $depth = 0, $path = null) {
         if ($depth == 5)
             return;
@@ -78,7 +80,7 @@ class OrderTools {
         if ($path != null) {
             $next_path = array_shift($path);
         }
-        
+
         $this->order_id = $order_id;
         $this->objDBTools = $objDBTools;
 
@@ -95,7 +97,7 @@ class OrderTools {
         $this->admin_id = $order_row["admin_id"];
         $this->update_date = $order_row["update_date"];
         $this->vl_number = $order_row["vl_number"];
-        
+
         $this->getOrderOptions();
 
         //Get customer
@@ -105,7 +107,7 @@ class OrderTools {
             $customer_row = $this->objDBTools->fetch_assoc($customer_result);
             $this->customer = new CustomerTools($customer_row["customer_id"], $this->objDBTools, $this->depth);
         }
-        
+
         //Get Reseller
         if ($next_path == "" || $next_path == "reseller") {
             $customer_sql = "select * from `customers` where `customer_id`='" . $order_row["reseller_id"] . "'";
@@ -130,11 +132,11 @@ class OrderTools {
                     else if (($request->getAction() == "upgrade" || $request->getAction() == "downgrade") && $request->getVerdict() == "approve" && $request->getActionOnDate <= $today) {
                         $this->product_id = $request->getActionValue();
                     }
-                     * 
+                     *
                      */
                 }
         }
-        
+
         //Get Product
         if ($next_path == "" || $next_path == "product") {
             $this->product = new ProductTools($this->product_id, $this->objDBTools, $this->depth);
@@ -161,12 +163,12 @@ class OrderTools {
     public function setTerminationDate($termination_date) {
         $this->termination_date = $termination_date;
     }
-    
+
     public function getProductTitle() {
         return $this->product_title;
     }
 
-    
+
     public function getUpdateDate() {
         return $this->update_date;
     }
@@ -174,7 +176,7 @@ class OrderTools {
     public function setUpdateDate($update_date) {
         $this->update_date = $update_date;
     }
-    
+
     public function getAdminID() {
         return $this->admin_id;
     }
@@ -182,7 +184,7 @@ class OrderTools {
     public function setAdminID($admin_id) {
         $this->admin_id = $admin_id;
     }
-    
+
     public function getVLNumber() {
         return $this->vl_number;
     }
@@ -190,7 +192,7 @@ class OrderTools {
     public function setVLNumber($vl_number) {
         $this->vl_number = $vl_number;
     }
-    
+
     public function getStartDate() {
         if((int)$this->getOrderID() < 10000) // Old system
             return $start_date = clone $this->getCustomer()->getStartDate();
@@ -207,15 +209,15 @@ class OrderTools {
         } else if ($this->getProduct()->getCategory() == "phone") {
             $start_date = $this->getCreationDate();
         }
-     
+
         return $start_date;
     }
 
     public function getRecurringStartDate() {
         $start_date = clone $this->getStartDate();
-        
+
         $SubscriptionType = $this->getProduct()->getSubscriptionType();
-        
+
         //Find out 1st recurring date
         if ($SubscriptionType == "yearly") { //If yearly payment
             if ($start_date->format('d') == "01") { //if start date = 1st day of month, add one year only
@@ -258,9 +260,11 @@ class OrderTools {
         $this->modem_mac_address = $order_options_row["modem_mac_address"];
         $this->modem_modem_type = $order_options_row["modem_modem_type"];
         $this->additional_service = $order_options_row["additional_service"];
+        $this->static_ip = $order_options_row["static_ip"];
         $this->modem_id = $order_options_row["modem_id"];
         $this->product_price = $order_options_row["product_price"];
         $this->additional_service_price = $order_options_row["additional_service_price"];
+        $this->static_ip_price = $order_options_row["static_ip_price"];
         $this->setup_price = $order_options_row["setup_price"];
         $this->modem_price = $order_options_row["modem_price"];
         $this->router_price = $order_options_row["router_price"];
@@ -278,7 +282,7 @@ class OrderTools {
             $this->actual_installation_date = new DateTime($order_options_row["actual_installation_date"]);
         else
             $this->actual_installation_date = null;
-        
+
         $this->actual_installation_time_from = $order_options_row["actual_installation_time_from"];
         $this->actual_installation_time_to = $order_options_row["actual_installation_time_to"];
         //$this->termination_date = $order_options_row["termination_date"];
@@ -305,7 +309,7 @@ class OrderTools {
     public function getOrderID() {
         return $this->order_id;
     }
-    
+
     public function getDisplayedID() {
         if((int)$this->order_id <= 10380)
             return $this->order_id;
@@ -396,8 +400,16 @@ class OrderTools {
         return $this->additional_service;
     }
 
+    public function getStaticIp() {
+        return $this->static_ip;
+    }
+
     public function getAdditionalServicePrice() {
         return (float) $this->additional_service_price;
+    }
+
+    public function getStaticIpPrice() {
+        return (float) $this->static_ip_price;
     }
 
     public function getTotalPrice() {
@@ -481,7 +493,7 @@ class OrderTools {
             $actual_installation_date = "'" . $this->actual_installation_date->format("Y-m-d H:i:s") . "'";
         else
             $actual_installation_date = "NULL";
-        
+
         $result_order_options = $this->objDBTools->query("update `order_options` set"
                 . "`completion`='" . $this->completion . "', "
                 . "`actual_installation_date`= " . $actual_installation_date . " ,"

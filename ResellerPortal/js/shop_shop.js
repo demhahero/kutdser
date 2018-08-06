@@ -372,6 +372,7 @@ $(document).ready(function () {
             var gst_tax = 0;
             var qst_tax = 0;
             var additional_service = 0;
+            var static_ip = 0;
             var has_discount=false;
             var free_modem=false;
             var free_router=false;
@@ -409,6 +410,9 @@ $(document).ready(function () {
                 //Deposit has no tax
                 //value_has_no_tax = modem_cost;
             }
+            if ($("input[name=\"options[modem]\"]:checked").val() == "buy" ) {
+                modem_cost = 200;
+            }
 
             if ($("input[name=\"options[router]\"]:checked").val() == "rent") { //If rent router
                 router_cost = 2.90;
@@ -429,11 +433,20 @@ $(document).ready(function () {
                     additional_service = additional_service * 12;
                 }
             }
+            //Check static ip
+            if ($("input[name=\"options[static_ip]\"]").prop('checked') == true) {
+                static_ip = 20;
+                //if yearly, multiply static ip by 12 months.
+                if ($("select[name=\"product\"] option:selected").text().includes("Yearly") != false) {
+                    static_ip = static_ip * 12;
+                }
+
+            }
 
             //if NOT yearly payment, check monthly (no contract) for transfer or installation fees.
             //If user selects 60 or 120, then charge him the setup fees anyways.
             if ($("select[name=\"product\"] option:selected").text().includes("Yearly") == false) {
-                if ($("input[name=\"options[plan]\"]:checked").val() == "monthly" 
+                if ($("input[name=\"options[plan]\"]:checked").val() == "monthly"
                         || $("select[name=\"product\"] option:selected").val() == 416
                         || $("select[name=\"product\"] option:selected").val() == 418) {
                     if ($("input[name=\"options[cable_subscriber]\"]:checked").val() == "yes")
@@ -490,10 +503,12 @@ $(document).ready(function () {
                     //Calculate additional + product for the rest of the month
                     price_of_remainig_days = parseFloat((product_price / 12) / days_in_month) * remainigDays;
                     price_of_remainig_days += parseFloat(additional_service / days_in_month) * remainigDays;
+                    price_of_remainig_days += parseFloat(static_ip / days_in_month) * remainigDays;
                 } else {
                     //Calculate additional + product + router rent for the rest of the month
                     price_of_remainig_days = parseFloat(product_price / days_in_month) * remainigDays;
                     price_of_remainig_days += parseFloat(additional_service / days_in_month) * remainigDays;
+                    price_of_remainig_days += parseFloat(static_ip / days_in_month) * remainigDays;
                     if ($("input[name=\"options[router]\"]:checked").val() == "rent") {
                         price_of_remainig_days += parseFloat(router_cost / days_in_month) * remainigDays;
                     }
@@ -501,7 +516,7 @@ $(document).ready(function () {
             }
 
             //Calculate total price
-            total_price = product_price + price_of_remainig_days + installation_transfer_cost + router_cost + modem_cost + additional_service;
+            total_price = product_price + price_of_remainig_days + installation_transfer_cost + router_cost + modem_cost + additional_service+static_ip;
 
             //Calculate texes
             qst_tax = (total_price - value_has_no_tax) * 0.09975;
@@ -530,6 +545,8 @@ $(document).ready(function () {
 
             $("div.order_details span.additional-service-cost").html("$" + additional_service.toFixed(2));
 
+            $("div.order_details span.static-ip-cost").html("$" + static_ip.toFixed(2));
+
             $("div.order_details span.qst-cost").html("$" + qst_tax.toFixed(2));
 
             $("div.order_details span.gst-cost").html("$" + gst_tax.toFixed(2));
@@ -549,6 +566,7 @@ $(document).ready(function () {
             var gst_tax = 0;
             var qst_tax = 0;
             var additional_service = 0;
+            var static_ip = 0;
 
             //Get product
             product_price = parseFloat($("select[name=\"product\"] option:selected").attr("real_price"));
