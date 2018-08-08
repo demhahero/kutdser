@@ -310,11 +310,9 @@ font.tax-number{
 		<img src="'.__DIR__ .'/logo-1.png" width="516" height="300" alt="AM Pro Telecom Inc." />		</td>
 		<td class="shop-info">
 			<div class="shop-name"><h3>AM Pro Telecom Inc.</h3></div>
-			<div class="shop-address"><p>4230, Boul St Jean<br />
-Dollard des ormuex<br />
-#221<br />
-H9H3X4<br />
-Canada-Qc</p>
+			<div class="shop-address"><p>1600 Boul Henri-Bourassa<br />
+H3M 3E3, Suite 1590<br />
+Montréal, Canada-Qc</p>
 </div>
 		</td>
 	</tr>
