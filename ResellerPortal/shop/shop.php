@@ -12,11 +12,10 @@ $free_installation= ($reseller_row['free_installation']==="yes"?TRUE:FALSE);
 $free_transfer= ($reseller_row['free_transfer']==="yes"?TRUE:FALSE);
 
 
-
-$products = $dbTools->query("SELECT * FROM `products` INNER JOIN `reseller_discounts` on `products`.`product_id`=`reseller_discounts`.`product_id` WHERE `reseller_discounts`.`reseller_id`='" . $reseller_id . "'");
+$products = $dbTools->query("SELECT * FROM `products` INNER JOIN `reseller_discounts` on `products`.`product_id`=`reseller_discounts`.`product_id` WHERE `reseller_discounts`.`reseller_id`='" . $reseller_id . "' and `products`.`product_id` NOT IN ('699','700')");
 
 if($products->num_rows ==0)
-$products = $dbTools->query("SELECT * FROM `products`");
+$products = $dbTools->query("SELECT * FROM `products`where `products`.`product_id` NOT IN ('699','700')");
 $products_rows=[];
 while($products_row=$dbTools->fetch_assoc($products))
 {
@@ -179,10 +178,12 @@ while($products_row=$dbTools->fetch_assoc($products))
                                         <?= $free_modem? "<span style='color:green' class='discount_offer'> you have a limited offer free modem deposit</span>":""?>
                                     </label>
                                     <br/>
+                                    <?php if($reseller_id==="190"){?>
                                     <label class="radio-inline">
                                         <input type="radio" class="input-text modem custom-options custom_field" data-price="200" name="options[modem]" value="buy" />Business Modem
                                     </label>
                                     <br/>
+                                  <?php }?>
                                     <label class="radio-inline">
                                         <input type="radio" class="input-text modem custom-options custom_field" data-price="60" name="options[modem]" value="inventory" />Reseller Inventory
                                     </label>
@@ -220,6 +221,9 @@ while($products_row=$dbTools->fetch_assoc($products))
                                     <label class="radio-inline">
                                         <input type="radio" class="input-text custom-options custom_field rent-router" data-price="2.90" name="options[router]" value="rent" />Rent WIFI Router MikroTik Hap Series ($2.90)
                                         <?= $free_router?" <span style='color:green;' class='discount_offer'>you have a limited offer, now router rent is free for you  </span>":""?>
+                                    </label><br/>
+                                    <label class="radio-inline">
+                                        <input type="radio" class="input-text custom-options custom_field" data-price="4.90" name="options[router]" value="rent_hap_lite"   />Rent WIFI Router MikroTik Hap lite ($4.90)<br/>
                                     </label><br/>
                                     <label class="radio-inline">
                                         <input type="radio" class="input-text custom-options custom_field" data-price="74.00" name="options[router]" value="buy_hap_ac_lite"   />Buy WIFI Router MikroTik Hap ac lite ($74.00)<br/>
@@ -370,21 +374,27 @@ while($products_row=$dbTools->fetch_assoc($products))
                             <div class="panel panel-primary">
                                 <div class="panel-heading">Additional service</div>
                                 <div class="panel-body">
+                                  <label class="checkbox-inline">
                                     <input type="checkbox" class="input-text custom-options custom_field" data-price="0" name="options[additional_service]" value="yes" /> Additional service
+                                  </label>
                                 </div>
                             </div>
                             </p>
                         </div>
+                        <?php if($reseller_id==="190"){?>
                         <div class="col-sm-6" >
                             <p class="rounded form-row form-row-wide custom_check-service-availabilty  ">
                             <div class="panel panel-primary">
                                 <div class="panel-heading">Static IP</div>
                                 <div class="panel-body">
+                                  <label class="checkbox-inline">
                                     <input type="checkbox" class="input-text custom-options custom_field" data-price="20" name="options[static_ip]" value="yes" /> Static IP
+                                  </label>
                                 </div>
                             </div>
                             </p>
                         </div>
+                        <?PHP }?>
                     </div>
                 </div>
                 <div class="phone">
