@@ -27,9 +27,9 @@ $sqlTot = "SELECT `orders`.order_id,`orders`.creation_date,`orders`.status,`orde
     orders.product_title,orders.product_category,orders.product_subscription_type,resellers.full_name as 'reseller_name',
     `customers`.`full_name` as 'customer_name', `order_options`.`modem_mac_address`, `order_options`.`cable_subscriber` 
 FROM `orders` 
-inner JOIN `order_options` on `order_options`.`order_id`= `orders`.`order_id` 
-inner JOIN `customers` on `orders`.`customer_id`=`customers`.`customer_id` 
-INNER JOIN `customers` resellers on resellers.`customer_id` = `orders`.`reseller_id` ";
+left JOIN `order_options` on `order_options`.`order_id`= `orders`.`order_id` 
+left JOIN `customers` on `orders`.`customer_id`=`customers`.`customer_id` 
+left JOIN `customers` resellers on resellers.`customer_id` = `orders`.`reseller_id` ";
 
 $sqlRec = $sqlTot;
 

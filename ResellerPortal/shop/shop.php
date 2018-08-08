@@ -16,7 +16,7 @@ $free_transfer= ($reseller_row['free_transfer']==="yes"?TRUE:FALSE);
 $products = $dbTools->query("SELECT * FROM `products` INNER JOIN `reseller_discounts` on `products`.`product_id`=`reseller_discounts`.`product_id` WHERE `reseller_discounts`.`reseller_id`='" . $reseller_id . "'");
 
 if($products->num_rows ==0)
-$products = $dbTools->query("SELECT * FROM `products`");
+$products = $dbTools->query("SELECT * FROM products where product_id!='699' and product_id!='700'");
 $products_rows=[];
 while($products_row=$dbTools->fetch_assoc($products))
 {
