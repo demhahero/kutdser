@@ -391,7 +391,7 @@ private function fill_order_price_details_2($orderChild,$year,$month){
 
 
             $action="recurring";
-            if($orderChild["router"]==='rent')
+            if($orderChild["router"]==='rent' || $orderChild["router"]==='rent_hap_lite')
             {
               $action=$action.", Router Rent";
                $monthInfo["router_price"]=$router_price;
@@ -533,7 +533,7 @@ private function fill_order_price_details_2($orderChild,$year,$month){
   					$monthInfo["additional_service_price"]=0;
   					$monthInfo["setup_price"]=0;
 
-  					if($monthInfo["router"]!=="rent" )
+  					if($monthInfo["router"]!=="rent" && $monthInfo["router"]!=="rent_hap_lite" )
   						$monthInfo["router_price"]=0;
   					if($monthInfo["modem"]!=="rent" )
   						$monthInfo["modem_price"]=0;
@@ -694,7 +694,7 @@ private function fill_order_price_details_2($orderChild,$year,$month){
             ///commission base amount: product + remaining days
   					$totalPriceWoT=$total_paid;
             // subtotal : commission+all addition prices+fees
-            if($monthInfo["router"]!=="rent" )
+            if($monthInfo["router"]!=="rent" && $monthInfo["router"]!=="rent_hap_lite" )
             {
   						$monthInfo["router_price"]=0;
 
@@ -741,7 +741,7 @@ private function fill_order_price_details_2($orderChild,$year,$month){
   				else{
             $actionTax=$change_speed_fee+7;
             $this_product_price=(float)$request_row["product_price"];
-            if($monthInfo["router"]!=="rent" )
+            if($monthInfo["router"]!=="rent" && $monthInfo["router"]!=="rent_hap_lite" )
   						$monthInfo["router_price"]=0;
             if($request_row["action"]==="terminate")
             {
@@ -829,7 +829,7 @@ private function fill_order_price_details_2($orderChild,$year,$month){
             {
               /// then show zeros values
               $recurring_price=(float)$monthInfo["product_price"];
-              if($monthInfo["router"]==="rent")
+              if($monthInfo["router"]==="rent" || $monthInfo["router"]==="rent_hap_lite")
               {
                 $recurring_price=(float)$monthInfo["product_price"]+(float)$monthInfo["router_price"];
               }
@@ -913,7 +913,7 @@ private function fill_order_price_details($orderChild,$year,$month){
     )
     {
       $action="recurring";
-      if($orderChild["router"]==='rent')
+      if($orderChild["router"]==='rent' ||  $orderChild["router"]==='rent_hap_lite')
       {
         $action=$action.", Router Rent";
          $monthInfo["router_price"]=$router_price;
@@ -1220,9 +1220,12 @@ return $customers;
 			$orderChild["order_id"]=$order_row["order_id"];
       /// discount fields
       $orderChild["discount"]=$order_row["discount"];
+      $orderChild["discount_duration"]=$order_row["discount_duration"];
       $orderChild["free_router"]=$order_row["free_router"];
       $orderChild["free_modem"]=$order_row["free_modem"];
-      $orderChild["free_setup"]=$order_row["free_setup"];
+      $orderChild["free_adapter"]=$order_row["free_adapter"];
+      $orderChild["free_installation"]=$order_row["free_installation"];
+      $orderChild["free_transfer"]=$order_row["free_transfer"];
       ///////////
       $orderChild["join_type"]=$order_row["join_type"];
       $orderChild["reseller_name"]=$order_row["reseller_name"];
@@ -1895,9 +1898,12 @@ return $customers;
 			$orderChild["order_id"]=$order_row["order_id"];
       /// discount fields
       $orderChild["discount"]=$order_row["discount"];
+      $orderChild["discount_duration"]=$order_row["discount_duration"];
       $orderChild["free_router"]=$order_row["free_router"];
       $orderChild["free_modem"]=$order_row["free_modem"];
-      $orderChild["free_setup"]=$order_row["free_setup"];
+      $orderChild["free_adapter"]=$order_row["free_adapter"];
+      $orderChild["free_installation"]=$order_row["free_installation"];
+      $orderChild["free_transfer"]=$order_row["free_transfer"];
       ///////////
       $orderChild["join_type"]=$order_row["join_type"];
       $orderChild["reseller_name"]=$order_row["reseller_name"];
@@ -2040,7 +2046,7 @@ return $customers;
         )
         {
           $action="recurring";
-          if($orderChild["router"]==='rent')
+          if($orderChild["router"]==='rent' || $orderChild["router"]==='rent_hap_lite')
           {
             $action=$action.", Router Rent";
              $monthInfo["router_price"]=$router_price;
@@ -2166,7 +2172,7 @@ return $customers;
 				{
 					$totalPriceWoT=(float)$request_row["product_price"]+$change_speed_fee;
 
-          if($orderChild["router"]==='rent')
+          if($orderChild["router"]==='rent' || $orderChild["router"]==='rent_hap_lite')
           {
             $action=$action.", Router rent";
              $monthInfo["router_price"]=(float)$orderChild["router_price"];
@@ -2199,7 +2205,7 @@ return $customers;
 					//$monthInfo["additional_service_price"]=0;
 					$monthInfo["setup_price"]=0;
 
-					if($monthInfo["router"]!=="rent" )
+					if($monthInfo["router"]!=="rent" &&  $monthInfo["router"]!=="rent_hap_lite")
 						$monthInfo["router_price"]=0;
 					if($monthInfo["modem"]!=="rent" )
 						$monthInfo["modem_price"]=0;
@@ -2359,7 +2365,7 @@ echo "start_month_between_start_and_recurring: ".$start_month_between_start_and_
   					$totalPriceWoT=$total_paid;
             $request_row["action"]="terminated";
             // subtotal : commission+all addition prices+fees
-            if($monthInfo["router"]!=="rent" )
+            if($monthInfo["router"]!=="rent" && $monthInfo["router"]!=="rent_hap_lite" )
             {
   						$monthInfo["router_price"]=0;
 
@@ -2414,7 +2420,7 @@ echo "start_month_between_start_and_recurring: ".$start_month_between_start_and_
           else if($request_row["action"]==="moving"){
             $actionTax=82;
             $this_product_price=(float)$request_row["product_price"];
-            if($monthInfo["router"]!=="rent" )
+            if($monthInfo["router"]!=="rent" && $monthInfo["router"]!=="rent_hap_lite" )
   						$monthInfo["router_price"]=0;
             $monthInfo["product_price"]=(float)$request_row["product_price"];
 
@@ -2503,7 +2509,7 @@ echo "start_month_between_start_and_recurring: ".$start_month_between_start_and_
             ///commission base amount: product + remaining days
   					$totalPriceWoT=$total_paid;
             // subtotal : commission+all addition prices+fees
-            if($monthInfo["router"]!=="rent" )
+            if($monthInfo["router"]!=="rent" && $monthInfo["router"]!=="rent_hap_lite" )
             {
   						$monthInfo["router_price"]=0;
 
@@ -2557,7 +2563,7 @@ echo "start_month_between_start_and_recurring: ".$start_month_between_start_and_
 				else{
           $actionTax=$change_speed_fee+7;
           $this_product_price=(float)$request_row["product_price"];
-          if($monthInfo["router"]!=="rent" )
+          if($monthInfo["router"]!=="rent" && $monthInfo["router"]!=="rent_hap_lite" )
 						$monthInfo["router_price"]=0;
           $monthInfo["product_price"]=(float)$request_row["product_price"];
           if($request_row["action"]==="terminate")
@@ -2569,6 +2575,10 @@ echo "start_month_between_start_and_recurring: ".$start_month_between_start_and_
             $monthInfo["router_price"]=0;
             $monthInfo["product_price"]=0;
             $orderChild["recurring_date"]="0000-00-00";
+          }
+          else if($request_row["action"]==="moving")
+          {
+            $actionTax=82;
           }
           $action=$request_row["action"];
           if((int)$monthInfo["router_price"]>0)

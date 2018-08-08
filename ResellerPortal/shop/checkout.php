@@ -123,6 +123,9 @@ if ($product_type == "internet") {
         if($has_discount && $free_router)
         $router_cost=0;
 
+    }
+    else if($_POST["options"]["router"] == "rent_hap_lite") { //If rent hap lite router
+      $router_cost = 4.90;
     } else if ($_POST["options"]["router"] == "buy_hap_ac_lite") { //if buy hap ac lite
         $router_cost = 74.00;
     } else if ($_POST["options"]["router"] == "buy_hap_mini") { //if buy hap mini
@@ -183,6 +186,9 @@ if ($product_type == "internet") {
             if ($_POST["options"]["router"] == "rent") { //if rent router, add rent cost of the remaining day
                 $price_of_remaining_days += ($router_cost / $days_in_month) * $remainingDays;
             }
+            else if ($_POST["options"]["router"] == "rent_hap_lite") { //if rent hap lite router, add rent cost of the remaining day
+                $price_of_remaining_days += ($router_cost / $days_in_month) * $remainingDays;
+            }
         }
     }
 
@@ -214,6 +220,9 @@ if ($product_type == "internet") {
 
         if(!($has_discount && $free_router))
         $subscription_recurring_amount += 2.90;
+    }
+    else if($_POST["options"]["router"] == "rent_hap_lite") { //If rent hap lite router, add $4.90 on the recurring amount
+      $subscription_recurring_amount +=4.90;
     }
 } else if ($product_type == "phone") {
     //Get start date

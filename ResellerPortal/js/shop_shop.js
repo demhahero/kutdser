@@ -418,6 +418,9 @@ $(document).ready(function () {
                 router_cost = 2.90;
                 if(has_discount && free_router)
                 router_cost=0;
+            }
+            else if($("input[name=\"options[router]\"]:checked").val() == "rent_hap_lite") { //If rent router hap lite
+              router_cost = 4.90;
             } else if ($("input[name=\"options[router]\"]:checked").val() == "buy_hap_ac_lite") { //if buy hap ac lite
                 router_cost = 74.00;
             } else if ($("input[name=\"options[router]\"]:checked").val() == "buy_hap_mini") { //if buy hap mini
@@ -510,6 +513,9 @@ $(document).ready(function () {
                     price_of_remainig_days += parseFloat(additional_service / days_in_month) * remainigDays;
                     price_of_remainig_days += parseFloat(static_ip / days_in_month) * remainigDays;
                     if ($("input[name=\"options[router]\"]:checked").val() == "rent") {
+                        price_of_remainig_days += parseFloat(router_cost / days_in_month) * remainigDays;
+                    }
+                    else if ($("input[name=\"options[router]\"]:checked").val() == "rent_hap_lite") {
                         price_of_remainig_days += parseFloat(router_cost / days_in_month) * remainigDays;
                     }
                 }
