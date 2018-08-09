@@ -397,7 +397,7 @@ $(document).ready(function () {
 
             var title=$("select[name=\"product\"] option:selected").attr("data_title")+" "+product_price
             if(has_discount)
-              var title=$("select[name=\"product\"] option:selected").text();
+               title=$("select[name=\"product\"] option:selected").text();
             //If rent modem
             if ($("input[name=\"options[inventory_modem_price]\"]").prop('checked') == true)
             {
@@ -561,6 +561,7 @@ $(document).ready(function () {
 
             $("div.order_details span.total").html("$" + total_price.toFixed(2));
         } else if (product_type == "phone") {
+
             var total_price = 0;
             var product_price = 0;
             var price_of_remainig_days = 0;
@@ -573,12 +574,31 @@ $(document).ready(function () {
             var qst_tax = 0;
             var additional_service = 0;
             var static_ip = 0;
+            var has_discount=false;
+            var free_modem=false;
+            var free_router=false;
+            var free_adapter=false;
+            var free_installation=false;
+            var free_transfer=false;
+
+            //Get product price
+            has_discount = $("input[name=\"has_discount\"]").val()==='yes';
+            free_modem = $("input[name=\"free_modem\"]").val()==='yes';
+            free_router = $("input[name=\"free_router\"]").val()==='yes';
+            free_adapter = $("input[name=\"free_adapter\"]").val()==='yes';
+            free_installation = $("input[name=\"free_installation\"]").val()==='yes';
+            free_transfer = $("input[name=\"free_transfer\"]").val()==='yes';
 
             //Get product
             product_price = parseFloat($("select[name=\"product\"] option:selected").attr("real_price"));
             if(has_discount)
               product_price = parseFloat($("select[name=\"product\"] option:selected").attr("price"));
 
+            //product title
+
+            var title=$("select[name=\"product\"] option:selected").attr("data_title")+" "+product_price
+            if(has_discount)
+               title=$("select[name=\"product\"] option:selected").text();
             //If buy adapter
             if ($("input[name=\"options[adapter]\"]:checked").val() == "buy_Cisco_SPA112") {
                 adapter_price = 59.90;
@@ -646,7 +666,7 @@ $(document).ready(function () {
 
             $("div.order_details span.gst-cost").html("$" + gst_tax.toFixed(2));
 
-            $("div.order_details span.product-name").html($("select[name=\"product\"] option:selected").attr("data_title")+" "+product_price);
+            $("div.order_details span.product-name").html(title);
 
             $("div.order_details span.total").html("$" + total_price.toFixed(2));
         }

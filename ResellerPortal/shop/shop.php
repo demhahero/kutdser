@@ -423,7 +423,7 @@ while($products_row=$dbTools->fetch_assoc($products))
                                             }
 
                                             ?>
-                                        <option price='<?= $price?>' value='<?= $product['product_id']?>' type="<?= $product['subscription_type']?>"> <?= $title." (".$price."$)"?></option>
+                                        <option real_price='<?=$product['price']?>' data_title='<?= $product['title']?>' price='<?= $price?>' value='<?= $product['product_id']?>' type="<?= $product['subscription_type']?>"> <?= $title." (".$price."$)"?></option>
                                       <?php }
                                       endforeach; ?>
                                     </select>
