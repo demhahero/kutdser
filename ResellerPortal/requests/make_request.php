@@ -40,6 +40,12 @@ if (isset($_POST["action"])) {
 
 <script>
     $(document).ready(function () {
+        var fistDayInstallation = '1';
+        $('#datepicker').datepicker({
+            format: 'mm/dd/yyyy',
+            startDate: '+' + fistDayInstallation + 'd'
+        });
+        
         $(".moving-field").hide();
         $("select[name=\"action\"]").change(function () {
             if (this.value == "change_speed") {
@@ -148,7 +154,7 @@ if (isset($_POST["action"])) {
     </div>
     <div class="form-group">
         <label>Action on date:</label>
-        <input readonly="" name="action_on_date" type="text" class="form-control datepicker" />
+        <input readonly="" name="action_on_date" type="text" id="datepicker" class="form-control" />
     </div>
     <div class="form-group moving-field">
         <label>City:</label>
