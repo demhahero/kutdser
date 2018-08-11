@@ -18,52 +18,66 @@ if(isset($_POST["products"]))
       $services["free_installation"]="no";
       $services["free_transfer"]="no";
   }
-  $dbTools->query("UPDATE `customers` SET
+  $today_date = new DateTime();
+  $discount_expire_date=(isset($_POST['discount_expire_date']) && strlen($_POST['discount_expire_date'])>0)?$_POST['discount_expire_date']:$today_date->format('Y-m-d');
+  $discount_query="UPDATE `customers` SET
      `has_discount`=N'yes',
+     `discount_expire_date`=N'".$discount_expire_date."',
      `free_modem`=N'".$services["free_modem"]."',
      `free_router`=N'".$services["free_router"]."',
      `free_adapter`=N'".$services["free_adapter"]."',
      `free_installation`=N'".$services["free_installation"]."',
      `free_transfer`=N'".$services["free_transfer"]."'
-     WHERE `customer_id`=".$_POST['reseller_id']);
+     WHERE `customer_id`=".$_POST['reseller_id'];
+  $discount_query_result=$dbTools->query($discount_query);
   $products = $dbTools->query("SELECT * FROM `products` INNER JOIN `reseller_discounts` on `products`.`product_id`=`reseller_discounts`.`product_id` WHERE `reseller_discounts`.`reseller_id`='" . $_POST['reseller_id'] . "'");
 
-  if($products->num_rows ==0)
-  {
-    $query="INSERT INTO `reseller_discounts`
-          ( `reseller_id`, `product_id`, `discount`,`discount_duration`)
-      VALUES";
-      $values="";
+  if($discount_query_result){
+      if($products->num_rows ==0)
+      {
+        $query="INSERT INTO `reseller_discounts`
+              ( `reseller_id`, `product_id`, `discount`,`discount_duration`)
+          VALUES";
+          $values="";
 
-    foreach ($_POST['products'] as $key => $value) {
+        foreach ($_POST['products'] as $key => $value) {
 
-      $values.="(N'".$_POST['reseller_id']."',N'".$key."',N'".$value['discount']."',N'".$value['discount_duration']."'),";
+          $values.="(N'".$_POST['reseller_id']."',N'".$key."',N'".$value['discount']."',N'".$value['discount_duration']."'),";
+        }
+        $values= substr($values, 0, strlen($values)-1);
+        $query.=$values;
+
+        $query_result= $dbTools->query($query);
+      }
+      else {
+        foreach ($_POST['products'] as $key => $value) {
+          $query="UPDATE `reseller_discounts` SET
+          `reseller_id`=N'".$_POST['reseller_id']."',
+          `product_id`=N'".$key."',
+          `discount`=N'".$value['discount']."',
+          `discount_duration`=N'".$value['discount_duration']."'
+          WHERE `reseller_discounts_id`=".$value['reseller_discounts_id'];
+          $query_result= $dbTools->query($query);
+
+        }
+        $query_result= $dbTools->query($query);
+
+      }
     }
-    $values= substr($values, 0, strlen($values)-1);
-    $query.=$values;
-
-    $query_result= $dbTools->query($query);
-  }
-  else {
-    foreach ($_POST['products'] as $key => $value) {
-      $query="UPDATE `reseller_discounts` SET
-      `reseller_id`=N'".$_POST['reseller_id']."',
-      `product_id`=N'".$key."',
-      `discount`=N'".$value['discount']."',
-      `discount_duration`=N'".$value['discount_duration']."'
-      WHERE `reseller_discounts_id`=".$value['reseller_discounts_id'];
-      $query_result= $dbTools->query($query);
-
+    else{
+      $query_result=false;
+      echo $discount_query;
     }
-    $query_result= $dbTools->query($query);
-  }
 }
 
 
 
 $reseller_id = intval($_GET["reseller_id"]);
-$reseller = $dbTools->query("SELECT `has_discount`,`free_modem`,`free_router`,`free_adapter`,`free_installation`,`free_transfer`,`full_name` FROM `customers` WHERE `customer_id`='" . $reseller_id . "'");
+$reseller = $dbTools->query("SELECT `discount_expire_date`,`has_discount`,`free_modem`,`free_router`,`free_adapter`,`free_installation`,`free_transfer`,`full_name` FROM `customers` WHERE `customer_id`='" . $reseller_id . "'");
 $reseller_row=$dbTools->fetch_assoc($reseller);
+
+$today_date = new DateTime();
+$discount_expire_date=(isset($reseller_row['discount_expire_date']) && strlen($reseller_row['discount_expire_date'])>0)?$reseller_row['discount_expire_date']:$today_date->format('Y-m-d');
 
 $products = $dbTools->query("SELECT * FROM `products` INNER JOIN `reseller_discounts` on `products`.`product_id`=`reseller_discounts`.`product_id` WHERE `reseller_discounts`.`reseller_id`='" . $reseller_id . "'");
 
@@ -103,6 +117,16 @@ else if(isset($query_result) && !$query_result)
 <form id="discount_form" action="#" method="POST">
   <p class="rounded  form-row form-row-wide custom_installation-date  ">
   <div class="panel panel-primary installation">
+      <div class="panel-heading">Discount Expire date</div>
+      <div class="panel-body">
+        <div class="date4" style="width: 30%">
+          Expire Date : <input name="discount_expire_date"  readonly="" value="<?=$discount_expire_date?>" class="form-control datepicker" >
+        </div>
+      </div>
+    </div>
+  </p>
+  <p class="rounded  form-row form-row-wide custom_installation-date  ">
+  <div class="panel panel-primary installation">
       <div class="panel-heading">Services</div>
       <div class="panel-body">
           <div class="checkbox">
@@ -120,6 +144,7 @@ else if(isset($query_result) && !$query_result)
           <div class="checkbox">
             <label><input type="checkbox" name="services[free_transfer]" value="yes" <?=$reseller_row['free_transfer']==='yes'?"checked":""?>>Free Transfer fees</label>
           </div>
+
         </div>
     </div>
 

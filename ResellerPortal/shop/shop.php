@@ -2,14 +2,34 @@
 include_once "../header.php";
 $dbTools->query("SET CHARACTER SET utf8");
 
-$reseller = $dbTools->query("SELECT `has_discount`,`free_modem`,`free_router`,`free_adapter`,`free_installation`,`free_transfer`,`full_name` FROM `customers` WHERE `customer_id` = '" . $reseller_id . "'");
+$reseller = $dbTools->query("SELECT `discount_expire_date`,`has_discount`,`free_modem`,`free_router`,`free_adapter`,`free_installation`,`free_transfer`,`full_name` FROM `customers` WHERE `customer_id` = '" . $reseller_id . "'");
 $reseller_row=$dbTools->fetch_assoc($reseller);
-$has_discount= ($reseller_row['has_discount']==="yes"?TRUE:FALSE);
-$free_modem= ($reseller_row['free_modem']==="yes"?TRUE:FALSE);
-$free_router= ($reseller_row['free_router']==="yes"?TRUE:FALSE);
-$free_adapter= ($reseller_row['free_adapter']==="yes"?TRUE:FALSE);
-$free_installation= ($reseller_row['free_installation']==="yes"?TRUE:FALSE);
-$free_transfer= ($reseller_row['free_transfer']==="yes"?TRUE:FALSE);
+
+$today_date = new DateTime();
+$discount_expire_date=(isset($reseller_row['discount_expire_date']) && strlen($reseller_row['discount_expire_date'])>0)?new DateTime($reseller_row['discount_expire_date']):new DateTime($today_date->format('Y-m-d'));
+$discount_days_remaining=0;
+if($discount_expire_date>$today_date)
+$discount_days_remaining=$discount_expire_date->diff($today_date)->days;
+
+if($discount_days_remaining>0)
+{
+  $has_discount= ($reseller_row['has_discount']==="yes"?TRUE:FALSE);
+  $free_modem= ($reseller_row['free_modem']==="yes"?TRUE:FALSE);
+  $free_router= ($reseller_row['free_router']==="yes"?TRUE:FALSE);
+  $free_adapter= ($reseller_row['free_adapter']==="yes"?TRUE:FALSE);
+  $free_installation= ($reseller_row['free_installation']==="yes"?TRUE:FALSE);
+  $free_transfer= ($reseller_row['free_transfer']==="yes"?TRUE:FALSE);
+
+}
+else {
+  $has_discount= FALSE;
+  $free_modem= FALSE;
+  $free_router= FALSE;
+  $free_adapter= FALSE;
+  $free_installation= FALSE;
+  $free_transfer= FALSE;
+
+}
 
 
 $products = $dbTools->query("SELECT * FROM `products` INNER JOIN `reseller_discounts` on `products`.`product_id`=`reseller_discounts`.`product_id` WHERE `reseller_discounts`.`reseller_id`='" . $reseller_id . "' and `products`.`product_id` NOT IN ('699','700')");
@@ -79,6 +99,15 @@ while($products_row=$dbTools->fetch_assoc($products))
 
             </div>
             <div id="step-2" class="">
+
+              <?PHP
+              if($discount_days_remaining>0){?>
+                <div class="alert alert-warning alert-dismissible fade in" role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span>
+                    </button>
+                    Your offer discount will ends after  <strong><?= $discount_days_remaining?></strong>
+                  </div>
+              <?PHP }?>
                 <div class="internet">
                     <div class="row" style="width:100% !important;">
                         <div class="col-sm-12" >
