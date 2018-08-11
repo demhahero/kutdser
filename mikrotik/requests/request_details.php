@@ -11,13 +11,18 @@ $query = "SELECT `request_id`, reseller.`customer_id`, `admins`.`username`
 ,reseller.`full_name`, `requests`.`order_id`, `creation_date`, `action`,
  `action_value`,`admins`.`admin_id`, `verdict`, `verdict_date`, `action_on_date`,
  `product_price`, `requests`.`note`, `product_title`, `product_category`,
- `product_subscription_type`, `modem_mac_address`, `modem_id`,`requests`.`city`,`requests`.`address_line_1`,`requests`.`address_line_2`,`requests`.`postal_code`
+ `product_subscription_type`, `modem_mac_address`, `requests`.`modem_id`,`requests`.`city`,`requests`.`address_line_1`,`requests`.`address_line_2`,`requests`.`postal_code`,
+ `modems`.`mac_address`
 FROM `requests`
 INNER JOIN `customers` as reseller on `reseller`.`customer_id`= `requests`.`reseller_id`
+LEFT JOIN `modems` on `requests`.`modem_id`=`modems`.`modem_id`
 LEFT JOIN `admins` on `admins`.`admin_id`=`requests`.`admin_id`
 WHERE `request_id`=" . $request_id;
+
 $request = $dbTools->query($query);
 $request_row = $dbTools->fetch_assoc($request);
+
+$request_modem_mac_address=(strlen($request_row["modem_mac_address"])>0?$request_row["modem_mac_address"]:$request_row["mac_address"]);
 
 /// get request's order info
 $request_order_query = "SELECT *,`customers`.`full_name` FROM `orders`
@@ -44,15 +49,19 @@ $last_request_query = "SELECT `request_id`, reseller.`customer_id`, `admins`.`us
 ,reseller.`full_name`, `requests`.`order_id`, `creation_date`, `action`,
  `action_value`,`admins`.`admin_id`, `verdict`, `verdict_date`, `action_on_date`,
  `product_price`, `requests`.`note`, `product_title`, `product_category`,
- `product_subscription_type`, `modem_mac_address`,`requests`.`city`,`requests`.`address_line_1`,`requests`.`address_line_2`,`requests`.`postal_code`
+ `product_subscription_type`, `modem_mac_address`,`requests`.`city`,`requests`.`address_line_1`,`requests`.`address_line_2`,`requests`.`postal_code`,
+ `modems`.`mac_address`
 FROM `requests`
 INNER JOIN `customers` as reseller on `reseller`.`customer_id`= `requests`.`reseller_id`
+LEFT JOIN `modems` on `requests`.`modem_id`=`modems`.`modem_id`
 LEFT JOIN `admins` on `admins`.`admin_id`=`requests`.`admin_id`
 
 WHERE `requests`.`order_id`=" . $request_row['order_id'] . " and `requests`.`action_on_date` < N'" . $request_row['action_on_date'] . "' and verdict='approve' ORDER BY action_on_date DESC LIMIT 1";
 
 $last_request = $dbTools->query($last_request_query);
 $last_request_row = $dbTools->fetch_assoc($last_request);
+
+$last_request_modem_mac_address=(strlen($last_request_row["modem_mac_address"])>0?$last_request_row["modem_mac_address"]:$last_request_row["mac_address"]);
 
 
 $product_price = $request_order_row['product_price'];
@@ -213,7 +222,7 @@ if ($request_row["verdict"] == "") {
                             </td>
                             <td class=" bg-success">Modem Mac Address:</td>
                             <td>
-                                <?= $request_row['modem_mac_address'] ?>
+                                <?= $request_modem_mac_address ?>
                             </td>
                             <td class=" bg-success">Note:</td>
                             <td>
@@ -492,7 +501,7 @@ if ($request_row["verdict"] == "") {
                         <tr>
                             <td class=" bg-success">Modem Mac Address:</td>
                             <td>
-                                <?= $last_request_row['modem_mac_address'] ?>
+                                <?= $last_request_modem_mac_address ?>
                             </td>
                             <td class=" bg-success">Note:</td>
                             <td>
