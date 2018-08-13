@@ -49,7 +49,7 @@ $last_request_query = "SELECT `request_id`, reseller.`customer_id`, `admins`.`us
 ,reseller.`full_name`, `requests`.`order_id`, `creation_date`, `action`,
  `action_value`,`admins`.`admin_id`, `verdict`, `verdict_date`, `action_on_date`,
  `product_price`, `requests`.`note`, `product_title`, `product_category`,
- `product_subscription_type`, `modem_mac_address`,`requests`.`city`,`requests`.`address_line_1`,`requests`.`address_line_2`,`requests`.`postal_code`,
+ `product_subscription_type`, `modem_mac_address`, `requests`.`modem_id`,`requests`.`city`,`requests`.`address_line_1`,`requests`.`address_line_2`,`requests`.`postal_code`,
  `modems`.`mac_address`
 FROM `requests`
 INNER JOIN `customers` as reseller on `reseller`.`customer_id`= `requests`.`reseller_id`
@@ -189,11 +189,16 @@ if ($request_row["verdict"] == "") {
                 <table class="display table table-striped table-bordered">
                     <?PHP
                     if (sizeof($request_row) > 0) {
+                      $action=$request_row['action'] ;
+                      if($request_row['action'] ==="change_speed" && is_numeric($request_row["modem_id"]) && (int)$request_row["modem_id"] >0)
+                      {
+                        $action="swap modem and change speed";
+                      }
                         ?>
                         <tr>
                             <td class=" bg-success">Action:</td>
                             <td>
-                                <?= $request_row['action'] ?>
+                                <?= $action ?>
                             </td>
 
                             <td class=" bg-success">Action On Date:</td>
@@ -464,11 +469,16 @@ if ($request_row["verdict"] == "") {
                 <table class="display table table-striped table-bordered">
                     <?PHP
                     if (sizeof($last_request_row) > 0) {
+                      $last_action=$last_request_row['action'] ;
+                      if($last_request_row['action'] ==="change_speed" && is_numeric($last_request_row["modem_id"]) && (int)$last_request_row["modem_id"] >0)
+                      {
+                        $last_action="swap modem and change speed";
+                      }
                         ?>
                         <tr>
                             <td class=" bg-success">Action:</td>
                             <td>
-                                <?= $last_request_row['action'] ?>
+                                <?= $last_action ?>
                             </td>
 
                             <td class=" bg-success">Action On Date:</td>

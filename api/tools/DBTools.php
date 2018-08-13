@@ -3393,7 +3393,17 @@ $customers = $this->query("SELECT customers.customer_id,resellers.customer_id as
              $request = array();
             foreach ($fields as $key => $value)
             {
+              if($key==="action")
+              {
                 $request[$key] = $request_row[$value];
+                if($request_row[$value]==="change_speed" && strlen($request_row["modem_id"])>0)
+                {
+                  $request[$key]="swap modem and change speed";
+                }
+              }
+              else{
+                $request[$key] = $request_row[$value];
+              }
             }
             if ($child != null) {
                 $requestChildArray = array();

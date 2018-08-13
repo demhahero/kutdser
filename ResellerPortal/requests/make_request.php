@@ -45,24 +45,33 @@ if (isset($_POST["action"])) {
             format: 'mm/dd/yyyy',
             startDate: '+' + fistDayInstallation + 'd'
         });
-        
+
         $(".moving-field").hide();
+        $(".swap-change").hide();
         $("select[name=\"action\"]").change(function () {
-            if (this.value == "change_speed") {
+
+          var data_value=$(this).find(':selected').data('value');
+
+            if (data_value == "change_speed") {
                 $(".action-value").show();
             } else {
                 $(".action-value").hide();
             }
-            if (this.value == "moving") {
+            if (data_value == "moving") {
                 $(".moving-field").show();
             } else {
                 $(".moving-field").hide();
             }
 
-            if (this.value == "swap_modem") {
+            if (data_value == "swap_modem") {
                 $(".swap-modem").show();
             } else {
                 $(".swap-modem").hide();
+            }
+            if (data_value == "swap_change_speed") {
+                $(".swap-change").show();
+            } else {
+                $(".swap-change").hide();
             }
         });
 
@@ -146,10 +155,11 @@ if (isset($_POST["action"])) {
     <div class="form-group">
         <label>Action:</label>
         <select name="action" class="form-control">
-            <option value="change_speed">Change speed</option>
-            <option value="moving">Moving</option>
-            <option value="terminate">Terminate</option>
-            <option value="swap_modem">Swap Modem</option>
+            <option data-value="change_speed" value="change_speed">Change speed</option>
+            <option data-value="swap_modem" value="swap_modem">Swap Modem</option>
+            <option data-value="swap_change_speed" value="change_speed">Swap Modem and Change speed</option>
+            <option data-value="moving" value="moving">Moving</option>
+            <option data-value="terminate" value="terminate">Terminate</option>
         </select>
     </div>
     <div class="form-group">
@@ -181,9 +191,14 @@ if (isset($_POST["action"])) {
         <select name="product_id" class="product-list form-control">
         </select>
     </div>
-    <div class="form-group action-value">
+    <div class="form-group swap-change">
+        <label>Speed:</label>
+        <select name="product_id" class="product-list form-control">
+        </select>
+    </div>
+    <div class="form-group swap-change">
         <label>New Modem Mac Address (optional):</label>
-        
+
         <select name="modem_id" class="form-control">
             <option value="0" selected>Select Modem</option>
             <?php
