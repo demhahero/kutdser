@@ -28,7 +28,7 @@ include_once "../header.php";
         ?>
         <tr>
             <td style="width: 5%;"><?=$customer['customer_id']?></td>
-            <td style="width: 40%;"><a href="<?=$site_url?>/edit_customer.php?customer_id=<?=$customer['customer_id']?>"><?=$customer['full_name']?></a></td>
+            <td style="width: 40%;"><a href="<?=$site_url?>/customers/edit_reseller.php?customer_id=<?=$customer['customer_id']?>"><?=$customer['full_name']?></a></td>
             <td style="width: 15%;"><?=$customer['phone']?></td>
             <td style="width: 25%;"><?=$customer['email']?></td>
             <td style="width: 5%;">
