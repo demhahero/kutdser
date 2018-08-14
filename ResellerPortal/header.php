@@ -50,8 +50,8 @@ include_once "dbconfig.php";
                 <div id="navbar" class="navbar-collapse collapse">
                     <ul class="nav navbar-nav">
                         <li><a href="<?= $site_url ?>/customers.php">Customers</a></li>
-                        <li><a href="<?= $site_url ?>/my_resellers.php">My Resellers</a></li>	
-                        <li><a href="<?= $site_url ?>/notes.php">Notes</a></li>	
+                        <li><a href="<?= $site_url ?>/my_resellers.php">My Resellers</a></li>
+                        <li><a href="<?= $site_url ?>/notes.php">Notes</a></li>
 
                     </ul>
                     <ul class="nav navbar-nav navbar-right">
@@ -73,11 +73,12 @@ include_once "dbconfig.php";
                 </div>
                 <div id="navbar" class="navbar-collapse collapse">
                     <ul class="nav navbar-nav">
-                        <li><a href="<?= $site_url ?>/customers/customers.php">Customers</a></li>	
+                        <li><a href="<?= $site_url ?>/customers/customers.php">Customers</a></li>
                         <li><a href="<?= $site_url ?>/orders/orders.php">Orders</a></li>
                         <li><a href="<?= $site_url ?>/shop/shop.php">Shop</a></li>
                         <li><a href="<?= $site_url ?>/requests/requests.php">Requests</a></li>
                         <li><a href="<?= $site_url ?>/customers/my_resellers.php">My Resellers</a></li>
+                        <li><a href="<?= $site_url ?>/customers/statistics.php">Statistics</a></li>
                     </ul>
                     <ul class="nav navbar-nav navbar-right">
                         <li><a  style="color:red" href="#">Hello "<?= $username; ?>"</a></li>
