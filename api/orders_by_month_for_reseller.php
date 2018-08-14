@@ -16,7 +16,17 @@ if (
     $year = $_GET['year'];
     $month = $_GET['month'];
 
-    $getCustomers = $dbTools->query("SELECT full_name,customer_id from customers where reseller_id=" . $reseller_id);
+    $getReseller = $dbTools->query("SELECT full_name,customer_id,reseller_commission_percentage from customers where customer_id=" . $reseller_id);
+
+    $reseller = array();
+    while ($reseller_row = $dbTools->fetch_assoc($getReseller)) {
+      $reseller["customer_id"] = $reseller_row["customer_id"];
+      $reseller["full_name"] = $reseller_row["full_name"];
+      $reseller["reseller_commission_percentage"] = $reseller_row["reseller_commission_percentage"];
+
+    }
+
+    $getCustomers = $dbTools->query("SELECT full_name,customer_id,reseller_commission_percentage from customers where reseller_id=" . $reseller_id);
 
     $start_active_date = null;
     $customers = array();
@@ -24,6 +34,7 @@ if (
         $customer = array();
         $customer["customer_id"] = $customer_row["customer_id"];
         $customer["full_name"] = $customer_row["full_name"];
+        $customer["reseller_commission_percentage"] = $customer_row["reseller_commission_percentage"];
 
         //$orders = $dbTools->orders_by_month($customer_row["customer_id"], $year, $month);
         $ordersMonthly=$dbTools->orders_by_month($customer_row["customer_id"], $year, $month);
@@ -34,9 +45,9 @@ if (
 
         array_push($customers, $customer);
     }
-
+    $json_reseller = json_encode($reseller);
     $json = json_encode($customers);
-    echo "{\"customers\" :", $json, ",\"error\" :null}";
+    echo "{\"reseller\" :", $json_reseller, ",\"customers\" :", $json, ",\"error\" :null}";
 } else {
     echo "{\"customers\" :null,\"error\" :\"invalid params\"}";
 }

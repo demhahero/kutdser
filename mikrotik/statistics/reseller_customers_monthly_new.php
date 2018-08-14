@@ -7,6 +7,12 @@ $year=isset($_GET["year"])?$_GET["year"]:2018;
 
 <script>
     $(document).ready(function () {
+      var tableDetailsTag=$('#resellerTableDetails');
+
+      var tableDetails=tableDetailsTag.DataTable({"pageLength": 14,"ordering": false});
+        $('.dataTables_empty').html('<div class="loader"></div>');
+
+      var customersData=[];
       var tableTag=$('#resellerTable');
       var table=tableTag.DataTable( {
         "drawCallback": function( settings ) {
@@ -25,9 +31,9 @@ $year=isset($_GET["year"])?$_GET["year"]:2018;
           //console.log(row);
           //console.log(data);
           //console.log(index);
-          $('td', row).eq(8).addClass('bg-success');
-          $('td', row).eq(10).addClass('bg-warning');
-          $('td', row).eq(11).addClass('bg-danger');
+          $('td', row).eq(5).addClass('bg-success');
+          $('td', row).eq(7).addClass('bg-warning');
+          $('td', row).eq(8).addClass('bg-danger');
         }
     } );
         $('.dataTables_empty').html('<div class="loader"></div>');
@@ -109,27 +115,92 @@ $year=isset($_GET["year"])?$_GET["year"]:2018;
                               if(discountText.length===0){
                                 tooltipTex="";
                               }
-                              totalWoR+= parseFloat(monthInfo["total_price_with_out_router"]);
+
+                              var total_commission_base_amount_long=parseFloat(monthInfo["total_price_with_out_router"]-(monthInfo["total_price_with_out_router"]*(result['reseller']["reseller_commission_percentage"]/100)));
+                              total_commission_base_amount=total_commission_base_amount_long.toFixed(2);
+
+                              totalWoR+= parseFloat(total_commission_base_amount);
                     					total+= parseFloat(monthInfo["total_price_with_out_tax"]);
                     					totalWT+= parseFloat(monthInfo["total_price_with_tax_p7"]);
                               var join_type=(field['cable_subscriber']==='yes')?"transfer":"new";
+
+
+                              customersData[customers['customer_id']]=[];
+                              customersData[customers['customer_id']].push({
+                                name:"ID",
+                                value:customers['customer_id']
+                              });
+                              customersData[customers['customer_id']].push({
+                                name:"Full Name",
+                                value:customers['full_name']
+                              });
+                              customersData[customers['customer_id']].push({
+                                name:"Product",
+                                value:product_title
+                              });
+                              customersData[customers['customer_id']].push({
+                                name:"Payment Method",
+                                value:field['payment_method']
+                              });
+                              customersData[customers['customer_id']].push({
+                                name:"Start Date",
+                                value:field['start_active_date']
+                              });
+                              customersData[customers['customer_id']].push({
+                                name:"Join Type",
+                                value:join_type
+                              });
+                              customersData[customers['customer_id']].push({
+                                name:"Recurring Start Date",
+                                value:field['recurring_date']
+                              });
+                              customersData[customers['customer_id']].push({
+                                name:"Product Price",
+                                value:product_price
+                              });
+                              customersData[customers['customer_id']].push({
+                                name:"Commission Base Amount",
+                                value:monthInfo["total_price_with_out_router"]
+                              });
+                              customersData[customers['customer_id']].push({
+                                name:"Reseller Commission percentage",
+                                value:result['reseller']["reseller_commission_percentage"]+"%"
+                              });
+                              customersData[customers['customer_id']].push({
+                                name:"Total Commission Base Amount",
+                                value:total_commission_base_amount
+                              });
+                              customersData[customers['customer_id']].push({
+                                name:"Type",
+                                value:monthInfo["action"]+tooltipTex
+                              });
+                              customersData[customers['customer_id']].push({
+                                name:"Subtotal",
+                                value:monthInfo["total_price_with_out_tax"]
+                              });
+                              customersData[customers['customer_id']].push({
+                                name:"Total With Tax",
+                                value:monthInfo["total_price_with_tax_p7"]
+                              });
+
+
                               table.row.add([
+
                                   customers['customer_id']+
                                   '<a target="_blank" href="<?=$site_url?>/orders/print_order.php?order_id='
                                           + field["order_id"] + '" class="btn btn-primary btn-xs"><i class="fa fa-print"></i> Print </a>'
                                   ,
                                   customers['full_name'],
                                   product_title,
-                                  field['payment_method'],
-                                  field['start_active_date'],
-                                  join_type,
-                                  field['recurring_date'],
                                   product_price,
                                   monthInfo["total_price_with_out_router"],
+                                  total_commission_base_amount,
                                   monthInfo["action"]+tooltipTex,
                                   monthInfo["total_price_with_out_tax"],
-                                  monthInfo["total_price_with_tax_p7"]
+                                  monthInfo["total_price_with_tax_p7"],
+                                  '<a data-id="'+customers['customer_id']+'" type="button" class="btn btn-primary openPopup" >Details</a>'
                               ]).draw(false);
+
 
                               if(join_type==='new' && monthInfo["action"].includes('order'))
                               {
@@ -165,6 +236,7 @@ $year=isset($_GET["year"])?$_GET["year"]:2018;
                 });
 
                 });
+
                 var MyMessageBottom='Total Commission base amount :'+totalWoR.toFixed(2)+'$, '
 
       							+'Total Price for subtotal :'+total.toFixed(2)+'$, '
@@ -178,10 +250,15 @@ $year=isset($_GET["year"])?$_GET["year"]:2018;
                                         exportOptions: {
                                             format: {
                                                 body: function ( data, row, column, node ) {
-
-                                                    return column === 0 ?
-                                                        data.substr(0, data.indexOf('<')) :
-                                                        data;
+                                                  customeData=data;
+                                                    if(column === 0)
+                                                    {
+                                                      customeData=data.substr(0, data.indexOf('<'));
+                                                    }
+                                                    else if(column === 9){
+                                                      customeData="";
+                                                    }
+                                                    return customeData;
                                                 }
                                             }
                                         }
@@ -215,14 +292,26 @@ $year=isset($_GET["year"])?$_GET["year"]:2018;
                     //console.log(row);
                     //console.log(data);
                     //console.log(index);
-                    $('td', row).eq(8).addClass('bg-success');
-                    $('td', row).eq(10).addClass('bg-warning');
-                    $('td', row).eq(11).addClass('bg-danger');
+                    $('td', row).eq(5).addClass('bg-success');
+                    $('td', row).eq(7).addClass('bg-warning');
+                    $('td', row).eq(8).addClass('bg-danger');
                   }
               }
                 tableTag.DataTable().destroy()
                 tableTag.DataTable(tableOptions);
+                $('.openPopup').click(function() {
+                  $('#myModal').modal({show:true});
 
+                  var customer_id = $(this).attr('data-id');
+                  tableDetails.clear().draw();
+                  customersData[customer_id].map((item)=>{
+                    tableDetails.row.add([
+                        item.name,
+                        item.value
+                    ]).draw(false);
+                  })
+
+                });
                 ////////////// add total prices for Commission base, all orders with tax and subtotal
       					$("#totalTable").append('<tr>'
 
@@ -315,18 +404,17 @@ $year=isset($_GET["year"])?$_GET["year"]:2018;
 <br><br>
 <table id="resellerTable" class="display table table-striped table-bordered">
     <thead>
-    <th style="width:5%">ID</th>
-    <th style="width:25%">Full Name</th>
-    <th style="width:15%">Product</th>
-    <th style="width:10%">Payment Method</th>
-    <th style="width:10%">Start Date</th>
-    <th style="width:5%">Join Type</th>
-    <th style="width:10%">Recurring Start</th>
-    <th style="width:5%">Product Price</th>
-    <th style="width:5%">Commission base amount</th>
-    <th style="width:5%">Type</th>
-    <th style="width:5%">Subtotal</th>
-    <th style="width:5%">total with Tax </th>
+
+    <th >ID</th>
+    <th >Full Name</th>
+    <th >Product</th>
+    <th >Product Price</th>
+    <th >Commission base amount</th>
+    <th >Total Commission base amount</th>
+    <th >Type</th>
+    <th >Subtotal</th>
+    <th >total with Tax </th>
+    <th >More Info</th>
 </thead>
 <tbody>
 
@@ -340,7 +428,35 @@ $year=isset($_GET["year"])?$_GET["year"]:2018;
 <p id="total_price_with_out_tax"></p>
 <p id="total_price_with_tax_p7"></p>
 
+<div id="myModal" class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-hidden="true" style="display: none;">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
 
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
+        </button>
+        <h4 class="modal-title" id="myModalLabel">More details</h4>
+      </div>
+      <div class="modal-body">
+        <table id="resellerTableDetails" class="display table table-striped table-bordered">
+            <thead>
+            <th style="width:5%">Name</th>
+            <th style="width:5%">Value</th>
+        </thead>
+        <tbody>
+
+
+        </tbody>
+        </table>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+
+      </div>
+
+    </div>
+  </div>
+</div>
 <?php
 //echo "Total without tax:" . number_format((float) $total_without_tax, 2, '.', '') . "$";
 //echo "<br>";
