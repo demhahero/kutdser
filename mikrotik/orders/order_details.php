@@ -26,6 +26,9 @@ $order = $dbTools->objOrderTools($_GET["order_id"], 2);
 ?>
 <script>
     $(document).ready(function () {
+        table2 = $('#myTable2').DataTable({
+            responsive: true
+        });
         $('.dataTables_empty').html('<div class="loader"></div>');
 
         $.getJSON("<?= $api_url ?>order_api.php?order_id=<?= $_GET["order_id"] ?>", function (result) {
@@ -60,41 +63,62 @@ $order = $dbTools->objOrderTools($_GET["order_id"], 2);
                         $(".subscription-card-ref").html("CARD_" + field['merchantref'][0]["merchantref"]);
                         $(".subscription-payment-ref").html("P_" + field['merchantref'][0]["merchantref"]);
                     });
-                });
+        });
 
+        $.getJSON("<?= $api_url ?>customer_log_api.php?customer_id=<?= $order->getCustomer()->getCustomerID(); ?>", function (result) {
 
-
-
-                $.getJSON("<?= $api_url ?>customer_log_api.php?customer_id=<?= $order->getCustomer()->getCustomerID(); ?>", function (result) {
-
-                            $.each(result['customer_logs'], function (i, field) {
-                                table.row.add([
-                                    field['customer_log_id'],
-                                    field['note'],
-                                    field['log_date'],
-                                    field['admin'][0]['username']
-                                ]).draw(false);
-                            });
-                        });
-
-                        $(".submit").click(function () {
-<?php
-$dt = new DateTime();
-?>
-                            var customer_id = "<?= $order->getCustomer()->getCustomerID(); ?>";
-                            var log_date = "<?= $dt->format("Y-m-d H:i:s") ?>";
-                            var note = $("textarea[name=\"note\"]").val();
-                            $.post("<?= $api_url ?>customer_log_api.php", {customer_id: customer_id, log_date: log_date, note: note, type: "general", completion: "1", admin_id: '<?= $admin_id ?>'}, function (data, status) {
-                                data = $.parseJSON(data);
-                                if (data.inserted == true) {
-                                    alert("Log inserted");
-                                    location.reload();
-                                } else
-                                    alert("Error, try again");
-                            });
-                            return false;
-                        });
+                    $.each(result['customer_logs'], function (i, field) {
+                        table.row.add([
+                            field['customer_log_id'],
+                            field['note'],
+                            field['log_date'],
+                            field['admin'][0]['username']
+                        ]).draw(false);
                     });
+        });
+                        
+        $.getJSON("<?= $api_url ?>customer_requests_api.php?order_id=<?= $_GET["order_id"] ?>", function (result) {
+
+                    $.each(result['requests'], function (i, field) {
+                        action_on_date="";
+                        if(field['action_on_date'] != null){
+                            action_on_date = field['action_on_date'].split(' ');
+                            action_on_date = action_on_date[0];
+                        }
+                        table2.row.add([
+                            '<a href="request_details.php?request_id='+field['request_id']+'" >'+field['request_id']+'</a>',
+                            field['order']["0"]["order_id"],
+                            field['customer']["0"]["full_name"],
+                            field['reseller']["0"]["full_name"],
+                            field['action'],
+                            field['product_title'],
+                            action_on_date,
+                            field['creation_date'],
+                            field['verdict'],
+                            field['admin']["0"]["username"]
+                        ]).draw(false);
+                    });
+        });
+                
+                
+        $(".submit").click(function () {
+            <?php
+            $dt = new DateTime();
+            ?>
+            var customer_id = "<?= $order->getCustomer()->getCustomerID(); ?>";
+            var log_date = "<?= $dt->format("Y-m-d H:i:s") ?>";
+            var note = $("textarea[name=\"note\"]").val();
+            $.post("<?= $api_url ?>customer_log_api.php", {customer_id: customer_id, log_date: log_date, note: note, type: "general", completion: "1", admin_id: '<?= $admin_id ?>'}, function (data, status) {
+                data = $.parseJSON(data);
+                if (data.inserted == true) {
+                    alert("Log inserted");
+                    location.reload();
+                } else
+                    alert("Error, try again");
+            });
+            return false;
+        });
+    });
 </script>
 <title>Order <?= $order->getOrderID(); ?>'s details</title>
 <div class="page-header">
@@ -378,6 +402,30 @@ $dt = new DateTime();
             </div>
             <input type="submit" class="btn btn-default submit"  value="Send">
         </form>
+    </div>
+</div>
+
+
+<div class="panel panel-success">
+    <div class="panel-heading">Requests</div>
+    <div class="panel-body">
+        <table id="myTable2" class="display table table-striped table-bordered">
+            <thead>
+                <th style="width: 5%;">ID</th>
+                <th style="width: 10%;">Order</th>
+                <th style="width: 15%;">Customer</th>
+                <th style="width: 15%;">Reseller</th>
+                <th style="width: 5%;">Action</th>
+                <th style="width: 5%;">Product title</th>
+                <th style="width: 10%;">Action on Date</th>
+                <th style="width: 15%;">Date</th>
+                <th style="width: 10%;">Verdict</th>
+                <th style="width: 10%;">Admin</th>
+            </thead>
+            <tbody>
+
+            </tbody>
+        </table>
     </div>
 </div>
 <?php

@@ -42,7 +42,7 @@ INNER JOIN `customers` resellers on resellers.`customer_id` = requests.reseller_
 INNER JOIN orders on orders.order_id = requests.order_id
 INNER JOIN customers on customers.customer_id=orders.customer_id
 left JOIN admins on requests.admin_id = admins.admin_id
-ORDER BY requests.request_id"
+Where orders.`order_id` = '".$_GET['order_id']."' ORDER BY requests.request_id "
         , $fields
         , $child, $childFields
         , $child2, $child2Fields
