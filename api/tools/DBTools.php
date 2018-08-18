@@ -1265,8 +1265,10 @@ return $customers;
 
 			$orderChild = array();
       $order_row["order_id"]=$order_row["id"];
-      if ((int) $order_row["order_id"] > 10380)
-          $order_row["order_id"] = (((0x0000FFFF & (int) $order_row["order_id"]) << 16) + ((0xFFFF0000 & (int) $order_row["order_id"]) >> 16));
+      $orderChild["displayed_order_id"]=$order_row["order_id"];
+      $order_id=$order_row["order_id"];
+      if ((int) $order_id > 10380)
+          $orderChild["displayed_order_id"] = (((0x0000FFFF & (int) $order_id) << 16) + ((0xFFFF0000 & (int) $order_id) >> 16));
 
 			$orderChild["order_id"]=$order_row["order_id"];
       /// discount fields
@@ -1735,37 +1737,37 @@ return $customers;
 							if($requests[$i]["action"]==="terminate"){
 								$periodPriceCurrent=0;
 							}
-							$orderChild = array();
-							$orderChild["beginDate"] = $requests[$i-1]["action_on_date"];
-							$orderChild["endDate"]=$requests[$i]["action_on_date"];
+							$orderChildTemp = array();
+							$orderChildTemp["beginDate"] = $requests[$i-1]["action_on_date"];
+							$orderChildTemp["endDate"]=$requests[$i]["action_on_date"];
 
-							$orderChild["daysPrevious"]=$periodInDaysPrevious;
-							$orderChild["daysCurrent"]=$periodInDaysCurrent;
+							$orderChildTemp["daysPrevious"]=$periodInDaysPrevious;
+							$orderChildTemp["daysCurrent"]=$periodInDaysCurrent;
 
-							$orderChild["pricePrevious"]=$periodPricePrevious;
-							$orderChild["priceCurrent"]=$periodPriceCurrent;
+							$orderChildTemp["pricePrevious"]=$periodPricePrevious;
+							$orderChildTemp["priceCurrent"]=$periodPriceCurrent;
 
-							$orderChild["pricePreviousActual"]=$requests[$i-1]["product_price"];
-							$orderChild["priceCurrentActual"]=$requests[$i]["product_price"];
+							$orderChildTemp["pricePreviousActual"]=$requests[$i-1]["product_price"];
+							$orderChildTemp["priceCurrentActual"]=$requests[$i]["product_price"];
 
 							if($i+1===sizeof($requests))
-								$orderChild["priceDifference"]=0;
+								$orderChildTemp["priceDifference"]=0;
 							else
-								$orderChild["priceDifference"]=$periodPriceCurrent-((float)$requests[$i-1]["product_price"]-$periodPricePrevious);
+								$orderChildTemp["priceDifference"]=$periodPriceCurrent-((float)$requests[$i-1]["product_price"]-$periodPricePrevious);
 
-							$orderChild["action_previous"]=$requests[$i-1]["action"];
-							$orderChild["action_current"]=$requests[$i]["action"];
+							$orderChildTemp["action_previous"]=$requests[$i-1]["action"];
+							$orderChildTemp["action_current"]=$requests[$i]["action"];
 
-							$orderChild["product_title_previous"]=$requests[$i-1]["product_title"];
-							$orderChild["product_title_current"]=$requests[$i]["product_title"];
+							$orderChildTemp["product_title_previous"]=$requests[$i-1]["product_title"];
+							$orderChildTemp["product_title_current"]=$requests[$i]["product_title"];
 
-							$orderChild["product_category_previous"]=$requests[$i-1]["product_category"];
-							$orderChild["product_category_current"]=$requests[$i]["product_category"];
+							$orderChildTemp["product_category_previous"]=$requests[$i-1]["product_category"];
+							$orderChildTemp["product_category_current"]=$requests[$i]["product_category"];
 
-							$orderChild["product_subscription_type_previous"]=$requests[$i-1]["product_subscription_type"];
-							$orderChild["product_subscription_type_current"]=$requests[$i]["product_subscription_type"];
+							$orderChildTemp["product_subscription_type_previous"]=$requests[$i-1]["product_subscription_type"];
+							$orderChildTemp["product_subscription_type_current"]=$requests[$i]["product_subscription_type"];
 
-							array_push($productPrices,$orderChild);
+							array_push($productPrices,$orderChildTemp);
 						}
 
 
