@@ -3398,7 +3398,7 @@ $customers = $this->query("SELECT customers.customer_id,resellers.customer_id as
               if($key==="action")
               {
                 $request[$key] = $request_row[$value];
-                if($request_row[$value]==="change_speed" && strlen($request_row["modem_id"])>0)
+                if($request_row[$value]==="change_speed" && is_numeric($request_row["modem_id"])  && (int)$request_row["modem_id"] >0)
                 {
                   $request[$key]="swap modem and change speed";
                 }
