@@ -47,6 +47,8 @@ if (isset($_POST["action"])) {
         });
 
         $(".moving-field").hide();
+        $(".cusotmer-info-field").hide();
+        
         $(".swap-change").hide();
         $("select[name=\"action\"]").change(function () {
 
@@ -63,6 +65,11 @@ if (isset($_POST["action"])) {
                 $(".moving-field").hide();
             }
 
+            if (data_value == "customer_information_modification") {
+                $(".cusotmer-info-field").show();
+            } else {
+                $(".cusotmer-info-field").hide();
+            }
             if (data_value == "swap_modem") {
                 $(".swap-modem").show();
             } else {
@@ -89,7 +96,11 @@ if (isset($_POST["action"])) {
             var address_line_1 = $("input[name=\"address_line_1\"]").val();
             var address_line_2 = $("input[name=\"address_line_2\"]").val();
             var postal_code = $("input[name=\"postal_code\"]").val();
-
+            
+            var full_name = $("input[name=\"full_name\"]").val();
+            var email = $("input[name=\"email\"]").val();
+            var phone = $("input[name=\"phone\"]").val();
+            
             //Swap modem
             var modem_id = $("select[name=\"modem_id\"]").val();
 
@@ -106,6 +117,9 @@ if (isset($_POST["action"])) {
                         address_line_1: address_line_1,
                         address_line_2: address_line_2,
                         postal_code: postal_code,
+                        full_name: full_name,
+                        email: email,
+                        phone: phone,
                         note: note,
                         reseller_id: reseller_id}, function (data, status) {
                 data = $.parseJSON(data);
@@ -160,6 +174,7 @@ if (isset($_POST["action"])) {
             <option data-value="swap_change_speed" value="change_speed">Swap Modem and Change speed</option>
             <option data-value="moving" value="moving">Moving</option>
             <option data-value="terminate" value="terminate">Terminate</option>
+            <option data-value="customer_information_modification" value="customer_information_modification">Customer Information Modification</option>
         </select>
     </div>
     <div class="form-group">
@@ -169,7 +184,6 @@ if (isset($_POST["action"])) {
     <div class="form-group moving-field">
         <label>City:</label>
         <input type="text" name="city" class="form-control"/>
-
     </div>
     <div class="form-group moving-field">
         <label>New Address:</label>
@@ -179,13 +193,26 @@ if (isset($_POST["action"])) {
     <div class="form-group moving-field">
         <label>New Address 2 (optional):</label>
         <input type="text" name="address_line_2" class="form-control"/>
-
     </div>
     <div class="form-group moving-field">
         <label>Postal Code:</label>
         <input type="text" name="postal_code" class="form-control"/>
-
     </div>
+
+    
+    <div class="form-group cusotmer-info-field">
+        <label>Full Name:</label>
+        <input type="text" name="full_name" value="<?=$customer_row["full_name"]?>" class="form-control"/>
+    </div>
+    <div class="form-group cusotmer-info-field">
+        <label>Email:</label>
+        <input type="text" name="email" value="<?=$customer_row["email"]?>" class="form-control"/>
+    </div>
+    <div class="form-group cusotmer-info-field">
+        <label>Phone:</label>
+        <input type="text" name="phone" value="<?=$customer_row["phone"]?>" class="form-control"/>
+    </div>
+
     <div class="form-group action-value">
         <label>Speed:</label>
         <select name="product_id" class="product-list form-control">

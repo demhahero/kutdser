@@ -10,7 +10,7 @@ $request_id = intval($_GET["request_id"]);
 $query = "SELECT `request_id`, reseller.`customer_id`, `admins`.`username`
 ,reseller.`full_name`, `requests`.`order_id`, `creation_date`, `action`,
  `action_value`,`admins`.`admin_id`, `verdict`, `verdict_date`, `action_on_date`,
- `product_price`, `requests`.`note`, `product_title`, `product_category`,
+ `product_price`, `requests`.`note`, `requests`.`full_name`, `requests`.`email`, `requests`.`phone`, `product_title`, `product_category`,
  `product_subscription_type`, `modem_mac_address`, `requests`.`modem_id`,`requests`.`city`,`requests`.`address_line_1`,`requests`.`address_line_2`,`requests`.`postal_code`,
  `modems`.`mac_address`
 FROM `requests`
@@ -22,7 +22,7 @@ WHERE `request_id`=" . $request_id;
 $request = $dbTools->query($query);
 $request_row = $dbTools->fetch_assoc($request);
 
-$request_modem_mac_address=(strlen($request_row["modem_mac_address"])>0?$request_row["modem_mac_address"]:$request_row["mac_address"]);
+$request_modem_mac_address = (strlen($request_row["modem_mac_address"]) > 0 ? $request_row["modem_mac_address"] : $request_row["mac_address"]);
 
 /// get request's order info
 $request_order_query = "SELECT *,`customers`.`full_name` FROM `orders`
@@ -61,7 +61,7 @@ WHERE `requests`.`order_id`=" . $request_row['order_id'] . " and `requests`.`act
 $last_request = $dbTools->query($last_request_query);
 $last_request_row = $dbTools->fetch_assoc($last_request);
 
-$last_request_modem_mac_address=(strlen($last_request_row["modem_mac_address"])>0?$last_request_row["modem_mac_address"]:$last_request_row["mac_address"]);
+$last_request_modem_mac_address = (strlen($last_request_row["modem_mac_address"]) > 0 ? $last_request_row["modem_mac_address"] : $last_request_row["mac_address"]);
 
 
 $product_price = $request_order_row['product_price'];
@@ -94,8 +94,7 @@ if (isset($_POST["verdict"])) {
         $request_result = $dbTools->query($query_update_request);
     } else {
 
-        if (($_POST["action"] === "swap_modem" && $_POST["verdict"] === "approve" )
-            || ($_POST["verdict"] === "approve" && $_POST["action"] === "change_speed" && is_numeric($request_row["modem_id"]) && (int)$request_row["modem_id"] >0)) {
+        if (($_POST["action"] === "swap_modem" && $_POST["verdict"] === "approve" ) || ($_POST["verdict"] === "approve" && $_POST["action"] === "change_speed" && is_numeric($request_row["modem_id"]) && (int) $request_row["modem_id"] > 0)) {
 
             $query_update_request = "update `modems` set `customer_id`='0' "
                     . "where `customer_id`='" . $request_order_row["customer_id"] . "'";
@@ -104,6 +103,13 @@ if (isset($_POST["verdict"])) {
             $query_update_request = "update `modems` set `customer_id`='" . $request_order_row["customer_id"] . "' "
                     . "where `modem_id`='" . $request_row["modem_id"] . "'";
             $request_result = $dbTools->query($query_update_request);
+        } 
+        else if ($_POST["action"] === "customer_information_modification" && $_POST["verdict"] === "approve"){
+            $query_update_request = "update `customers` set `full_name`='".$request_row['full_name']."',"
+                    . " `phone`='".$request_row['phone']."', `email`='".$request_row['email']."' "
+                    . "where `customer_id`='" . $request_order_row["customer_id"] . "'";
+            $request_result = $dbTools->query($query_update_request);
+
         }
 
         $verdict_date = new DateTime();
@@ -126,8 +132,7 @@ if (isset($_POST["verdict"])) {
             if ($order_result) {
                 echo "<script>window.location.href = \"" . $site_url . "/requests/requests.php\";</script>";
             }
-        }
-        else {
+        } else {
             echo "<script>window.location.href = \"" . $site_url . "/requests/requests.php\";</script>";
         }
     }
@@ -165,21 +170,21 @@ if ($request_row["verdict"] == "") {
         ?>
 
         <a target="_blank" href="<?= $site_url ?>/requests/print_request.php?order_id=
-           <?= $request_row["order_id"] ?>" class="btn btn-primary btn-xs"><i class="fa fa-print"></i> Print Invoice </a>
-       <?PHP } ?>
+        <?= $request_row["order_id"] ?>" class="btn btn-primary btn-xs"><i class="fa fa-print"></i> Print Invoice </a>
+       <?php } ?>
     <div>
         <table class="display table table-striped table-bordered">
             <tr>
                 <td>
                     "<?= $request_row["username"] ?>"
-                    <?= $request_row["verdict"] ?>
+    <?= $request_row["verdict"] ?>
                     on
                     <?= $request_row["verdict_date"] ?>
                 </td>
             </tr>
         </table>
     </div>
-<?PHP } ?>
+<?php } ?>
 <div class="row" style="width:100% !important;">
     <div class="col-lg-12 col-md-12 col-sm-12" >
         <p class="rounded form-row form-row-wide">
@@ -187,51 +192,50 @@ if ($request_row["verdict"] == "") {
             <div class="panel-heading">Request Info</div>
             <div class="panel-body">
                 <table class="display table table-striped table-bordered">
-                    <?PHP
-                    if (sizeof($request_row) > 0) {
-                      $action=$request_row['action'] ;
-                      if($request_row['action'] ==="change_speed" && is_numeric($request_row["modem_id"]) && (int)$request_row["modem_id"] >0)
-                      {
-                        $action="swap modem and change speed";
-                      }
-                        ?>
+<?PHP
+if (sizeof($request_row) > 0) {
+    $action = $request_row['action'];
+    if ($request_row['action'] === "change_speed" && is_numeric($request_row["modem_id"]) && (int) $request_row["modem_id"] > 0) {
+        $action = "swap modem and change speed";
+    }
+    ?>
                         <tr>
                             <td class=" bg-success">Action:</td>
                             <td>
-                                <?= $action ?>
+    <?= $action ?>
                             </td>
 
                             <td class=" bg-success">Action On Date:</td>
                             <td>
-                                <?= $request_row['action_on_date'] ?>
+    <?= $request_row['action_on_date'] ?>
                             </td>
                             <td class=" bg-success">Verdict Date:</td>
                             <td >
-                                <?= $request_row['verdict_date'] ?>
+    <?= $request_row['verdict_date'] ?>
                             </td>
 
 
                             <td class=" bg-success">Verdict:</td>
                             <td >
-                                <?= $request_row['verdict'] ?>
+    <?= $request_row['verdict'] ?>
                             </td>
                         </tr>
                         <tr>
                             <td class=" bg-success">Admin:</td>
                             <td>
-                                <?= $request_row['username'] ?>
+    <?= $request_row['username'] ?>
                             </td>
                             <td class=" bg-success">Reseller Name:</td>
                             <td>
-                                <?= $request_row['full_name'] ?>
+    <?= $request_row['full_name'] ?>
                             </td>
                             <td class=" bg-success">Modem Mac Address:</td>
                             <td>
-                                <?= $request_modem_mac_address ?>
+    <?= $request_modem_mac_address ?>
                             </td>
                             <td class=" bg-success">Note:</td>
                             <td>
-                                <?= $request_row['note'] ?>
+    <?= $request_row['note'] ?>
                             </td>
 
 
@@ -240,21 +244,21 @@ if ($request_row["verdict"] == "") {
                         <tr>
                             <td class=" bg-success">Product Name:</td>
                             <td>
-                                <?= $request_row['product_title'] ?>
+    <?= $request_row['product_title'] ?>
                             </td>
                             <td class=" bg-success">Product price:</td>
                             <td>
-                                <?= $request_row['product_price'] ?>
+    <?= $request_row['product_price'] ?>
                             </td>
 
                             <td class=" bg-success">Product Type:</td>
                             <td>
-                                <?= $request_row['product_subscription_type'] ?>
+    <?= $request_row['product_subscription_type'] ?>
                             </td>
 
                             <td class=" bg-success">Product Category:</td>
                             <td>
-                                <?= $request_row['product_category'] ?>
+    <?= $request_row['product_category'] ?>
                             </td>
 
 
@@ -263,31 +267,51 @@ if ($request_row["verdict"] == "") {
                         <tr>
                             <td class=" bg-success">City:</td>
                             <td>
-                                <?= $request_row['city'] ?>
+    <?= $request_row['city'] ?>
                             </td>
                             <td class=" bg-success">Address Line 1:</td>
                             <td>
-                                <?= $request_row['address_line_1'] ?>
+    <?= $request_row['address_line_1'] ?>
                             </td>
 
                             <td class=" bg-success">Address Line 2:</td>
                             <td>
-                                <?= $request_row['address_line_2'] ?>
+    <?= $request_row['address_line_2'] ?>
                             </td>
                             <td class=" bg-success">Postal Code:</td>
                             <td>
-                                <?= $request_row['postal_code'] ?>
+    <?= $request_row['postal_code'] ?>
                             </td>
                         </tr>
-                        <?PHP
-                    } else {
-                        ?>
+
+                        <tr>
+                            <td class=" bg-success">Full Name:</td>
+                            <td>
+    <?= $request_row['full_name'] ?>
+                            </td>
+                            <td class=" bg-success">Email:</td>
+                            <td>
+    <?= $request_row['email'] ?>
+                            </td>
+
+                            <td class=" bg-success">Phone:</td>
+                            <td>
+    <?= $request_row['phone'] ?>
+                            </td>
+                            <td class=" bg-success"></td>
+                            <td>
+
+                            </td>
+                        </tr>
+    <?PHP
+} else {
+    ?>
                         <tr>
                             <td>There are no previous Requests</td>
 
                         </tr>
-                    <?PHP }
-                    ?>
+<?PHP }
+?>
                 </table>
             </div>
         </div>
@@ -304,41 +328,41 @@ if ($request_row["verdict"] == "") {
                     <tr>
                         <td>Customer Name</td>
                         <td>
-                            <?= $request_order_row['full_name'] ?>
+<?= $request_order_row['full_name'] ?>
                         </td>
                     </tr>
                     <tr>
                         <td style="width:20%;">order ID</td>
                         <td><?PHP
-                            if ((int) $request_order_row['order_id'] <= 10380) {
-                                echo $request_order_row['order_id'];
-                            } else {
-                                echo (((0x0000FFFF & (int) $request_order_row['order_id']) << 16) + ((0xFFFF0000 & (int) $request_order_row['order_id']) >> 16));
-                            }
-                            ?></td>
+if ((int) $request_order_row['order_id'] <= 10380) {
+    echo $request_order_row['order_id'];
+} else {
+    echo (((0x0000FFFF & (int) $request_order_row['order_id']) << 16) + ((0xFFFF0000 & (int) $request_order_row['order_id']) >> 16));
+}
+?></td>
                     </tr>
                     <tr>
                         <td>Start Active Date</td>
                         <td>
-                            <?= $start_active_date ?>
+<?= $start_active_date ?>
                         </td>
                     </tr>
                     <tr>
                         <td>Product Type</td>
                         <td>
-                            <?= $request_order_row['product_subscription_type'] ?>
+<?= $request_order_row['product_subscription_type'] ?>
                         </td>
                     </tr>
                     <tr>
                         <td>Product Category</td>
                         <td>
-                            <?= $request_order_row['product_category'] ?>
+<?= $request_order_row['product_category'] ?>
                         </td>
                     </tr>
                     <tr>
                         <td>Product Name</td>
                         <td>
-                            <?= $request_order_row['product_title'] ?>
+<?= $request_order_row['product_title'] ?>
                         </td>
 
                     <tr>
@@ -353,107 +377,107 @@ if ($request_row["verdict"] == "") {
                     <tr>
                         <td>Plan</td>
                         <td>
-                            <?= $request_order_row['plan'] ?>
+<?= $request_order_row['plan'] ?>
                         </td>
                     </tr>
                     <tr>
                         <td>Modem</td>
                         <td>
-                            <?= $request_order_row['modem'] ?>
+<?= $request_order_row['modem'] ?>
                         </td>
                     </tr>
 
                     <tr>
                         <td>Router</td>
                         <td>
-                            <?= $request_order_row['router'] ?>
+<?= $request_order_row['router'] ?>
                         </td>
                     </tr>
-                    <?php
-                    if ($request_order_row['cable_subscriber'] == "yes") {
-                        ?>
+                            <?php
+                            if ($request_order_row['cable_subscriber'] == "yes") {
+                                ?>
                         <tr>
                             <td>Cable subscriber</td>
                             <td>
-                                <?= $request_order_row['cable_subscriber'] ?>
+    <?= $request_order_row['cable_subscriber'] ?>
                             </td>
                         </tr>
                         <tr>
                             <td>Current cable provider</td>
                             <td>
-                                <?= $request_order_row['current_cable_provider'] ?>
+    <?= $request_order_row['current_cable_provider'] ?>
                             </td>
                         </tr>
                         <tr>
                             <td>Cancellation date</td>
                             <td>
-                                <?= $request_order_row['cancellation_date'] ?>
+    <?= $request_order_row['cancellation_date'] ?>
                             </td>
                         </tr>
-                        <?php
-                    } else if ($request_order_row['cable_subscriber'] == "no") {
-                        ?>
+                                <?php
+                            } else if ($request_order_row['cable_subscriber'] == "no") {
+                                ?>
                         <tr>
                             <td>installation date 1</td>
                             <td>
-                                <?= $request_order_row['installation_date_1'] ?>
+    <?= $request_order_row['installation_date_1'] ?>
                             </td>
                         </tr>
                         <tr>
                             <td>installation time 1</td>
                             <td>
-                                <?= $request_order_row['installation_time_1'] ?>
+    <?= $request_order_row['installation_time_1'] ?>
                             </td>
                         </tr>
                         <tr>
                             <td>installation date 2</td>
                             <td>
-                                <?= $request_order_row['installation_date_2'] ?>
+    <?= $request_order_row['installation_date_2'] ?>
                             </td>
                         </tr>
                         <tr>
                             <td>installation time 2</td>
                             <td>
-                                <?= $request_order_row['installation_time_2'] ?>
+    <?= $request_order_row['installation_time_2'] ?>
                             </td>
                         </tr>
                         <tr>
                             <td>installation date 3</td>
                             <td>
-                                <?= $request_order_row['installation_date_3'] ?>
+    <?= $request_order_row['installation_date_3'] ?>
                             </td>
                         </tr>
                         <tr>
                             <td>installation time 3</td>
                             <td>
-                                <?= $request_order_row['installation_time_3'] ?>
+    <?= $request_order_row['installation_time_3'] ?>
                             </td>
                         </tr>
-                        <?php
-                    }
-                    ?>
+                                <?php
+                            }
+                            ?>
                     <tr>
                         <td>additional service</td>
                         <td>
-                            <?= $request_order_row['additional_service'] ?>
+<?= $request_order_row['additional_service'] ?>
                         </td>
                     </tr>
                     <tr>
                         <td>Actual installation date:</td>
                         <td>
-                            <?php if ($request_order_row['actual_installation_date']) echo $request_order_row['actual_installation_date']; ?>
+<?php if ($request_order_row['actual_installation_date']) echo $request_order_row['actual_installation_date']; ?>
                         </td>
                     </tr>
                     <tr>
                         <td>Actual installation time from:</td>
                         <td>
-                            <?= $request_order_row['actual_installation_time_from']; ?>
+<?= $request_order_row['actual_installation_time_from']; ?>
                         </td>
                     </tr>
                     <tr>
                         <td>Actual installation time to:</td>
                         <td>
-                            <?= $request_order_row['actual_installation_time_to']; ?>
+<?= $request_order_row['actual_installation_time_to']; ?>
                         </td>
                     </tr>
                 </table>
@@ -467,41 +491,40 @@ if ($request_row["verdict"] == "") {
             <div class="panel-heading">Previous Request Info</div>
             <div class="panel-body">
                 <table class="display table table-striped table-bordered">
-                    <?PHP
-                    if (sizeof($last_request_row) > 0) {
-                      $last_action=$last_request_row['action'] ;
-                      if($last_request_row['action'] ==="change_speed" && is_numeric($last_request_row["modem_id"]) && (int)$last_request_row["modem_id"] >0)
-                      {
-                        $last_action="swap modem and change speed";
-                      }
-                        ?>
+<?PHP
+if (sizeof($last_request_row) > 0) {
+    $last_action = $last_request_row['action'];
+    if ($last_request_row['action'] === "change_speed" && is_numeric($last_request_row["modem_id"]) && (int) $last_request_row["modem_id"] > 0) {
+        $last_action = "swap modem and change speed";
+    }
+    ?>
                         <tr>
                             <td class=" bg-success">Action:</td>
                             <td>
-                                <?= $last_action ?>
+                        <?= $last_action ?>
                             </td>
 
                             <td class=" bg-success">Action On Date:</td>
                             <td>
-                                <?= $last_request_row['action_on_date'] ?>
+    <?= $last_request_row['action_on_date'] ?>
                             </td>
                         </tr>
                         <tr>
                             <td class=" bg-success">Verdict Date:</td>
                             <td >
-                                <?= $last_request_row['verdict_date'] ?>
+    <?= $last_request_row['verdict_date'] ?>
                             </td>
 
 
                             <td class=" bg-success">Verdict:</td>
                             <td >
-                                <?= $last_request_row['verdict'] ?>
+    <?= $last_request_row['verdict'] ?>
                             </td>
                         </tr>
                         <tr>
                             <td class=" bg-success">Admin:</td>
                             <td>
-                                <?= $last_request_row['username'] ?>
+    <?= $last_request_row['username'] ?>
                             </td>
                             <td class=" bg-success">Reseller Name:</td>
                             <td>
@@ -511,7 +534,7 @@ if ($request_row["verdict"] == "") {
                         <tr>
                             <td class=" bg-success">Modem Mac Address:</td>
                             <td>
-                                <?= $last_request_modem_mac_address ?>
+    <?= $last_request_modem_mac_address ?>
                             </td>
                             <td class=" bg-success">Note:</td>
                             <td>
@@ -524,7 +547,7 @@ if ($request_row["verdict"] == "") {
                         <tr>
                             <td class=" bg-success">Product Name:</td>
                             <td>
-                                <?= $last_request_row['product_title'] ?>
+    <?= $last_request_row['product_title'] ?>
                             </td>
                             <td class=" bg-success">Product price:</td>
                             <td>
@@ -534,12 +557,12 @@ if ($request_row["verdict"] == "") {
                         <tr>
                             <td class=" bg-success">Product Type:</td>
                             <td>
-                                <?= $last_request_row['product_subscription_type'] ?>
+    <?= $last_request_row['product_subscription_type'] ?>
                             </td>
 
                             <td class=" bg-success">Product Category:</td>
                             <td>
-                                <?= $last_request_row['product_category'] ?>
+    <?= $last_request_row['product_category'] ?>
                             </td>
 
 
@@ -548,7 +571,7 @@ if ($request_row["verdict"] == "") {
                         <tr>
                             <td class=" bg-success">City:</td>
                             <td>
-                                <?= $last_request_row['city'] ?>
+    <?= $last_request_row['city'] ?>
                             </td>
                             <td class=" bg-success">Address Line 1:</td>
                             <td>
@@ -558,22 +581,22 @@ if ($request_row["verdict"] == "") {
                         <tr>
                             <td class=" bg-success">Address Line 2:</td>
                             <td>
-                                <?= $last_request_row['address_line_2'] ?>
+    <?= $last_request_row['address_line_2'] ?>
                             </td>
                             <td class=" bg-success">Postal Code:</td>
                             <td>
                                 <?= $last_request_row['postal_code'] ?>
                             </td>
                         </tr>
-                        <?PHP
-                    } else {
-                        ?>
+                                <?PHP
+                            } else {
+                                ?>
                         <tr>
                             <td>There are no previous Requests</td>
 
                         </tr>
-                    <?PHP }
-                    ?>
+<?PHP }
+?>
                 </table>
             </div>
         </div>

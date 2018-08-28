@@ -118,6 +118,9 @@ else if (isset($_GET["order_id"]) && isset($_GET['do']) == "product_list") {
         "address_line_1" => "",
         "address_line_2" => "",
         "postal_code" => "",
+        "full_name" => "",
+        "phone" => "",
+        "email" => "",
         "note" => "",
             //"product_title"=>"",
             //"product_category"=>"",
@@ -145,6 +148,9 @@ else if (isset($_GET["order_id"]) && isset($_GET['do']) == "product_list") {
         "address_line_1" => "",
         "address_line_2" => "",
         "postal_code" => "",
+        "full_name" => "",
+        "phone" => "",
+        "email" => "",
     );
 
     if (!isset($_POST["product_id"])) {
