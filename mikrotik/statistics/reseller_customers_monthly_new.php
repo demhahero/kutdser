@@ -299,7 +299,9 @@ $year=isset($_GET["year"])?$_GET["year"]:2018;
               }
                 tableTag.DataTable().destroy()
                 tableTag.DataTable(tableOptions);
-                $('.openPopup').click(function() {
+                //$('.openPopup').click(function() {
+                  $( "#resellerTable tbody" ).on( "click", ".openPopup", function() {
+
                   $('#myModal').modal({show:true});
 
                   var customer_id = $(this).attr('data-id');
