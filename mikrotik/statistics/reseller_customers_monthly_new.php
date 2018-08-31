@@ -42,6 +42,7 @@ $year=isset($_GET["year"])?$_GET["year"]:2018;
 
         $.getJSON("<?= $api_url ?>orders_by_month_for_reseller.php?reseller_id=<?= $_GET["reseller_id"] ?>&month=<?= $month ?>&year=<?= $year ?>", function (result) {
           var total=0;
+          var totalCB=0;
           var totalWoR=0;
 					var totalWT=0;
           var table_header="";
@@ -119,7 +120,7 @@ $year=isset($_GET["year"])?$_GET["year"]:2018;
 
                               var total_commission_base_amount_long=parseFloat((monthInfo["total_price_with_out_router"]*(result['reseller']["reseller_commission_percentage"]/100)));
                               total_commission_base_amount=total_commission_base_amount_long.toFixed(2);
-
+                              totalCB+= parseFloat(monthInfo["total_price_with_out_router"]);
                               totalWoR+= parseFloat(total_commission_base_amount);
                     					total+= parseFloat(monthInfo["total_price_with_out_tax"]);
                     					totalWT+= parseFloat(monthInfo["total_price_with_tax_p7"]);
@@ -239,7 +240,7 @@ $year=isset($_GET["year"])?$_GET["year"]:2018;
                 });
                 $('.print_form').show();
                 $('#print_total_commission_base_amount').val(totalWoR.toFixed(2));
-                var MyMessageBottom='Monthly commission :'+totalWoR.toFixed(2)+'$, '
+                var MyMessageBottom='Commission Base amount :'+totalCB.toFixed(2)+'$, '
 
       							+'Total Price for subtotal :'+total.toFixed(2)+'$, '
       							+'Total Price for all orders With Tax :'+totalWT.toFixed(2)+'$';
@@ -318,23 +319,24 @@ $year=isset($_GET["year"])?$_GET["year"]:2018;
                 });
                 ////////////// add total prices for Commission base, all orders with tax and subtotal
       					$("#totalTable").append('<tr>'
-
-                    +'<td colspan="3" class="bg-success">Monthly commission </td>'
+                    +'<td  class="bg-default">Commission Base Amount </td>'
+                    +'<td class="bg-default">'+totalCB.toFixed(2)+'$</td>'
+                    +'<td  class="bg-success">Monthly commission </td>'
       							+'<td class="bg-success">'+totalWoR.toFixed(2)+'$</td>'
-      							+'<td colspan="4" class="bg-warning">Total Price for subtotal</td>'
+      							+'<td  class="bg-warning">Total Price for subtotal</td>'
       							+'<td class="bg-warning">'+total.toFixed(2)+'$</td>'
-      							+'<td colspan="3" class="bg-danger">Total Price for all orders With Tax</td>'
+      							+'<td  class="bg-danger">Total Price for all orders With Tax</td>'
       							+'<td class="bg-danger">'+totalWT.toFixed(2)+'$</td>'
       							+'</tr>');
               ////////////////////////// add total terminated, new and transfer orders
                 $("#totalTable").append('<tr>'
 
-                    +'<td colspan="3" class="bg-success">Total Terminated Orders </td>'
-      							+'<td class="bg-success">'+total_terminated_orders+'</td>'
-      							+'<td colspan="4" class="bg-warning">Total New Orders</td>'
-      							+'<td class="bg-warning">'+total_new_orders+'</td>'
-      							+'<td colspan="3" class="bg-danger">Total Transfer Orders</td>'
-      							+'<td class="bg-danger">'+total_transfer_orders+'</td>'
+                    +'<td colspan="2" class="bg-default">Total Terminated Orders </td>'
+      							+'<td class="bg-default">'+total_terminated_orders+'</td>'
+      							+'<td  class="bg-default">Total New Orders</td>'
+      							+'<td class="bg-default">'+total_new_orders+'</td>'
+      							+'<td colspan="2" class="bg-default">Total Transfer Orders</td>'
+      							+'<td class="bg-default">'+total_transfer_orders+'</td>'
       							+'</tr>');
 
                 });
