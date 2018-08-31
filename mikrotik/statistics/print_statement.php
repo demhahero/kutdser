@@ -25,7 +25,7 @@ $gst_tax = ($total_commission_base_amount) * 0.05;
 $total_commission_base_amount_with_tax = $total_commission_base_amount + $qst_tax + $gst_tax;
 $total_commission_base_amount_with_tax=number_format((float) $total_commission_base_amount_with_tax, 2, '.', '');
 
-$reseller = $dbTools->objCustomerTools($reseller_id, 1);
+$reseller = $dbTools->objCustomerTools($reseller_id);
 
 $statement_no=$reseller_id."0".$year."0".$month;
 
