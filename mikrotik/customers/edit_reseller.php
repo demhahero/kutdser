@@ -160,7 +160,7 @@ $html = curl_exec($c);
                         <label class="control-label col-md-3 col-sm-3 col-xs-12">Parent reseller</label>
                         <div class="col-md-9 col-sm-9 col-xs-12">
                           <select name="parent_reseller" class="select2_single form-control">
-                            <option></option>
+                            <option value="0"></option>
                           </select>
                         </div>
                       </div>

@@ -1,5 +1,7 @@
 <?php
 include_once "../header.php";
+if ($reseller_id!=="190")
+exit();
 
 $month=isset($_GET["month"])?$_GET["month"]:5;
 $year=isset($_GET["year"])?$_GET["year"]:2018;
@@ -116,7 +118,7 @@ $year=isset($_GET["year"])?$_GET["year"]:2018;
                                 tooltipTex="";
                               }
 
-                              var total_commission_base_amount_long=parseFloat(monthInfo["total_price_with_out_router"]-(monthInfo["total_price_with_out_router"]*(result['reseller']["reseller_commission_percentage"]/100)));
+                              var total_commission_base_amount_long=parseFloat((monthInfo["total_price_with_out_router"]*(result['reseller']["reseller_commission_percentage"]/100)));
                               total_commission_base_amount=total_commission_base_amount_long.toFixed(2);
 
                               totalWoR+= parseFloat(total_commission_base_amount);
@@ -167,7 +169,7 @@ $year=isset($_GET["year"])?$_GET["year"]:2018;
                                 value:result['reseller']["reseller_commission_percentage"]+"%"
                               });
                               customersData[customers['customer_id']].push({
-                                name:"Total Commission Base Amount",
+                                name:"Monthly commission",
                                 value:total_commission_base_amount
                               });
                               customersData[customers['customer_id']].push({
@@ -186,9 +188,9 @@ $year=isset($_GET["year"])?$_GET["year"]:2018;
 
                               table.row.add([
 
-                                  customers['customer_id']+
-                                  '<a target="_blank" href="<?=$site_url?>/orders/print_order.php?order_id='
-                                          + field["order_id"] + '" class="btn btn-primary btn-xs"><i class="fa fa-print"></i> Print </a>'
+                                  customers['customer_id']
+                                  //+'<a target="_blank" href="<?=$site_url?>/orders/print_order.php?order_id='
+                                  //        + field["order_id"] + '" class="btn btn-primary btn-xs"><i class="fa fa-print"></i> Print </a>'
                                   ,
                                   customers['full_name'],
                                   product_title,
@@ -237,7 +239,7 @@ $year=isset($_GET["year"])?$_GET["year"]:2018;
 
                 });
 
-                var MyMessageBottom='Total Commission base amount :'+totalWoR.toFixed(2)+'$, '
+                var MyMessageBottom='Monthly commission :'+totalWoR.toFixed(2)+'$, '
 
       							+'Total Price for subtotal :'+total.toFixed(2)+'$, '
       							+'Total Price for all orders With Tax :'+totalWT.toFixed(2)+'$';
@@ -299,7 +301,9 @@ $year=isset($_GET["year"])?$_GET["year"]:2018;
               }
                 tableTag.DataTable().destroy()
                 tableTag.DataTable(tableOptions);
-                $('.openPopup').click(function() {
+                //$('.openPopup').click(function() {
+                  $( "#resellerTable tbody" ).on( "click", ".openPopup", function() {
+
                   $('#myModal').modal({show:true});
 
                   var customer_id = $(this).attr('data-id');
@@ -315,7 +319,7 @@ $year=isset($_GET["year"])?$_GET["year"]:2018;
                 ////////////// add total prices for Commission base, all orders with tax and subtotal
       					$("#totalTable").append('<tr>'
 
-                    +'<td colspan="3" class="bg-success">Total Commission base amount </td>'
+                    +'<td colspan="3" class="bg-success">Monthly commission </td>'
       							+'<td class="bg-success">'+totalWoR.toFixed(2)+'$</td>'
       							+'<td colspan="4" class="bg-warning">Total Price for subtotal</td>'
       							+'<td class="bg-warning">'+total.toFixed(2)+'$</td>'
@@ -410,7 +414,7 @@ $year=isset($_GET["year"])?$_GET["year"]:2018;
     <th >Product</th>
     <th >Product Price</th>
     <th >Commission base amount</th>
-    <th >Total Commission base amount</th>
+    <th >Monthly commission</th>
     <th >Type</th>
     <th >Subtotal</th>
     <th >total with Tax </th>
