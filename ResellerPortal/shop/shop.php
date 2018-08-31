@@ -410,7 +410,7 @@ while($products_row=$dbTools->fetch_assoc($products))
                             </div>
                             </p>
                         </div>
-                        <?php if($reseller_id==="190"){?>
+                        <?php if($reseller_id==="190" || $reseller_id==="1379"){?>
                         <div class="col-sm-6" >
                             <p class="rounded form-row form-row-wide custom_check-service-availabilty  ">
                             <div class="panel panel-primary">
