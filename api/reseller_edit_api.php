@@ -51,7 +51,7 @@ if (isset($_GET["customer_id"]) /* && isset($_GET["action_on_date"]) */) {
       $username_exist=FALSE;
       while ($row  = $dbTools->fetch_assoc($reseller_result)) {
         $username_exist=TRUE;
-          if (password_verify($_POST["password"], $row["password"])) {
+
             if(isset($_POST["new_password"]) && strlen($_POST["new_password"])>4){
               $password = password_hash($_POST["new_password"], PASSWORD_DEFAULT);
               $query = "update `customers` set "
@@ -69,10 +69,8 @@ if (isset($_GET["customer_id"]) /* && isset($_GET["action_on_date"]) */) {
             else {
                 echo "{\"inserted\" :\"false\",\"error\" :\" please enter new password\"}";
             }
-          }
-          else {
-              echo "{\"inserted\" :\"false\",\"error\" :\" current password is wrong\"}";
-          }
+
+
       }
       if(!$username_exist)
       {
@@ -80,7 +78,7 @@ if (isset($_GET["customer_id"]) /* && isset($_GET["action_on_date"]) */) {
       }
   }
   else {
-      echo "{\"inserted\" :\"false\",\"error\" :\" please enter username username\"}";
+      echo "{\"inserted\" :\"false\",\"error\" :\" please enter username \"}";
   }
 
 

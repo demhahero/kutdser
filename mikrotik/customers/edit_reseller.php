@@ -77,14 +77,12 @@ $html = curl_exec($c);
                 $("#submit_account").click(function () {
                     var customer_id = "<?= $_GET['customer_id'] ?>";
                     var username = $("input[name=\"username\"]").val();
-                    var password = $("input[name=\"password\"]").val();
                     var new_password = $("input[name=\"new_password\"]").val();
 
                     $.post("<?= $api_url ?>reseller_edit_api.php",
                             {
                               customer_id: customer_id,
                               username: username,
-                              password: password,
                               new_password: new_password
                             }
                     , function (data, status) {
@@ -222,13 +220,10 @@ $html = curl_exec($c);
               </div>
 
 
-              <div class="col-md-12 col-sm-12 col-xs-12 form-group has-feedback">
-                <input name="password" type="text" class="form-control has-feedback-left" placeholder="Enter your cuurent password">
-                <span class="fa fa-unlock form-control-feedback left" aria-hidden="true"></span>
-              </div>
+
 
               <div class="col-md-12 col-sm-12 col-xs-12 form-group has-feedback">
-                <input name="new_password" type="text" class="form-control has-feedback-left" placeholder="Enter your new password">
+                <input name="new_password" type="password" class="form-control has-feedback-left" placeholder="Enter your new password">
                 <span class="fa fa-lock form-control-feedback left" aria-hidden="true"></span>
               </div>
 
