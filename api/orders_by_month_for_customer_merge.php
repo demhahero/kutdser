@@ -22,23 +22,31 @@ if (
 //$ordersYearly=$dbTools->orders_by_month_yearly($customer_id,$year,$month);
 //$orders=array_merge($ordersMonthly,$ordersYearly);
     $json = json_encode($orders);
-    
-    if($_GET["do"] == "merge"){
-        foreach ($orders as $customer){
+
+
+    if ($_GET["do"] == "merge") {
+        include '../ResellerPortal/shop/GlobalOnePaymentXMLTools.php';
+        $GlobalOnePaymentXMLTools = new GlobalOnePaymentXMLTools();
+        $i = 0;
+        foreach ($orders as $customer) {
+
+            $i++;
+            if ($i <= 2)
+                continue;
             $merchantref = $customer["merchantref"];
-            $recurring = (int)$customer['orders'][0]['monthInfo']['recurring_price']
-                    +(int)$customer['orders'][1]['monthInfo']['recurring_price'];
-            include 'GlobalOnePaymentXMLTools.php';
+
+
+            $recurring = $customer['orders'][0]['monthInfo']['recurring_price'] + $customer['orders'][1]['monthInfo']['recurring_price'];
+            echo $merchantref . " " . $recurring . " - ";
             $GlobalOnePaymentXMLTools = new GlobalOnePaymentXMLTools();
-            echo $GlobalOnePaymentXMLTools->updateSubscription("SS_".$merchantref, "SS_".$merchantref, "CARD_".$merchantref, $recurring);
-            die();
+            echo $GlobalOnePaymentXMLTools->updateSubscription("SS_" . $merchantref, "SS_" . $merchantref, "CARD_" . $merchantref, $recurring);
+            //echo "***************".$merchantref;
         }
+        die();
     }
-    
+
     echo "{\"customers\" :", $json, ",\"error\" :null}";
 } else {
     echo "{\"customers\" :null,\"error\" :\"invalid params\"}";
 }
-
-
 ?>

@@ -102,6 +102,7 @@ include_once "dbconfig.php";
                                         <ul class="nav child_menu">
                                             <li><a href="<?= $site_url ?>/statistics/orders_between_two_dates.php?date1=2018-04-01&date2=2018-06-01">Orders over duration</a></li>
                                             <li><a href="<?= $site_url ?>/statistics/orders_by_new_transfer.php?date1=2018-04-01&date2=2018-06-01&cable_subscriber=yes">Orders New/Transfer</a></li>
+                                            <li><a href="<?= $site_url ?>/statistics/requests_between_two_dates.php?date1=2018-04-01&date2=2018-09-14&type=requests_fees">Requests</a></li>
                                         </ul>
                                     </li>
                                     <li><a><i class="fa fa-inbox"></i> Inventory <span class="fa fa-chevron-down"></span></a>
