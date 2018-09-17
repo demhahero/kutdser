@@ -1,6 +1,6 @@
 <?php
 
-//include connection file 
+//include connection file
 include_once "dbconfig.php";
 
 // initilize all variable
@@ -25,10 +25,10 @@ $where = $sqlTot = $sqlRec = "";
 
 $sqlTot = "SELECT `orders`.order_id,`orders`.creation_date,`orders`.status,`orders`.reseller_id,`orders`.customer_id,
     `orders`.`product_title`,`orders`.`product_category`,orders.product_subscription_type,resellers.full_name as 'reseller_name',
-    `customers`.`full_name` as 'customer_name', `order_options`.`modem_mac_address`, `order_options`.`cable_subscriber` 
-FROM `orders` 
-inner JOIN `order_options` on `order_options`.`order_id`= `orders`.`order_id` 
-inner JOIN `customers` on `orders`.`customer_id`=`customers`.`customer_id` 
+    `customers`.`full_name` as 'customer_name', `order_options`.`modem_mac_address`, `order_options`.`cable_subscriber`
+FROM `orders`
+inner JOIN `order_options` on `order_options`.`order_id`= `orders`.`order_id`
+inner JOIN `customers` on `orders`.`customer_id`=`customers`.`customer_id`
 INNER JOIN `customers` resellers on resellers.`customer_id` = `orders`.`reseller_id` where `orders`.order_id <= 10000 ";
 
 $sqlRec = $sqlTot;
@@ -39,7 +39,7 @@ $sqlRec = $sqlTot;
 // check search value exist
 if (!empty($params['search']['value'])) {
 
-    $where .= " ( customers.full_name LIKE '%" . $params['search']['value'] . "%' ";
+    $where .= " and ( customers.full_name LIKE '%" . $params['search']['value'] . "%' ";
     $where .= " OR resellers.full_name LIKE '%" . $params['search']['value'] . "%' ";
     $where .= " OR product_title LIKE '%" . $params['search']['value'] . "%' ";
     $where .= " OR status LIKE '%" . $params['search']['value'] . "%' ";
@@ -61,6 +61,8 @@ $sqlRec .= " ORDER BY " . $columns[$params['order'][0]['column']] . "   " . $par
 $sqlRec .= " LIMIT " . $params['start'] . " ," . $params['length'];
 
 mysqli_query($dbTools->getConnection(), "SET CHARACTER SET utf8");
+// echo $sqlTot;
+// exit();
 $queryTot = mysqli_query($dbTools->getConnection(), $sqlTot);
 
 $totalRecords = mysqli_num_rows($queryTot);
@@ -73,16 +75,16 @@ while ($row = mysqli_fetch_array($queryRecords)) {
         $displayed_order_id = (((0x0000FFFF & (int) $row["order_id"]) << 16) + ((0xFFFF0000 & (int) $row["order_id"]) >> 16));
     else
         $displayed_order_id = $row["order_id"];
-    
+
     $data[0] = '<a href="order_details.php?order_id=' . $row['order_id'] . '" >' . $displayed_order_id . '</a>';
     $data[1] = '<a href="' . $site_url . '/customers/customer_details.php?customer_id='.$row['customer_id'].'">'.$row['customer_name'].'</a>';
     $data[2] = $row['reseller_name'];
     $data[3] = $row['product_title'];
     $data[4] = $row['creation_date'];
     $data[5] = $row['status'];
-    $data[6] = '<a href="' . $site_url . '/temp/edit_order.php?order_id=' . $row['order_id'] . '&type=' 
+    $data[6] = '<a href="' . $site_url . '/temp/edit_order.php?order_id=' . $row['order_id'] . '&type='
             . $row['product_category'] . '" class="btn btn-primary btn-xs"><i class="fa fa-print"></i> Edit </a>';
-    
+
     $all_data[] = $data;
 }
 
@@ -95,4 +97,3 @@ $json_data = array(
 
 echo $json = json_encode($json_data);
 ?>
-	
