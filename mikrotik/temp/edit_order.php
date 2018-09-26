@@ -394,7 +394,7 @@ if ($result->num_rows > 0) {
                              ?>
                             <div class="date5">
                                 <div class="input-group input-append date" id="datePicker5">
-                                    <input readonly="readonly" type="text" name="options[installation_date_1]" value="" class="form-control" />
+                                    <input readonly="readonly" type="text" name="options[installation_date_1]" value="<?=$installation_date_1 ?>" class="form-control" />
                                     <span class="input-group-addon add-on"><span class="glyphicon glyphicon-calendar"></span></span>
                                 </div>
                             </div>
@@ -422,7 +422,7 @@ if ($result->num_rows > 0) {
                              ?>
                             <div class="date2">
                                 <div class="input-group input-append date" id="datePicker2">
-                                    <input readonly="readonly" type="text" name="options[installation_date_2]" value="" class="form-control" />
+                                    <input readonly="readonly" type="text" name="options[installation_date_2]" value="<?=$installation_date_2 ?>" class="form-control" />
                                     <span class="input-group-addon add-on"><span class="glyphicon glyphicon-calendar"></span></span>
                                 </div>
                             </div>
@@ -450,7 +450,7 @@ if ($result->num_rows > 0) {
                              ?>
                             <div class="date3">
                                 <div class="input-group input-append date" id="datePicker3">
-                                    <input readonly="readonly" type="text" name="options[installation_date_3]" value="" class="form-control" />
+                                    <input readonly="readonly" type="text" name="options[installation_date_3]" value="<?=$installation_date_3 ?>" class="form-control" />
                                     <span class="input-group-addon add-on"><span class="glyphicon glyphicon-calendar"></span></span>
                                 </div>
                             </div>

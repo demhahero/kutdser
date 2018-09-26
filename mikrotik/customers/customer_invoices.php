@@ -39,6 +39,26 @@ $customer = $dbTools->objCustomerTools($customer_id);
             <?php
         }
     }
+    else {
+        $start = $customer->getRecurringStartDate()->modify('first day of this month');
+        $end = (new DateTime())->modify('first day of this month');
+        $interval = DateInterval::createFromDateString('1 month');
+        $period = new DatePeriod($start, $interval, $end);
+
+        foreach ($period as $dt) {
+            ?>
+            <tr>
+                <td><?= $dt->format("Y-m") ?></td>
+                <td>
+                    <a target="_blank" href="print_customer_recurring_invoice.php?month=<?= $dt->format("m") ?>&year=<?= $dt->format("Y") ?>&customer_id=<?= $customer_id ?>">
+                        Print
+                    </a>
+                </td>
+            </tr>
+
+            <?php
+        }       
+    }
     ?>
 </tbody>
 </table>
