@@ -24,7 +24,7 @@ if (
     $json = json_encode($orders);
 
 
-    if ($_GET["do"] == "merge") {
+    if (isset($_GET["do"]) && $_GET["do"] == "merge") {
         include '../ResellerPortal/shop/GlobalOnePaymentXMLTools.php';
         $GlobalOnePaymentXMLTools = new GlobalOnePaymentXMLTools();
         $i = 0;
