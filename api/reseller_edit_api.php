@@ -3,10 +3,20 @@
 if (isset($_GET["customer_id"]) /* && isset($_GET["action_on_date"]) */) {
     include_once "dbconfig.php";
 
-    $customer_query = $dbTools->query("SELECT *
+    $stmt = $dbTools->getConnection()->prepare('SELECT *
      FROM `customers`
-      WHERE `customer_id`='" . $_GET["customer_id"] . "'");
-    $customer = $dbTools->fetch_assoc($customer_query);
+      WHERE `customer_id`= ?');
+    $stmt->bind_param('s', $_GET["customer_id"]); // 's' specifies the variable type => 'string'
+
+    $stmt->execute();
+
+    $result = $stmt->get_result();
+    $customer = $result->fetch_assoc();
+
+    // $customer_query = $dbTools->query("SELECT *
+    //  FROM `customers`
+    //   WHERE `customer_id`='" . $_GET["customer_id"] . "'");
+    // $customer = $dbTools->fetch_assoc($customer_query);
     $json = json_encode($customer);
 
     $reseller_query = $dbTools->query("SELECT customer_id,full_name
