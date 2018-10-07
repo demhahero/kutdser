@@ -459,6 +459,7 @@ private function fill_order_price_details_2($orderChild,$year,$month){
   			//if($requestResult->num_rows===0)
   			//{
   				$requestResult = $this->query("SELECT * from requests where
+            `action` in ('terminate','change_speed','moving','swap_modem') and
   				order_id=".$orderChild["order_id"]."
   				and (year(action_on_date) <".$year."
   				or (year(action_on_date) =".$year." and month(action_on_date) <".$month." ))
@@ -571,6 +572,7 @@ private function fill_order_price_details_2($orderChild,$year,$month){
   ///////////////// check if there is request in the same month as the requested date
 
   			$requestResult = $this->query("SELECT * from requests where
+          `action` in ('terminate','change_speed','moving','swap_modem') and
   			order_id=".$orderChild["order_id"]."
   			and (year(action_on_date) =".$year." and month(action_on_date) =".$month." )
   			and verdict = 'approve' order by action_on_date");
@@ -1399,6 +1401,7 @@ return $customers;
 
 				/// if there is request after order and before the recurring date get it's value as init value for recurring date
 				$requestResult = $this->query("SELECT * from requests where
+          `action` in ('terminate','change_speed','moving','swap_modem') and
 				order_id=".$order_row["order_id"]."
 				and (year(action_on_date) <".$startEndRecurringDate["start_date"]->format('Y')."
 				or (year(action_on_date) =".$startEndRecurringDate["start_date"]->format('Y')." and month(action_on_date) <".$startEndRecurringDate["start_date"]->format('m')." ))
@@ -1550,6 +1553,7 @@ return $customers;
 			//if($requestResult->num_rows===0)
 			//{
 				$requestResult = $this->query("SELECT * from requests where
+          `action` in ('terminate','change_speed','moving','swap_modem') and
 				order_id=".$order_row["order_id"]."
 				and
 				(year(action_on_date) <".$year."
@@ -1634,6 +1638,7 @@ return $customers;
 ///////////////// check if there is request in the same month as the requested date
 
 			$requestResult = $this->query("SELECT * from requests where
+        `action` in ('terminate','change_speed','moving','swap_modem') and
 			order_id=".$order_row["order_id"]."
 			and (year(action_on_date) =".$year." and month(action_on_date) =".$month." )
 			and verdict = 'approve' order by action_on_date");
@@ -2188,6 +2193,7 @@ return $customers;
 			//if($requestResult->num_rows===0)
 			//{
         $requestQuery="SELECT * from requests where
+        `action` in ('terminate','change_speed','moving','swap_modem') and
 				order_id=".$orderChild["order_id"]."
 				and (year(action_on_date) <".$year."
 				or (year(action_on_date) =".$year." and month(action_on_date) <".$month." ))
@@ -2318,6 +2324,7 @@ return $customers;
 ///////////////// check if there is request in the same month as the requested date
 
 			$requestResult = $this->query("SELECT * from requests where
+        `action` in ('terminate','change_speed','moving','swap_modem') and
 			order_id=".$order_row["order_id"]."
 			and (year(action_on_date) =".$year." and month(action_on_date) =".$month." )
 			and verdict = 'approve' order by action_on_date");
@@ -2888,6 +2895,7 @@ $customers = $this->query("SELECT customers.customer_id,resellers.customer_id as
 		////echo "same order month</br>";
 		// check if there are any request also in the same month
 		$requestResult = $this->query("SELECT * from requests where
+      `action` in ('terminate','change_speed','moving','swap_modem') and
 		order_id=".$order_row["order_id"]."
 		and (year(creation_date) =".$year." and month(creation_date) =".$month." )
 		and verdict = 'approve' order by creation_date");
@@ -3094,6 +3102,7 @@ $customers = $this->query("SELECT customers.customer_id,resellers.customer_id as
 		////echo "same order month</br>";
 		// check if there are any request also before the requested month if exist then set it's price at init value instead of order price
 		$requestResult = $this->query("SELECT * from requests where
+      `action` in ('terminate','change_speed','moving','swap_modem') and
 		order_id=".$order_row["order_id"]."
 		and (year(creation_date) <".$year."
 		or (year(creation_date) =".$year." and month(creation_date) <".$month." ))
@@ -3118,6 +3127,7 @@ $customers = $this->query("SELECT customers.customer_id,resellers.customer_id as
 
 		// now  check if there are any request also in the same month as the requested month
 		$requestResult = $this->query("SELECT * from requests where
+      `action` in ('terminate','change_speed','moving','swap_modem') and
 		order_id=".$order_row["order_id"]."
 		and (year(creation_date) =".$year." and month(creation_date) =".$month." )
 		and verdict = 'approve' order by creation_date");

@@ -20,7 +20,8 @@ $year=isset($_GET["year"])?$_GET["year"]:2018;
             //alert( 'DataTables has redrawn the table' );
             $('[data-toggle="tooltip"]').tooltip();
         },
-        dom: 'Bfrtip',
+        "scrollX": true,   // enables horizontal scrolling
+        "dom": 'Bfrtip',
         buttons: [
             //'copy', 'csv', 'excel', 'pdf', 'print'
             {
@@ -54,7 +55,7 @@ $year=isset($_GET["year"])?$_GET["year"]:2018;
           $.each(result['customers'], function (index, customers) {
 
         					$.each(customers['orders'], function (i, field) {
-                    table_header=field["reseller_name"]+"'s Customers";
+                    table_header=field["reseller_name"]+"'s Customers STATISTICS for month <?=$month?> and year <?=$year?>";
                     $(".last").html(table_header);
                     var product_price;
                     var product_title;
@@ -200,7 +201,13 @@ $year=isset($_GET["year"])?$_GET["year"]:2018;
                                   monthInfo["action"]+tooltipTex,
                                   monthInfo["total_price_with_out_tax"],
                                   monthInfo["total_price_with_tax_p7"],
-                                  '<a data-id="'+customers['customer_id']+'" type="button" class="btn btn-primary openPopup" >Details</a>'
+
+                                  field['payment_method'],
+                                  field['start_active_date'],
+                                  join_type,
+                                  field['recurring_date'],
+                                  result['reseller']["reseller_commission_percentage"]+"%",
+                                  '<a data-id="'+customers['customer_id']+'" type="button" class="btn btn-primary openPopup" >Details</a>',
                               ]).draw(false);
 
 
@@ -258,7 +265,7 @@ $year=isset($_GET["year"])?$_GET["year"]:2018;
                                                     {
                                                       customeData=data.substr(0, data.indexOf('<'));
                                                     }
-                                                    else if(column === 9){
+                                                    else if(column === 14){
                                                       customeData="";
                                                     }
                                                     return customeData;
@@ -272,6 +279,7 @@ $year=isset($_GET["year"])?$_GET["year"]:2018;
                       $('[data-toggle="tooltip"]').tooltip();
                   },
                   dom: 'Bfrtip',
+                  "scrollX": true,
                   buttons: [
                       //'copy', 'csv', 'excel', 'pdf', 'print'
                       $.extend( true, {}, buttonCommon, {
@@ -416,16 +424,21 @@ $year=isset($_GET["year"])?$_GET["year"]:2018;
 <table id="resellerTable" class="display table table-striped table-bordered">
     <thead>
 
-    <th >ID</th>
-    <th >Full Name</th>
-    <th >Product</th>
-    <th >Product Price</th>
-    <th >Commission base amount</th>
-    <th >Monthly commission</th>
-    <th >Type</th>
-    <th >Subtotal</th>
-    <th >total with Tax </th>
-    <th >More Info</th>
+    <th style="width:50px">ID</th>
+    <th style="width:100px">Full Name</th>
+    <th style="width:100px">Product</th>
+    <th style="width:50px">Product Price</th>
+    <th style="width:100px">Commission base amount</th>
+    <th style="width:100px">Monthly commission</th>
+    <th style="width:50px">Type</th>
+    <th style="width:50px">Subtotal</th>
+    <th style="width:50px">total with Tax </th>
+    <th style="width:50px">Payment Method</th>
+    <th style="width:100px">Start Date</th>
+    <th style="width:50px">Join Type</th>
+    <th style="width:100px">Recurring Start Date</th>
+    <th style="width:50px">Reseller Commission percentage</th>
+    <th style="width:50px">More Info</th>
 </thead>
 <tbody>
 
