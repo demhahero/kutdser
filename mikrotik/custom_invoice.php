@@ -119,16 +119,19 @@ if (!isset($_GET["do"])) {
                 <?php
                 $files = array();
                 if ($handle = opendir('custom_invoices')) {
-                    while (false !== ($entry = readdir($handle))) {  
+                    while (false !== ($entry = readdir($handle))) {
                         if ($entry != "." && $entry != "..") {
-                            $files[] = $entry;  
+                            $files[] = $entry;
                         }
                     }
                     closedir($handle);
                 }
                 sort($files);
-                foreach($files as $file){
-                    echo "<li class=\"list-group-item\"><a target='_blank' href='custom_invoices/$file'>$file</a><span class=\"badge\"><a id='$file' class='send-invoice' href='javascript:{}' style='color:white;'>Send</a></span></li>";
+                foreach ($files as $file) {
+                    $file_name = explode("_", $file);
+                    $date = substr($file_name[2], 0, strrpos($file_name[2], "."));
+                    $name = $file_name[1] . " : " . date('d/m/Y', $date);
+                    echo "<li class=\"list-group-item\"><a target='_blank' href='custom_invoices/$file'>" . $name . "</a><span class=\"badge\"><a id='$file' class='send-invoice' href='javascript:{}' style='color:white;'>Send</a></span></li>";
                 }
                 ?>
             </ul>
@@ -145,8 +148,8 @@ if (!isset($_GET["do"])) {
                 <div class="form-group">
                     <label >Message:</label>
                     <textarea name="body" class="form-control">Dear Sir,
-Please, find the attached file.
-Best,</textarea>
+    Please, find the attached file.
+    Best,</textarea>
                 </div>
                 <div class="form-group">
 
@@ -196,15 +199,15 @@ Best,</textarea>
                 $(".product-list").append(myvar);
                 return false;
             });
-            
+
             $("tbody").on("change", "select", function () {
-                if($(this).val() == "custom"){
+                if ($(this).val() == "custom") {
                     $(this).replaceWith(function () {
                         return $("<input name='product_name[]' />");
                     });
                 }
             });
-            
+
             $("tbody").on("change", "tr .quantity,.price", function () {
                 $("#subtotal").val("0");
                 $(".quantity").each(function () {
@@ -269,7 +272,7 @@ use Dompdf\Dompdf;
 use Dompdf\Options;
 
 $html = $terms_header . '
-                    ' .  $_POST["full_name"] . '<br/>' . $_POST["address"] . '								
+                    ' . $_POST["full_name"] . '<br/>' . $_POST["address"] . '								
                 </td>
 		<td class="address shipping-address">
 					</td>
@@ -287,7 +290,7 @@ $html = $terms_header . '
 					<th>Invoice:</th>
 					<td>' . uniqid() . '</td>
 				</tr>
-                                
+		
 							</table>			
 		</td>
 	</tr>
