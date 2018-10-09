@@ -90,8 +90,10 @@ if (!isset($_GET["do"])) {
                     while (false !== ($entry = readdir($handle))) {
 
                         if ($entry != "." && $entry != "..") {
-
-                            echo "<li class=\"list-group-item\"><a target='_blank' href='custom_statement/$entry'>$entry</a><span class=\"badge\"><a id='$entry' class='send-statement' href='javascript:{}' style='color:white;'>Send</a></span></li>";
+                            $file_name = explode("_", $entry);
+                            $date = substr($file_name[2], 0, strrpos($file_name[2], "."));
+                            $name = $file_name[1] . " : " . date('d/m/Y', $date);
+                            echo "<li class=\"list-group-item\"><a target='_blank' href='custom_statement/$entry'>" . $name . "</a><span class=\"badge\"><a id='$entry' class='send-statement' href='javascript:{}' style='color:white;'>Send</a></span></li>";
                         }
                     }
 
@@ -112,8 +114,8 @@ if (!isset($_GET["do"])) {
                 <div class="form-group">
                     <label >Message:</label>
                     <textarea name="body" class="form-control">Dear Sir,
-Please, find the attached file.
-Best,</textarea>
+    Please, find the attached file.
+    Best,</textarea>
                 </div>
                 <div class="form-group">
 
@@ -123,7 +125,7 @@ Best,</textarea>
             <input type="submit" class="btn btn-primary" value="Send">
         </form>
     </div>    
-    
+
     <script>
         $(document).ready(function () {
             $("#subtotal").val("0");
@@ -137,7 +139,7 @@ Best,</textarea>
                         '            </td>' +
                         '            <td>' +
                         '                <input type="text" name="product_price[]" class="form-control price" placeholder="product price"/>' +
-                        '            </td>' + 
+                        '            </td>' +
                         '           <td>' +
                         '               <input type="text" name="product_reseller_discount[]" class="form-control price" placeholder="product reseller_discount"/>' +
                         '           </td>' +
@@ -185,8 +187,8 @@ Best,</textarea>
                 }
                 $(".quantity").change();
             });
-            
-            
+
+
             $("#dialog").dialog({
                 autoOpen: false,
                 modal: true,
@@ -541,7 +543,7 @@ Statement</h1>
 	<tr>
 		<td class="address billing-address">
                     <!-- <h3>Billing Address:</h3> -->' . '
-                    ' .  $_POST["full_name"] . '<br/>' . $_POST["address"] . '								
+                    ' . $_POST["full_name"] . '<br/>' . $_POST["address"] . '								
                 </td>
 		<td class="address shipping-address">
 					</td>
@@ -558,8 +560,8 @@ Statement</h1>
 				<tr class="order-date">
 					<th>Statement:</th>
 					<td>' . uniqid() . '</td>
-				</tr>		
-
+				</tr>
+		
 							</table>			
 		</td>
 	</tr>
