@@ -112,9 +112,10 @@ $year=isset($_GET["year"])?$_GET["year"]:2018;
                               if(field['free_setup']==="yes")
                                 discountText+="Free Setup,";
                               discountText=discountText.substring(0, discountText.length-1);
-                              var tooltipTex='</br><button type="button" class="btn btn-secondary" data-toggle="tooltip" data-html="true" title="'+discountText+'">'
-                                                  +'<i class="fa fa-tags"></i>'
-                                                +'</button>';
+                              // var tooltipTex='</br><button type="button" class="btn btn-secondary" data-toggle="tooltip" data-html="true" title="'+discountText+'">'
+                              //                     +'<i class="fa fa-tags"></i>'
+                              //                   +'</button>';
+                              var tooltipTex='</br>With offer';
                               if(discountText.length===0){
                                 tooltipTex="";
                               }
