@@ -2,7 +2,7 @@
 
 //error_reporting(E_ALL);
 //ini_set('display_errors', 1);
-include_once "dbconfig.php";
+include_once "../dbconfig.php";
 $fields = array(
     "request_id" => "request_id",
     "action" => "action",

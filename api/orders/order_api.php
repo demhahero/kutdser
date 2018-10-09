@@ -1,6 +1,6 @@
 <?php
 
-include_once "dbconfig.php";
+include_once "../dbconfig.php";
 
 $order_id = intval($_GET['order_id']);
 
@@ -54,7 +54,7 @@ $child3Fields = array(
     "is_credit" => "is_credit",
 );
 
-$orders = $dbTools->order_query_api("SELECT `merchantrefs`.`merchantref`, `merchantrefs`.`order_id`, 
+$orders = $dbTools->order_query_api("SELECT `merchantrefs`.`merchantref`, `merchantrefs`.`order_id`,
     `merchantrefs`.`is_credit`, `orders`.order_id,`orders`.creation_date,`orders`.status,`orders`.reseller_id,
     `orders`.customer_id,orders.product_title,orders.product_category,orders.product_subscription_type,
     resellers.full_name as 'reseller_name',`customers`.`full_name` as 'customer_name', `order_options`.`modem_mac_address`,
@@ -67,11 +67,11 @@ $orders = $dbTools->order_query_api("SELECT `merchantrefs`.`merchantref`, `merch
     `order_options`.`actual_installation_time_from`, `order_options`.`actual_installation_time_to`,
     `order_options`.`actual_installation_date`, `order_options`.`current_phone_number`, `order_options`.`adapter`
     , `order_options`.`additional_service`
-FROM `orders` 
-left JOIN `order_options` on `order_options`.`order_id`= `orders`.`order_id` 
-left JOIN `customers` on `orders`.`customer_id`=`customers`.`customer_id` 
-left JOIN `customers` resellers on resellers.`customer_id` = `orders`.`reseller_id` 
-left JOIN `merchantrefs` on `merchantrefs`.`customer_id` = `orders`.`customer_id` and type!='payment' 
+FROM `orders`
+left JOIN `order_options` on `order_options`.`order_id`= `orders`.`order_id`
+left JOIN `customers` on `orders`.`customer_id`=`customers`.`customer_id`
+left JOIN `customers` resellers on resellers.`customer_id` = `orders`.`reseller_id`
+left JOIN `merchantrefs` on `merchantrefs`.`customer_id` = `orders`.`customer_id` and type!='payment'
 where `orders`.`order_id`='" . $order_id . "'"
         , $fields
         , "customer", $childFields

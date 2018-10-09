@@ -40,6 +40,24 @@ include_once "dbconfig.php";
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
         <script type="text/javascript" src="https://cdn.datatables.net/v/bs/jszip-2.5.0/dt-1.10.18/b-1.5.2/b-html5-1.5.2/datatables.min.js"></script>
+        <script>
+          $(document).ready(function () {
+            $.post("<?= $api_url ?>orders/order_sent_count_api.php",
+    				 {
+    					 action:"get_total_order_sent"
+    				 }
+             , function (response, status) {
+            		 response = $.parseJSON(response);
+            		 if (!response.error) {
+                   $('#total_order_sent').html(response.total_order_sent);
+                 }
+                 else{
+                   $('#total_order_sent').html(0);
+                 }
+               }
+             );
+          });
+        </script>
     </head>
 
     <body class="nav-md">
@@ -180,14 +198,10 @@ include_once "dbconfig.php";
                                     </ul>
                                 </li>
 
-                                <?php
-                                $orders = $dbTools->order_query("select * from `orders` where `status`='sent'", 3);
-
-                                ?>
                                 <li role="presentation" class="dropdown">
                                     <a href="javascript:;" class="dropdown-toggle info-number" data-toggle="dropdown" aria-expanded="false">
                                         <i class="fa fa-envelope-o"></i>
-                                        <span class="badge bg-green"><?=count($orders)?></span>
+                                        <span class="badge bg-green" id="total_order_sent"></span>
                                     </a>
                                     <ul id="menu1" class="dropdown-menu list-unstyled msg_list" role="menu">
 

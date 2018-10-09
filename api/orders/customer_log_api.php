@@ -4,7 +4,7 @@
 //ini_set('display_errors', 1);
 
 if (isset($_GET["customer_id"]) /* && isset($_GET["action_on_date"]) */) {
-    include_once "dbconfig.php";
+    include_once "../dbconfig.php";
 
     //$action_on_dateString=$_GET["action_on_date"];
     //$action_on_date=new DateTime($action_on_dateString);
@@ -51,7 +51,7 @@ if (isset($_GET["customer_id"]) /* && isset($_GET["action_on_date"]) */) {
     echo "{\"customer_logs\" :", $json, "}";
 } else if (isset($_POST["customer_id"])) {
 
-    include_once "dbconfig.php";
+    include_once "../dbconfig.php";
 
 
 

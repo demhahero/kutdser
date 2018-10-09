@@ -11,7 +11,7 @@ include_once "../header.php";
             "bProcessing": true,
             "serverSide": true,
             "ajax": {
-                url: "<?= $api_url ?>orders_api.php", // json datasource
+                url: "<?= $api_url ?>orders/orders_api.php", // json datasource
                 type: "post", // type of method  , by default would be get
                 error: function () {  // error handling code
                     $("#employee_grid_processing").css("display", "none");
@@ -46,7 +46,7 @@ include_once "../header.php";
 
 <title>Orders</title>
 <div class="page-header">
-    <a class="last" href="">Orders</a>    
+    <a class="last" href="">Orders</a>
 </div>
 
 <table id="myTable2"  class="display table table-striped table-bordered">
