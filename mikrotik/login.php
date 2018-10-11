@@ -2,20 +2,6 @@
 include_once "dbconfig.php";
 ?>
 
-<?php
-$username = stripslashes(filter_input(INPUT_POST, 'username', FILTER_SANITIZE_SPECIAL_CHARS));
-$password = stripslashes(filter_input(INPUT_POST, 'password', FILTER_SANITIZE_SPECIAL_CHARS));
-
-$admin_result = $conn_routers->query("select * from `admins` where `username`='" . $username . "'");
-while ($admin_row = $admin_result->fetch_assoc()) {
-    if (password_verify($password, $admin_row['password'])) {
-        $session_id = uniqid('', true);
-        $conn_routers->query("update `admins` set `session_id`='" . $session_id . "' where `username`='" . $username . "'");
-        $_SESSION["session_id"] = $session_id;
-        header('Location: customers/customers.php');
-    }
-}
-?>
 
 
 
@@ -40,6 +26,42 @@ while ($admin_row = $admin_result->fetch_assoc()) {
 
     <!-- Custom Theme Style -->
     <link href="<?= $site_url ?>/gentelella/build/css/custom.min.css" rel="stylesheet">
+    <!-- jquery-ui -->
+    <link rel="stylesheet" type="text/css" href="https://code.jquery.com/ui/1.12.0/themes/smoothness/jquery-ui.css">
+
+    <!-- jQuery -->
+    <script src="<?= $site_url ?>/gentelella/vendors/jquery/dist/jquery.min.js"></script>
+    <!-- Bootstrap -->
+    <script src="<?= $site_url ?>/gentelella/vendors/bootstrap/dist/js/bootstrap.min.js"></script>
+    <!-- jQuery-UI -->
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            $("#login_form").submit(function (e) {
+              e.preventDefault();
+              var username = $("input[name=\"username\"]").val();
+              var password = $("input[name=\"password\"]").val();
+
+              $.post("<?= $api_url ?>authentication/authentication_api.php",
+                      {
+                        action:"login",
+                        username: username,
+                        password: password
+                      }
+              , function (data_response, status) {
+                  data_response = $.parseJSON(data_response);
+                  if (data_response.login == true) {
+                    window.location.href = 'customers/customers.php';
+                  } else
+                  {
+                      alert(data_response.message);
+
+                    }
+              });
+            });
+        });
+    </script>
   </head>
 
   <body class="login">
@@ -50,7 +72,7 @@ while ($admin_row = $admin_result->fetch_assoc()) {
       <div class="login_wrapper">
         <div class="animate form login_form">
           <section class="login_content">
-            <form method="post">
+            <form id="login_form">
               <h1>Login Form</h1>
               <div>
                   <input type="text" class="form-control" name="username" placeholder="Username" required="" />
@@ -59,14 +81,14 @@ while ($admin_row = $admin_result->fetch_assoc()) {
                   <input type="password" class="form-control" name="password" placeholder="Password" required="" />
               </div>
               <div>
-                  <input type="submit" class="btn btn-default submit" value="Login" href="index.html">
+                  <input type="submit" class="btn btn-default submit" value="Login" >
                 <a class="reset_pass" href="#">Lost your password?</a>
               </div>
 
               <div class="clearfix"></div>
 
               <div class="separator">
-        
+
 
                 <div class="clearfix"></div>
                 <br />

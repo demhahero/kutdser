@@ -5,19 +5,16 @@ session_start();
 //ini_set('display_errors', 1);
 date_default_timezone_set('America/New_York');
 
-include "D:/Program/wamp/www/kutdser-master/ResellerPortal/tools/DBTools.php";
-$dbTools = new DBTools();
+// include "C:/wamp64/www/kutdser/ResellerPortal/tools/DBTools.php";
+// $dbTools = new DBTools();
 
-$site_url="http://localhost/kutdser-master/mikrotik";
-$api_url = "http://localhost/kutdser-master/api/";
+$site_url="http://localhost/kutdser/mikrotik";
+$api_url = "http://localhost/kutdser/api/";
 
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "router";
+include_once "db_credentials.php";
 
-$conn_routers = new mysqli($servername, $username, $password, $dbname);
-
+$conn_routers = new mysqli($servername, $dbusername, $dbpassword, $dbname);
+$connection=$conn_routers;
 $admin_id = 0;
 //Authentication
 $page = basename($_SERVER['REQUEST_URI'], '?' . $_SERVER['QUERY_STRING']);

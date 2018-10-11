@@ -1,16 +1,21 @@
 <?php
+
 class DBTools {
 
-    private $db_host = "localhost";
+    private $db_host = "";
 
-    private $db_username = "root";
+    private $db_username = "";
     private $db_password = "";
-    private $db_name = 'routers_2018_09_16'; //database name
+    private $db_name = ""; //database name
 
     private $conn_routers;
     private $query_result;
 
-    public function __construct() {
+    public function __construct($servername,$dbusername,$dbpassword,$dbname) {
+      $this->db_host=$servername;
+      $this->db_username=$dbusername;
+      $this->db_password=$dbpassword;
+      $this->db_name=$dbname;
         $this->conn_routers = new mysqli($this->db_host, $this->db_username, $this->db_password, $this->db_name);
         if ($this->conn_routers->connect_error) {
             die("Connection failed: " . $this->conn_routers->connect_error);
