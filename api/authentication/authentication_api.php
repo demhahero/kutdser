@@ -83,6 +83,13 @@ if(isset($_POST["action"]))
     }
 
   }// end login
+  else if($_POST["action"]==="logout") {
+          $_SESSION["session_id"] = null;
+          //header('Location: '.$site_url.'/login.php');
+          echo "{\"logout\" :", "true"
+            , ",\"message\":\"logout success\""
+            , ",\"error\":false}";
+  }// end logout
 }
 else {
   echo "{\"login\" :", "false"

@@ -28,10 +28,5 @@ if ($page != "login.php") {
     $username = $admin_row["username"];
     $admin_id = $admin_row["admin_id"];
 }
-if (isset($_GET["do"])) {
-    if ($_GET["do"] == "logout") {
-        $_SESSION["session_id"] = null;
-        header('Location: '.$site_url.'/login.php');
-    }
-}
+
 ?>

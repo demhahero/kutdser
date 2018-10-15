@@ -42,6 +42,22 @@ include_once "dbconfig.php";
         <script type="text/javascript" src="https://cdn.datatables.net/v/bs/jszip-2.5.0/dt-1.10.18/b-1.5.2/b-html5-1.5.2/datatables.min.js"></script>
         <script>
           $(document).ready(function () {
+            $(".logout").click(function(){
+              $.post("<?= $api_url ?>authentication/authentication_api.php",
+                      {
+                        action:"logout"
+                      }
+              , function (data_response, status) {
+                  data_response = $.parseJSON(data_response);
+                  if (data_response.logout == true) {
+                    window.location.href = '<?=$site_url?>/login.php';
+                  } else
+                  {
+                      alert("logout failed");
+
+                    }
+              });
+            });
             $.post("<?= $api_url ?>orders/order_sent_count_api.php",
     				 {
     					 action:"get_total_order_sent"
@@ -163,7 +179,7 @@ include_once "dbconfig.php";
                             <a data-toggle="tooltip" data-placement="top" title="Lock">
                                 <span class="glyphicon glyphicon-eye-close" aria-hidden="true"></span>
                             </a>
-                            <a data-toggle="tooltip" data-placement="top" title="Logout" href="<?= $site_url ?>/?do=logout">
+                            <a class="logout" data-toggle="tooltip" data-placement="top" title="Logout" href="#">
                                 <span class="glyphicon glyphicon-off" aria-hidden="true"></span>
                             </a>
                         </div>
@@ -194,7 +210,7 @@ include_once "dbconfig.php";
                                             </a>
                                         </li>
                                         <li><a href="javascript:;">Help</a></li>
-                                        <li><a href="<?= $site_url ?>/?do=logout"><i class="fa fa-sign-out pull-right"></i> Log Out</a></li>
+                                        <li><a class="logout" href="#"><i class="fa fa-sign-out pull-right"></i> Log Out</a></li>
                                     </ul>
                                 </li>
 

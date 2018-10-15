@@ -26,15 +26,17 @@ include_once "../header.php";
 ?>
 <script>
     $(document).ready(function () {
+      var current_customer_id=-1;
       function customerLog(customer_id){
         $.getJSON("<?= $api_url ?>orders/customer_log_api.php?customer_id="+customer_id, function (result) {
+          table.clear().draw();
 
                     $.each(result['customer_logs'], function (i, field) {
                         table.row.add([
                             field['customer_log_id'],
                             field['note'],
                             field['log_date'],
-                            field['admin'][0]['username']
+                            field['username']
                         ]).draw(false);
                     });
         });
@@ -50,9 +52,11 @@ include_once "../header.php";
         , function (response, status) {
             response = $.parseJSON(response);
             if (!response.error  ) {
+              current_customer_id=response.order_details.customer_id;
               customerLog(response.order_details.customer_id);
               $("input[name=\"customer_id\"]").val(response.order_details.customer_id);
-              $('#order_id').html(response.order_details.order_id);
+
+              document.title="Order "+response.order_details.order_id+"'s details"
               $('#displayed_order_id').html(response.order_details.order_id);
               $('#send_by_email').attr("href", "send_invoice.php?order_id="+response.order_details.order_id);
 
@@ -99,16 +103,16 @@ include_once "../header.php";
         });
         $('.dataTables_empty').html('<div class="loader"></div>');
 
-        $.getJSON("<?= $api_url ?>orders/order_api.php?order_id=<?= $_GET["order_id"] ?>", function (result) {
-                    $.each(result, function (i, field) {
+        $.getJSON("<?= $api_url ?>orders/order_api.php?order_id=<?= $_GET["order_id"] ?>", function (field) {
+
                         $(".displyed-order-id").html(field['displayed_order_id']);
-                        $(".customer-full-name").html(field['customer'][0]['full_name']);
-                        $(".customer-address").html(field['customer'][0]['address'] + field['customer'][0]['city'] + " " +
-                                field['customer'][0]['address_line_1'] + " " + field['customer'][0]['address_line_2'] + " " +
-                                field['customer'][0]['postal_code']);
-                        $(".customer-email").html(field['customer'][0]['email']);
-                        $(".customer-phone").html(field['customer'][0]['phone']);
-                        $(".customer-note").html(field['customer'][0]['note']);
+                        $(".customer-full-name").html(field['customer_name']);
+                        $(".customer-address").html(field['address'] + field['city'] + " " +
+                                field['address_line_1'] + " " + field['address_line_2'] + " " +
+                                field['postal_code']);
+                        $(".customer-email").html(field['email']);
+                        $(".customer-phone").html(field['phone']);
+                        $(".customer-note").html(field['note']);
                         $(".product-title").html(field['product_title']);
                         $(".plan").html(field['plan']);
                         $(".creation-date").html(field['creation_date']);
@@ -120,17 +124,17 @@ include_once "../header.php";
                         $(".current-cable-provider").html(field['current_cable_provider']);
                         $(".additional-service").html(field['additional_service']);
                         $(".completion").html(field['completion']);
-                        $(".reseller-full-name").html(field['reseller'][0]['full_name']);
+                        $(".reseller-full-name").html(field['reseller_name']);
                         $(".installation-date-1").html(field['installation_date_1']);
                         $(".installation-time-1").html(field['installation_time_1']);
                         $(".installation-date-2").html(field['installation_date_2']);
                         $(".installation-time-2").html(field['installation_time_2']);
                         $(".installation-date-3").html(field['installation_date_3']);
                         $(".installation-time-3").html(field['installation_time_3']);
-                        $(".subscription-ref").html("SS_" + field['merchantref'][0]["merchantref"]);
-                        $(".subscription-card-ref").html("CARD_" + field['merchantref'][0]["merchantref"]);
-                        $(".subscription-payment-ref").html("P_" + field['merchantref'][0]["merchantref"]);
-                    });
+                        $(".subscription-ref").html("SS_" + field["merchantref"]);
+                        $(".subscription-card-ref").html("CARD_" + field["merchantref"]);
+                        $(".subscription-payment-ref").html("P_" + field["merchantref"]);
+
         });
 
 
@@ -142,17 +146,18 @@ include_once "../header.php";
                             action_on_date = field['action_on_date'].split(' ');
                             action_on_date = action_on_date[0];
                         }
+
                         table2.row.add([
                             '<a href="request_details.php?request_id='+field['request_id']+'" >'+field['request_id']+'</a>',
-                            field['order']["0"]["order_id"],
-                            field['customer']["0"]["full_name"],
-                            field['reseller']["0"]["full_name"],
+                            field["order_id"],
+                            field["full_name"],
+                            field['reseller_name'],
                             field['action'],
                             field['product_title'],
                             action_on_date,
                             field['creation_date'],
                             field['verdict'],
-                            field['admin']["0"]["username"]
+                            field["username"]
                         ]).draw(false);
                     });
         });
@@ -165,11 +170,20 @@ include_once "../header.php";
             var customer_id = $("input[name=\"customer_id\"]").val();
             var log_date = "<?= $dt->format("Y-m-d H:i:s") ?>";
             var note = $("textarea[name=\"note\"]").val();
-            $.post("<?= $api_url ?>orders/customer_log_api.php", {customer_id: customer_id, log_date: log_date, note: note, type: "general", completion: "1", admin_id: '<?= $admin_id ?>'}, function (data, status) {
+            $.post("<?= $api_url ?>orders/customer_log_api.php",
+            {
+              customer_id: customer_id,
+              log_date: log_date,
+              note: note,
+              type: "general",
+              completion: "1",
+              admin_id: '<?= $admin_id ?>'
+            }, function (data, status) {
                 data = $.parseJSON(data);
                 if (data.inserted == true) {
                     alert("Log inserted");
-                    location.reload();
+                    //location.reload();
+                    customerLog(current_customer_id);
                 } else
                     alert("Error, try again");
             });
@@ -177,7 +191,7 @@ include_once "../header.php";
         });
     });
 </script>
-<title>Order <span id="order_id"></span>'s details</title>
+<title></title>
 <div class="page-header">
     <a href="orders.php">Orders</a>
     <span class="glyphicon glyphicon-play"></span>
