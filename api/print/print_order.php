@@ -2,32 +2,87 @@
 
 include_once "../dbconfig.php";
 include "../../terms.php";
-require_once '../vendor/autoload.php';
+require_once '../../mikrotik/vendor/autoload.php';
 
 use Dompdf\Dompdf;
 use Dompdf\Options;
 
 $order_id = intval(filter_input(INPUT_GET, 'order_id', FILTER_VALIDATE_INT));
-$order = $dbTools->objOrderTools($order_id, 3);
+$query = "SELECT
+          `orders`.`order_id`,
+          `order_options`.`qst_tax`,
+          `order_options`.`gst_tax`,
+          `order_options`.`remaining_days_price`,
+          `order_options`.`setup_price`,
+          `order_options`.`router_price`,
+          `order_options`.`modem_price`,
+          `order_options`.`adapter_price`,
+          `order_options`.`additional_service_price`,
+          `order_options`.`total_price`,
+          `order_options`.`product_price`,
+          `orders`.`product_title`,
 
-$qst_tax = number_format((float) $order->getQSTTax(), 2, '.', '');
-$gst_tax = number_format((float) $order->getGSTTax(), 2, '.', '');
-$price_of_remaining_days = number_format((float) $order->getRemainingDaysPrice(), 2, '.', '');
-$installation_transfer_cost = number_format((float) $order->getSetupPrice(), 2, '.', '');
-$router_cost = number_format((float) $order->getRouterPrice(), 2, '.', '');
-$modem_cost = number_format((float) $order->getModemPrice(), 2, '.', '');
-$adapter_cost = number_format((float) $order->getAdapterPrice(), 2, '.', '');
-$additional_service = number_format((float) $order->getAdditionalServicePrice(), 2, '.', '');
-$total_price = number_format((float) $order->getTotalPrice(), 2, '.', '');
-$sub_total = number_format((float) $order->getTotalPrice()-$qst_tax-$gst_tax, 2, '.', '');
-$product_price = number_format((float) $order->getProductPrice(), 2, '.', '');
+          `customers`.`full_name`,
+          `customers`.`address`,
+          `customers`.`city`,
+          `customers`.`address_line_1`,
+          `customers`.`address_line_2`,
+          `customers`.`postal_code`,
+          resellers.`full_name` as 'reseller_full_name',
+          resellers.`address` as 'reseller_address',
+          resellers.`city` as 'reseller_city',
+          resellers.`address_line_1` as 'reseller_address_line_1',
+          resellers.`address_line_2` as 'reseller_address_line_2',
+          resellers.`postal_code` as 'reseller_postal_code'
+
+          FROM `orders`
+          left JOIN `order_options` on `order_options`.`order_id`= `orders`.`order_id`
+          left JOIN `customers` on `orders`.`customer_id`=`customers`.`customer_id`
+          left JOIN `customers` resellers on resellers.`customer_id` = `orders`.`reseller_id`
+
+          where `orders`.`order_id`=?";
+
+        $stmt1 = $dbTools->getConnection()->prepare($query);
+
+
+        $stmt1->bind_param('s',
+                          $order_id
+                          ); // 's' specifies the variable type => 'string'
+
+
+        $stmt1->execute();
+
+        $result1 = $stmt1->get_result();
+        $result = $dbTools->fetch_assoc($result1);
+        $result["displayed_order_id"]=$result["order_id"];
+        if ((int) $result["order_id"] > 10380)
+            $result["displayed_order_id"] = (((0x0000FFFF & (int) $result["order_id"]) << 16).((0xFFFF0000 & (int) $result["order_id"]) >> 16));
+        $result["full_address"]=$result['address'].$result['city']." " .
+                $result['address_line_1']." ".$result['address_line_2']." " .
+                $result['postal_code'];
+        $result["reseller_full_address"]=$result['reseller_address'].$result['reseller_city']." " .
+                $result['reseller_address_line_1']." ".$result['reseller_address_line_2']." " .
+                $result['reseller_postal_code'];
+
+
+$qst_tax = number_format((float) $result["qst_tax"], 2, '.', '');
+$gst_tax = number_format((float) $result["gst_tax"], 2, '.', '');
+$price_of_remaining_days = number_format((float) $result["remaining_days_price"], 2, '.', '');
+$installation_transfer_cost = number_format((float) $result["setup_price"], 2, '.', '');
+$router_cost = number_format((float) $result["router_price"], 2, '.', '');
+$modem_cost = number_format((float) $result["modem_price"], 2, '.', '');
+$adapter_cost = number_format((float) $result["adapter_price"], 2, '.', '');
+$additional_service = number_format((float) $result["additional_service_price"], 2, '.', '');
+$total_price = number_format((float) $result["total_price"], 2, '.', '');
+$sub_total = number_format((float) $result["total_price"]-$qst_tax-$gst_tax, 2, '.', '');
+$product_price = number_format((float) $result["product_price"], 2, '.', '');
 
 $html = $terms_header . '
-                    ' . $order->getCustomer()->getFullName() . '<br/>' . $order->getCustomer()->getAddress() . '								
+                    ' . $result["full_name"] . '<br/>' . $result["full_address"] . '
                 </td>
 		<td class="address shipping-address">
                     <h3>Reseller:</h3>
-                    ' . $order->getReseller()->getFullName() . '<br/>' . $order->getReseller()->getAddress() . '
+                    ' . $result["reseller_full_name"] . '<br/>' . $result["reseller_full_address"] . '
 		</td>
 		<td class="order-data">
 			<table>
@@ -37,10 +92,10 @@ $html = $terms_header . '
 				</tr>
 				<tr class="order-date">
 					<th>Order:</th>
-					<td>#' . $order->getDisplayedID() . '</td>
+					<td>#' . $result["displayed_order_id"] . '</td>
 				</tr>
-		
-							</table>			
+
+							</table>
 		</td>
 	</tr>
 </table>
@@ -57,7 +112,7 @@ $html = $terms_header . '
 	<tbody>
             <tr class="415">
 		<td class="product">
-                    <span class="item-name">' . $order->getProduct()->getTitle() . '</span>
+                    <span class="item-name">' . $result["product_title"] . '</span>
                     <dl class="meta">																</dl>
 		</td>
 		<td class="quantity">1</td>
@@ -68,7 +123,7 @@ $html = $terms_header . '
 		<tr class="no-borders">
 			<td class="no-borders">
 				<div class="customer-notes">
-																			</div>				
+																			</div>
 			</td>
 			<td class="no-borders" colspan="2">
 				<table class="totals">
@@ -138,21 +193,20 @@ $html = $terms_header . '
 ' . $terms_footer;
 
 
-
 // instantiate and use the dompdf class
-$dompdf = new Dompdf();
-$dompdf->loadHtml($html);
-
-// (Optional) Setup the paper size and orientation
-$dompdf->setPaper('A4', 'portrait');
-
-// Render the HTML as PDF
-$dompdf->render();
-
-
-
-// Output the generated PDF to Browser
-$dompdf->stream("dompdf_out.pdf", array("Attachment" => false));
+ $dompdf = new Dompdf();
+ $dompdf->loadHtml($html);
+//
+// // (Optional) Setup the paper size and orientation
+ $dompdf->setPaper('A4', 'portrait');
+//
+// // Render the HTML as PDF
+ $dompdf->render();
+//
+//
+//
+// // Output the generated PDF to Browser
+ $dompdf->stream($result["displayed_order_id"].".pdf", array("Attachment" => false));
 
 
 exit(0);

@@ -199,7 +199,7 @@ include_once "../header.php";
 
 </div>
 
-<a target="_blank" href="<?= $site_url ?>/orders/print_order.php?order_id=<?php echo $_GET["order_id"]; ?>" class="btn btn-success print-button">Print</a>
+<a target="_blank" href="<?= $api_url ?>print/print_order.php?order_id=<?php echo $_GET["order_id"]; ?>" class="btn btn-success print-button">Print</a>
 <a id="send_by_email" class="btn btn-danger print-button check-alert" href="#">Send by Email</a>
 <a id="usage" class="btn btn-primary print-button" href="#">Usage</a>
 
