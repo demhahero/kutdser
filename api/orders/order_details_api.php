@@ -57,7 +57,7 @@ if(isset($_POST["action"]))
   }
 }else
 {
-  echo "{\"message\" :", "you don't have access to this page"
+  echo "{\"message\" :", "\"you don't have access to this page\""
     , ",\"error\":true}";
 }
 ?>

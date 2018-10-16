@@ -3,32 +3,52 @@ include_once "../header.php";
 ?>
 
 <?php
-if (isset($_GET["modem_id"])) {
-
-    $modemTools = $dbTools->objModemTools(intval($_GET["modem_id"]));
-
-    $result = $modemTools->doDelete();
-
-    if ($result)
-        echo "<div class='alert alert-success'>done</div>";
-}
+// if (isset($_GET["modem_id"])) {
+//
+//     $modemTools = $dbTools->objModemTools(intval($_GET["modem_id"]));
+//
+//     $result = $modemTools->doDelete();
+//
+//     if ($result)
+//         echo "<div class='alert alert-success'>done</div>";
+// }
 ?>
 
 <script>
 $(document).ready(function () {
     $('.dataTables_empty').html('<div class="loader"></div>');
 
-    $('#myTable2').DataTable({
+    var table2=$('#myTable2').DataTable({
         "bProcessing": true,
         "serverSide": true,
         "ajax": {
-            url: "<?= $api_url ?>modems_api.php", // json datasource
+            url: "<?= $api_url ?>modems/modems_api.php", // json datasource
             type: "post", // type of method  , by default would be get
             error: function () {  // error handling code
                 $("#myTable2").css("display", "none");
             }
         }
     });
+    $( "#myTable2 tbody" ).on( "click", ".edit", function() {
+      var edit_id = $(this).attr('data-id');
+      window.location.href = "edit_modem.php?modem_id="+edit_id;
+    });
+    $( "#myTable2 tbody" ).on( "click", ".remove", function() {
+
+        var delete_id = $(this).attr('data-id');
+        $.post("<?= $api_url ?>modems/delete_modem_api.php",
+                {
+                  delete_id: delete_id
+                }
+        , function (data, status) {
+            data = $.parseJSON(data);
+            if (data.deleted == true) {
+                alert("Record deleted");
+                table2.ajax.reload();
+            } else
+                alert("Error: delete record failed, try again later");
+        });
+      });
 });
 </script>
 <style>

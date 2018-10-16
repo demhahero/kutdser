@@ -2,28 +2,6 @@
 include_once "../header.php";
 ?>
 
-<?php
-// $order = $dbTools->objOrderTools($_GET["order_id"], 2);
-//
-// if (isset($_POST["status"])) {
-//     $order->setStatus($_POST["status"]);
-//     $order->setCompletion($_POST["completion"]);
-//
-//     if ($_POST["actual_installation_date"] != "")
-//         $order->setActualInstallationDate(new DateTime($_POST["actual_installation_date"]));
-//
-//     $order->setUpdateDate(new DateTime());
-//     $order->setAdminID($admin_id);
-//     $order->setActualInstallationTimeFrom($_POST["actual_installation_time_from"]);
-//     $order->setActualInstallationTimeTo($_POST["actual_installation_time_to"]);
-//     $order->setVLNumber($_POST["vl_number"]);
-//     $result = $order->doUpdate();
-//     if ($result)
-//         echo "<div class='alert alert-success'>done</div>";
-// }
-
-
-?>
 <script>
     $(document).ready(function () {
       var current_customer_id=-1;

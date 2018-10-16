@@ -75,7 +75,7 @@ if (isset($_GET["customer_id"])) {
             `completion`,
             `admin_id`) VALUES (?,?,?,?,?,?)";
 
-    $customer_log = $dbTools->query($query);
+    
     $stmt1 = $dbTools->getConnection()->prepare($query);
 
     $stmt1->bind_param('ssssss',
@@ -93,7 +93,7 @@ if (isset($_GET["customer_id"])) {
     if ($stmt1->errno==0) {
         echo "{\"inserted\" :true,\"error\" :\"null\"}";
     } else {
-      print_r($stmt1);
+
         echo "{\"inserted\" :\"false\",\"error\" :\"failed to insert value\"}";
     }
 }
