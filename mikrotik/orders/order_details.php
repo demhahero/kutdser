@@ -42,6 +42,19 @@ include_once "../header.php";
         });
 
       }
+      $("#send_by_email").click(function(){
+        var url=$(this).attr("data-href");
+        $.getJSON(url
+          , function (response, status) {
+              response = $.parseJSON(response);
+              if (!response.error  ) {
+                alert(response.message);//email sent
+              }
+              else{
+                alert(response.message);//email didn't sent
+              }
+            });
+      })
       var usageUrl="";
       $.post("<?= $api_url ?>orders/order_details_api.php",
         {
@@ -58,7 +71,7 @@ include_once "../header.php";
 
               document.title="Order "+response.order_details.order_id+"'s details"
               $('#displayed_order_id').html(response.order_details.order_id);
-              $('#send_by_email').attr("href", "send_invoice.php?order_id="+response.order_details.order_id);
+              $('#send_by_email').attr("data-href", "<?=$api_url?>print/send_invoice.php?order_id="+response.order_details.order_id);
 
               usageUrl="http://38.104.226.51/ahmed/netflow_graph2.php?ip="+response.order_details.ip_address;
 
@@ -200,7 +213,7 @@ include_once "../header.php";
 </div>
 
 <a target="_blank" href="<?= $api_url ?>print/print_order.php?order_id=<?php echo $_GET["order_id"]; ?>" class="btn btn-success print-button">Print</a>
-<a id="send_by_email" class="btn btn-danger print-button check-alert" href="#">Send by Email</a>
+<button id="send_by_email" class="btn btn-danger print-button check-alert" data-href="#">Send by Email</button>
 <a id="usage" class="btn btn-primary print-button" href="#">Usage</a>
 
 <br>
