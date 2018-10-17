@@ -25,7 +25,7 @@ class DBTools {
 
     private $db_username = "root";
     private $db_password = "";
-    private $db_name = 'router'; //database name
+    private $db_name = 'routers_2018_10_17'; //database name
 
     private $conn_routers;
     private $query_result;
@@ -283,7 +283,7 @@ private function fillOrderInfo($order_row,$year,$month){
   $orderChild["product_category"]=$order_row["product_category"];
 
   $orderChild["payment_method"]="Cash on Delivery";
-  if($order_row["is_credit"]==="yes")
+  if(strpos($order_row["merchantref"], 'cache_on_delivery') === false)
   {
     $orderChild["payment_method"]="VISA";
   }
@@ -1314,7 +1314,7 @@ return $customers;
 			$orderChild["product_subscription_type"]=$order_row["product_subscription_type"];
 
       $orderChild["payment_method"]="Cash on Delivery";
-      if($order_row["is_credit"]==="yes")
+      if(strpos($order_row["merchantref"], 'cache_on_delivery') === false)
       {
         $orderChild["payment_method"]="VISA";
       }
@@ -2009,7 +2009,7 @@ return $customers;
 			$orderChild["product_category"]=$order_row["product_category"];
 
       $orderChild["payment_method"]="Cash on Delivery";
-      if($order_row["is_credit"]==="yes")
+      if(strpos($order_row["merchantref"], 'cache_on_delivery') === false)
       {
         $orderChild["payment_method"]="VISA";
       }

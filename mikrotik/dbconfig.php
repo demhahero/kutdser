@@ -5,16 +5,16 @@ session_start();
 //ini_set('display_errors', 1);
 date_default_timezone_set('America/New_York');
 
-include "D:/Program/wamp/www/kutdser-master/ResellerPortal/tools/DBTools.php";
+include $_SERVER['DOCUMENT_ROOT']."/kutdser/ResellerPortal/tools/DBTools.php";
 $dbTools = new DBTools();
 
-$site_url="http://localhost/kutdser-master/mikrotik";
-$api_url = "http://localhost/kutdser-master/api/";
+$site_url="http://localhost/kutdser/mikrotik";
+$api_url = "http://localhost/kutdser/api/";
 
 $servername = "localhost";
 $username = "root";
 $password = "";
-$dbname = "router";
+$dbname = "routers_2018_10_17";
 
 $conn_routers = new mysqli($servername, $username, $password, $dbname);
 
