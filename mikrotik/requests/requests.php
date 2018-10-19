@@ -4,29 +4,19 @@ include_once "../header.php";
 
 <script>
     $(document).ready(function () {
-        $('.dataTables_empty').html('<div class="loader"></div>');
+      $('.dataTables_empty').html('<div class="loader"></div>');
 
-        $.getJSON("<?=$api_url?>requests_api.php", function (result) {
-            $.each(result['requests'], function (i, field) {
-                action_on_date="";
-                if(field['action_on_date'] != null){
-                    action_on_date = field['action_on_date'].split(' ');
-                    action_on_date = action_on_date[0];
-                }
-                table.row.add([
-                    '<a href="request_details.php?request_id='+field['request_id']+'" >'+field['request_id']+'</a>',
-                    field['order']["0"]["order_id"],
-                    field['customer']["0"]["full_name"],
-                    field['reseller']["0"]["full_name"],
-                    field['action'],
-                    field['product_title'],
-                    action_on_date,
-                    field['creation_date'],
-                    field['verdict'],
-                    field['admin']["0"]["username"]
-                 ]).draw(false);
-            });
-        });
+      var table2=$('#myTable2').DataTable({
+          "bProcessing": true,
+          "serverSide": true,
+          "ajax": {
+              url: "<?= $api_url ?>requests/requests_api.php", // json datasource
+              type: "post", // type of method  , by default would be get
+              error: function () {  // error handling code
+                  $("#myTable2").css("display", "none");
+              }
+          }
+      });
     });
 </script>
 <style>
@@ -55,9 +45,9 @@ include_once "../header.php";
 
 <title>Requests</title>
 <div class="page-header">
-    <h4>Requests</h4>    
+    <h4>Requests</h4>
 </div>
-<table id="myTable"  class="display table table-striped table-bordered">
+<table id="myTable2"  class="display table table-striped table-bordered">
     <thead>
     <th style="width: 5%;">ID</th>
     <th style="width: 10%;">Order</th>
