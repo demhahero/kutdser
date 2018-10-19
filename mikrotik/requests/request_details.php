@@ -1,5 +1,5 @@
 <?php
-include_once "../../api/dbconfig.php";
+
 include_once "../header.php";
 
 $request_id = intval($_GET["request_id"]);
