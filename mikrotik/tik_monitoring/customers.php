@@ -10,14 +10,21 @@ include_once "../header.php";
 
         $('#myTable2').DataTable({
             "order": [[0, "desc"]],
+
+            'processing': true,
+            'language': {
+                'loadingRecords': '&nbsp;',
+                'processing': 'Loading...'
+            },
             "bProcessing": true,
             "serverSide": true,
             "ajax": {
-                url: "<?= $api_url ?>tik_monitoring_customers_api.php", // json datasource
+                url: "<?= $api_url ?>tik_monitoring/tik_monitoring_customers_api.php", // json datasource
                 type: "post", // type of method  , by default would be get
                 error: function () {  // error handling code
                     $("#employee_grid_processing").css("display", "none");
                 }
+
             }
         });
     });
@@ -48,7 +55,7 @@ include_once "../header.php";
 
 <title>Support</title>
 <div class="page-header">
-    <a class="last" href="">Support</a>    
+    <a class="last" href="">Support</a>
 </div>
 <table id="myTable2" class="display table table-striped table-bordered">
     <thead>

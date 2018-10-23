@@ -1,5 +1,8 @@
 <?php
 include_once "../header.php";
+$edit_id=0;
+if(isset($_GET["customer_id"]))
+$edit_id=$_GET["customer_id"];
 ?>
 
 
@@ -7,35 +10,61 @@ include_once "../header.php";
 <script>
     $(document).ready(function () {
         $('.dataTables_empty').html('<div class="loader"></div>');
-    
 
-        $.getJSON("<?= $api_url ?>tik_monitoring_customer_api.php?customer_id=<?= $_GET["customer_id"] ?>", function (result) {
+        $.post("<?= $api_url ?>tik_monitoring/tik_monitoring_customer_api.php"
+        ,{
+              "edit_id":<?=$edit_id?>,
+              "action": "get_customer_monintor_by_id"
+          }, function (data) {
+          data = $.parseJSON(data);
+          if (data.error != true) {
+
+            $(".customer-id").html(data.customer['customer_id']);
+            $(".full-name").html(data.customer['full_name']);
+            $(".reseller").html(data.customer['reseller_name']);
+            $(".modem-mac").html(data.customer["mac_address"]);
+            $(".router-mac").html(data.customer["router_mac_address"]);
+
+            $(".address").html(data.customer['address']);
+            $(".phone").html(data.customer['phone']);
+            $(".ip").html(data.customer["ip_address"]);
+          }
+          else{
+            alert("error loading data, please contact admin");
+          }
+      });
+
+        $.getJSON("<?= $api_url ?>tik_monitoring/tik_monitoring_customer_api.php?customer_id=<?= $_GET["customer_id"] ?>", function (result) {
 
                     $.each(result['customers'], function (i, field) {
-                        
+
                         $(".customer-id").html(field['customer_id']);
                         $(".full-name").html(field['full_name']);
                         $(".reseller").html(field['reseller'][0]['full_name']);
                         $(".modem-mac").html(field['modem'][0]["mac_address"]);
                         $(".router-mac").html(field['modem'][0]["router_mac_address"]);
-                     
+
                         $(".address").html(field['address']);
                         $(".phone").html(field['phone']);
                         $(".ip").html(field['modem'][0]["ip_address"]);
                     });
                 });
 
-                $.getJSON("<?= $api_url ?>customer_log_api.php?customer_id=<?= $_GET["customer_id"] ?>", function (result) {
+function loadCustomerLog(){
+  $.getJSON("<?= $api_url ?>orders/customer_log_api.php?customer_id=<?= $_GET["customer_id"] ?>", function (result) {
+              table.clear().draw();
+              $.each(result['customer_logs'], function (i, field) {
 
-                            $.each(result['customer_logs'], function (i, field) {
-                                table.row.add([
-                                    field['customer_log_id'],
-                                    field['note'],
-                                    field['log_date'],
-                                    field['admin'][0]['username']
-                                ]).draw(false);
-                            });
-                        });
+                  table.row.add([
+                      field['customer_log_id'],
+                      field['note'],
+                      field['log_date'],
+                      field['username']
+                  ]).draw(false);
+              });
+          });
+}
+  loadCustomerLog();
 
                         $(".submit").click(function () {
 <?php
@@ -44,11 +73,11 @@ $dt = new DateTime();
                             var customer_id = "<?= $_GET['customer_id'] ?>";
                             var log_date = "<?= $dt->format("Y-m-d H:i:s") ?>";
                             var note = $("textarea[name=\"note\"]").val();
-                            $.post("<?= $api_url ?>customer_log_api.php", {customer_id: customer_id, log_date: log_date, note: note, type: "general", completion: "1", admin_id: '<?= $admin_id ?>'}, function (data, status) {
+                            $.post("<?= $api_url ?>orders/customer_log_api.php", {customer_id: customer_id, log_date: log_date, note: note, type: "general", completion: "1", admin_id: '<?= $admin_id ?>'}, function (data, status) {
                                 data = $.parseJSON(data);
                                 if (data.inserted == true) {
                                     alert("Log inserted");
-                                    location.reload();
+                                    loadCustomerLog();
                                 } else
                                     alert("Error, try again");
                             });
@@ -82,7 +111,7 @@ $dt = new DateTime();
 
 <title>Support</title>
 <div class="page-header">
-    <a class="last" href="">Support</a>    
+    <a class="last" href="">Support</a>
 </div>
 <table class="display table table-striped table-bordered">
     <tr>
@@ -140,7 +169,7 @@ $dt = new DateTime();
 <form class="register-form" method="post">
     <div class="form-group">
         <label>Note:</label>
-        <textarea name="note" style="width:100%;" class="form-control"></textarea> 
+        <textarea name="note" style="width:100%;" class="form-control"></textarea>
     </div>
     <input type="submit" class="btn btn-default submit"  value="Send">
 </form>

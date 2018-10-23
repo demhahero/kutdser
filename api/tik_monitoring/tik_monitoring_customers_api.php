@@ -1,6 +1,6 @@
 <?php
 
-include_once "dbconfig.php";
+include_once "../dbconfig.php";
 
 // initilize all variable
 $params = $columns = $totalRecords = $data = array();
@@ -25,8 +25,8 @@ $where = $sqlTot = $sqlRec = "";
 
 
 
-$sqlTot = "SELECT `merchantrefs`.`merchantref`, `merchantrefs`.`order_id`, 
-    `merchantrefs`.`is_credit`, `customers`.`customer_id` , `customers`.`phone` , customers.address, 
+$sqlTot = "SELECT `merchantrefs`.`merchantref`, `merchantrefs`.`order_id`,
+    `merchantrefs`.`is_credit`, `customers`.`customer_id` , `customers`.`phone` , customers.address,
     customers.email, customers.full_name, orders.order_id, resellers.full_name AS 'reseller_name',
     `orders`.`vl_number`,
     customers.reseller_id, `modems`.`mac_address`, `modems`.`modem_id`, `modems`.`ip_address`, `modems`.`router_mac_address`
@@ -44,17 +44,17 @@ $sqlRec = $sqlTot;
 // check search value exist
 if (!empty($params['search']['value'])) {
     $where .= " WHERE ";
-    $where .= " ( `customers`.`full_name` LIKE '%" . $params['search']['value'] . "%' ";
-    $where .= " OR `resellers`.`full_name` LIKE '%" . $params['search']['value'] . "%' ";
-    $where .= " OR `merchantref` LIKE '%" . $params['search']['value'] . "%' ";
-    $where .= " OR `customers`.`customer_id` LIKE '%" . $params['search']['value'] . "%' ";
-    $where .= " OR `customers`.`phone` LIKE '%" . $params['search']['value'] . "%' ";
-    $where .= " OR `customers`.`address` LIKE '%" . $params['search']['value'] . "%' ";
-    $where .= " OR `orders`.`vl_number` LIKE '%" . $params['search']['value'] . "%' ";
-    $where .= " OR `modems`.`ip_address` LIKE '%" . $params['search']['value'] . "%' ";
-    $where .= " OR `modems`.`router_mac_address` LIKE '%" . $params['search']['value'] . "%' ";
-    $where .= " OR `modems`.`mac_address` LIKE '%" . $params['search']['value'] . "%')  ";
-    
+    $where .= " ( `customers`.`full_name` LIKE ? ";
+    $where .= " OR `resellers`.`full_name` LIKE ? ";
+    $where .= " OR `merchantref` LIKE ? ";
+    $where .= " OR `customers`.`customer_id` LIKE ? ";
+    $where .= " OR `customers`.`phone` LIKE ? ";
+    $where .= " OR `customers`.`address` LIKE ? ";
+    $where .= " OR `orders`.`vl_number` LIKE ? ";
+    $where .= " OR `modems`.`ip_address` LIKE ? ";
+    $where .= " OR `modems`.`router_mac_address` LIKE ? ";
+    $where .= " OR `modems`.`mac_address` LIKE ?)  ";
+
 }
 
 //concatenate search sql if value exist
@@ -71,15 +71,64 @@ $sqlRec .= " ORDER BY " . $columns[$params['order'][0]['column']] . "   " . $par
 $sqlRec .= " LIMIT " . $params['start'] . " ," . $params['length'];
 
 
-echo $sqlRec;
 
 mysqli_query($dbTools->getConnection(), "SET CHARACTER SET utf8");
-$queryTot = mysqli_query($dbTools->getConnection(), $sqlTot);
+
+$stmt = $dbTools->getConnection()->prepare($sqlTot);
+
+
+
+
+if (isset($where) && $where != '') {
+  $search_value="%".$params['search']['value']."%";
+$stmt->bind_param('ssssssssss',
+                  $search_value,
+                  $search_value,
+                  $search_value,
+                  $search_value,
+                  $search_value,
+                  $search_value,
+                  $search_value,
+                  $search_value,
+                  $search_value,
+                  $search_value );
+
+}
+
+$stmt->execute();
+
+$result = $stmt->get_result();
+
+$queryTot = $result;
 
 $totalRecords = mysqli_num_rows($queryTot);
 
-$queryRecords = mysqli_query($dbTools->getConnection(), $sqlRec);
 
+$stmt1 = $dbTools->getConnection()->prepare($sqlRec);
+
+if (isset($where) && $where != '') {
+  $search_value="%".$params['search']['value']."%";
+
+  $stmt1->bind_param('ssssssssss',
+                    $search_value,
+                    $search_value,
+                    $search_value,
+                    $search_value,
+                    $search_value,
+                    $search_value,
+                    $search_value,
+                    $search_value,
+                    $search_value,
+                    $search_value );
+}
+
+
+$stmt1->execute();
+
+
+$result1 = $stmt1->get_result();
+
+$queryRecords = $result1;
 //iterate on results row and create new index array of data
 while ($row = mysqli_fetch_array($queryRecords)) {
 
@@ -93,7 +142,7 @@ while ($row = mysqli_fetch_array($queryRecords)) {
     $data[7] = $row['vl_number'];
     $data[8] = $row['address'];
     $data[9] = $row['merchantref'];
-    
+
     $all_data[] = $data;
 }
 
@@ -105,5 +154,5 @@ $json_data = array(
 );
 
 
-echo $json = json_encode($json_data);	
+echo $json = json_encode($json_data);
 ?>
