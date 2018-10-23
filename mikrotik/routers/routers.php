@@ -2,26 +2,52 @@
 include_once "../header.php";
 ?>
 
-<?php
-if (isset($_GET["router_id"])) {
+<script>
+$(document).ready(function () {
+    $('.dataTables_empty').html('<div class="loader"></div>');
 
-    $routerTools = $dbTools->objRouterTools(intval($_GET["router_id"]));
+    var table2=$('#myTable2').DataTable({
+        "bProcessing": true,
+        "serverSide": true,
+        "ajax": {
+            url: "<?= $api_url ?>routers/routers_api.php", // json datasource
+            type: "post", // type of method  , by default would be get
+            error: function () {  // error handling code
+                $("#myTable2").css("display", "none");
+            }
+        }
+    });
+    $( "#myTable2 tbody" ).on( "click", ".edit", function() {
+      var edit_id = $(this).attr('data-id');
+      window.location.href = "edit_router.php?router_id="+edit_id;
+    });
+    $( "#myTable2 tbody" ).on( "click", ".remove", function() {
 
-    $result = $routerTools->doDelete();
-
-    if ($result)
-        echo "<div class='alert alert-success'>done</div>";
-}
-?>
+        var delete_id = $(this).attr('data-id');
+        $.post("<?= $api_url ?>routers/delete_router_api.php",
+                {
+                  delete_id: delete_id
+                }
+        , function (data, status) {
+            data = $.parseJSON(data);
+            if (data.deleted == true) {
+                alert("Record deleted");
+                table2.ajax.reload();
+            } else
+                alert("Error: delete record failed, try again later");
+        });
+      });
+});
+</script>
 
 <title>Routers</title>
 <div class="page-header">
-    <h4>Routers</h4>    
+    <h4>Routers</h4>
 </div>
-<a href="create_router.php" class="btn btn-primary">+ Create</a> 
+<a href="create_router.php" class="btn btn-primary">+ Create</a>
 
 <br><br>
-<table id="myTable"  class="display table table-striped table-bordered">
+<table id="myTable2"  class="display table table-striped table-bordered">
     <thead>
     <th>ID</th>
     <th>Serial Number</th>
@@ -30,36 +56,7 @@ if (isset($_GET["router_id"])) {
     <th>Functions</th>
 </thead>
 <tbody>
-    <?php
-    $routers = $dbTools->router_query("select * from `routers`");
-    foreach ($routers as $router) {
-        ?>
-        <tr>
-            <td style="width: 5%;"><?= $router->getRouterID() ?></td>
-            <td style="width: 25%;"><?= $router->getSerialNumber() ?></td>
-            <td style="width: 30%;">
-                <?php
-                if ($router->getReseller() != null)
-                    echo $router->getReseller()->getFullName();
-                ?>
-            </td>
-            <td style="width: 30%;">
-                <?php
-                if ($router->getCustomer() != null) {
-                    echo "<a href=\"$site_url/edit_customer.php?customer_id=" . $router->getCustomer()->getCustomerID() . "\">" . $router->getCustomer()->getFullName() . "</a>";
-                }
-                ?>
-            </td>
-            <td class="functions" style="width: 12%;">
-                <span class="functions">
-                    <a href="edit_router.php?router_id=<?= $router->getRouterID() ?>"><img title="Edit" width="30px" src="<?= $site_url ?>/img/edit-icon.png" /></a>
-                    <a class="check-alert" href="routers.php?do=delete&router_id=<?= $router->getRouterID() ?>"><img title="Remove" width="30px" src="<?= $site_url ?>/img/delete-icon.png" /></a>
-                </span>
-            </td>
-        </tr>
-        <?php
-    }
-    ?>	
+    	
 </tbody>
 </table>
 
