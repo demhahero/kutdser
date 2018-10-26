@@ -2,11 +2,53 @@
 include_once "../header.php";
 ?>
 
+<script>
+$(document).ready(function () {
+    $('.dataTables_empty').html('<div class="loader"></div>');
+
+    var table2=$('#myTable2').DataTable({
+        "bProcessing": true,
+        "serverSide": true,
+        "ajax": {
+            url: "<?= $api_url ?>customers/resellers_api.php", // json datasource
+            type: "post", // type of method  , by default would be get
+            error: function () {  // error handling code
+                $("#myTable2").css("display", "none");
+            }
+        }
+    });
+
+});
+</script>
+<style>
+    .loader {
+        border: 16px solid #f3f3f3;
+        border-radius: 50%;
+        border-top: 16px solid #3498db;
+        width: 60px;
+        height: 60px;
+        margin:0 auto;
+        -webkit-animation: spin 2s linear infinite; /* Safari */
+        animation: spin 2s linear infinite;
+    }
+
+    /* Safari */
+    @-webkit-keyframes spin {
+        0% { -webkit-transform: rotate(0deg); }
+        100% { -webkit-transform: rotate(360deg); }
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+</style>
+
 <title>Resellers</title>
 <div class="page-header">
     <a class="last" href="">Resellers</a>
 </div>
-<table id="myTable" class="display table table-striped table-bordered">
+<table id="myTable2" class="display table table-striped table-bordered">
     <thead>
     <th>ID</th>
     <th>Full Name</th>
@@ -18,35 +60,7 @@ include_once "../header.php";
     <th>Edit discount</th>
 </thead>
 <tbody>
-    <?php
-    $query="select * from `customers` where `is_reseller` = '1'";
-    $queryRecords = mysqli_query($conn_routers, $query);
-    //iterate on results row and create new index array of data
-    while ($customer = mysqli_fetch_array($queryRecords)) {
 
-
-        ?>
-        <tr>
-            <td style="width: 5%;"><?=$customer['customer_id']?></td>
-            <td style="width: 40%;"><a href="<?=$site_url?>/customers/edit_reseller.php?customer_id=<?=$customer['customer_id']?>"><?=$customer['full_name']?></a></td>
-            <td style="width: 15%;"><?=$customer['phone']?></td>
-            <td style="width: 25%;"><?=$customer['email']?></td>
-            <td style="width: 5%;">
-                <a href="reseller_customers.php?reseller_id=<?=$customer['customer_id']?>">Customers</a>
-            </td>
-            <td style="width: 5%;">
-                <a href="<?=$site_url?>/statistics/reseller_child_customers_monthly.php?reseller_id=<?=$customer['customer_id']?>">Monthly</a>
-            </td>
-            <td style="width: 5%;">
-                <a href="<?=$site_url?>/statistics/reseller_customers_monthly_new.php?reseller_id=<?=$customer['customer_id']?>">Monthly</a>
-            </td>
-            <td style="width: 5%;">
-              <a target='_blank' href="<?= $site_url ?>/customers/edit_discount.php?reseller_id=<?=$customer['customer_id']?>"><img src='<?= $site_url ?>/img/edit-icon.png' style='width: 25px;' /></a>
-            </td>
-        </tr>
-        <?php
-    }
-    ?>
 </tbody>
 </table>
 

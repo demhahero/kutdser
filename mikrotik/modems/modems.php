@@ -2,17 +2,6 @@
 include_once "../header.php";
 ?>
 
-<?php
-// if (isset($_GET["modem_id"])) {
-//
-//     $modemTools = $dbTools->objModemTools(intval($_GET["modem_id"]));
-//
-//     $result = $modemTools->doDelete();
-//
-//     if ($result)
-//         echo "<div class='alert alert-success'>done</div>";
-// }
-?>
 
 <script>
 $(document).ready(function () {

@@ -1,19 +1,70 @@
 <?php
 include_once "../header.php";
+
+$reseller_id=0;
+if(isset($_GET["reseller_id"]))
+  $reseller_id = intval($_GET["reseller_id"]);
 ?>
 
-<?php
-$reseller_id = intval($_GET["reseller_id"]);
-$reseller = $dbTools->objCustomerTools($reseller_id);
-?>
+<script>
+$(document).ready(function () {
+    $('.dataTables_empty').html('<div class="loader"></div>');
 
-<title><?= $reseller->getFullName(); ?>'s customers</title>
-<div class="page-header">  
-    <a href="resellers.php">Resellers</a> 
+    var data_id={
+      "data_id":<?=$reseller_id?>
+    };
+    var table2=$('#myTable2').DataTable({
+        "bProcessing": true,
+        "serverSide": true,
+        "ajax": {
+            "url": "<?= $api_url ?>customers/reseller_customers_api.php", // json datasource
+            "type": "post", // type of method  , by default would be get
+            "data": data_id,
+            "dataSrc": function ( json ) {
+
+                $("#reseller_full_name").html(json.reseller_full_name+"'s customers");
+                document.title=json.reseller_full_name+"'s customers";
+                return json.data;
+              },
+            error: function () {  // error handling code
+                $("#myTable2").css("display", "none");
+            }
+        }
+    });
+
+});
+</script>
+<style>
+    .loader {
+        border: 16px solid #f3f3f3;
+        border-radius: 50%;
+        border-top: 16px solid #3498db;
+        width: 60px;
+        height: 60px;
+        margin:0 auto;
+        -webkit-animation: spin 2s linear infinite; /* Safari */
+        animation: spin 2s linear infinite;
+    }
+
+    /* Safari */
+    @-webkit-keyframes spin {
+        0% { -webkit-transform: rotate(0deg); }
+        100% { -webkit-transform: rotate(360deg); }
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+</style>
+
+<title>'s customers</title>
+<div class="page-header">
+    <a href="resellers.php">Resellers</a>
     <span class="glyphicon glyphicon-play"></span>
-    <a class="last" href=""><?= $reseller->getFullName(); ?>'s customers</a>  
+    <a id="reseller_full_name" class="last" href=""></a>
 </div>
-<table id="myTable" class="display table table-striped table-bordered">
+<table id="myTable2" class="display table table-striped table-bordered">
     <thead>
     <th>ID</th>
     <th>Full Name</th>
@@ -23,24 +74,7 @@ $reseller = $dbTools->objCustomerTools($reseller_id);
     <th>Orders</th>
 </thead>
 <tbody>
-    <?php
-    foreach ($reseller->getResellerCustomers() as $customer) {
-        ?>
-        <tr>
-            <td style="width: 5%;"><?= $customer->getCustomerID() ?></td>
-            <td style="width: 45%;"><?= $customer->getFullName() ?></td>
-            <td style="width: 15%;"><?= $customer->getPhone() ?></td>
-            <td style="width: 30%;"><?= $customer->getEmail() ?></td>
-            <td style="width: 5%;">
-                <a href="customer_invoices.php?customer_id=<?= $customer->getCustomerID() ?>">Invoices</a>
-            </td>
-            <td style="width: 5%;">
-                <a href="customer_orders.php?customer_id=<?= $customer->getCustomerID() ?>">Orders</a>
-            </td>
-        </tr>
-        <?php
-    }
-    ?>	
+
 </tbody>
 </table>
 
