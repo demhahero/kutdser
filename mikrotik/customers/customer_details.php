@@ -8,6 +8,8 @@ curl_setopt($c, CURLOPT_RETURNTRANSFER, true);
 //curl_setopt(... other options you want...)
 
 $html = curl_exec($c);
+if(strLen($html)<=0)
+  $html=0;
 ?>
 
 <script>
@@ -16,17 +18,20 @@ $html = curl_exec($c);
         var subscribers_list = <?= $html ?>;
 
 
-                $.getJSON("<?= $api_url ?>customer_log_api.php?customer_id=<?= $_GET["customer_id"] ?>", function (result) {
+function loadCustomerLog(){
+  $.getJSON("<?= $api_url ?>orders/customer_log_api.php?customer_id=<?= $_GET["customer_id"] ?>", function (result) {
 
-                            $.each(result['customer_logs'], function (i, field) {
-                                table.row.add([
-                                    field['customer_log_id'],
-                                    field['note'],
-                                    field['log_date'],
-                                    field['admin'][0]['username']
-                                ]).draw(false);
-                            });
-                        });
+        $.each(result['customer_logs'], function (i, field) {
+            table.row.add([
+                field['customer_log_id'],
+                field['note'],
+                field['log_date'],
+                field['username']
+            ]).draw(false);
+        });
+    });
+}
+loadCustomerLog();
 
                         $(".submit").click(function () {
 <?php
@@ -35,11 +40,12 @@ $dt = new DateTime();
                             var customer_id = "<?= $_GET['customer_id'] ?>";
                             var log_date = "<?= $dt->format("Y-m-d H:i:s") ?>";
                             var note = $("textarea[name=\"note\"]").val();
-                            $.post("<?= $api_url ?>customer_log_api.php", {customer_id: customer_id, log_date: log_date, note: note, type: "general", completion: "1", admin_id: '<?= $admin_id ?>'}, function (data, status) {
+                            $.post("<?= $api_url ?>orders/customer_log_api.php", {customer_id: customer_id, log_date: log_date, note: note, type: "general", completion: "1", admin_id: '<?= $admin_id ?>'}, function (data, status) {
                                 data = $.parseJSON(data);
                                 if (data.inserted == true) {
                                     alert("Log inserted");
-                                    location.reload();
+                                    table.clear().draw();
+                                    loadCustomerLog();
                                 } else
                                     alert("Error, try again");
                             });
@@ -73,7 +79,7 @@ $dt = new DateTime();
 
 <title>Customer Details</title>
 <div class="page-header">
-    <a class="last" href="">Customer Details</a>    
+    <a class="last" href="">Customer Details</a>
 </div>
 
 <table id="myTable" class="display table table-striped table-bordered">
@@ -91,7 +97,7 @@ $dt = new DateTime();
 <form class="register-form" method="post">
     <div class="form-group">
         <label>Note:</label>
-        <textarea name="note" style="width:100%;" class="form-control"></textarea> 
+        <textarea name="note" style="width:100%;" class="form-control"></textarea>
     </div>
     <input type="submit" class="btn btn-default submit"  value="Send">
 </form>

@@ -4,19 +4,19 @@ include_once "header.php";
 
 <?php
 if (isset($_POST["full_name"])) {
-   
+
     if(strlen($_POST["termination_date"]) > 5)
         $termination_date = "'" . mysql_real_escape_string($_POST["termination_date"]) . "'";
-    else 
+    else
         $termination_date = "NULL";
 
     if ($_POST["password"] != "" && $_POST["password"] != " ") {
         $password = password_hash($_POST["password"], PASSWORD_DEFAULT);
-        
+
         if ($_POST["is_reseller"] != "1") {
             $_POST["is_reseller"] = "0";
         }
-        $result = mysql_query("Update `customers` set
+        $result = mysql_query($conn_routers,"Update `customers` set
                                     `username` = '" . mysql_real_escape_string($_POST["username"]) . "',
                                     `password` = '" . mysql_real_escape_string($password) . "',
                                     `full_name` = '" . mysql_real_escape_string($_POST["full_name"]) . "',
@@ -31,10 +31,10 @@ if (isset($_POST["full_name"])) {
                                     `is_reseller` = '" . mysql_real_escape_string($_POST["is_reseller"]) . "',
                                     `actual_installation_date` = '" . mysql_real_escape_string($_POST["actual_installation_date"]) . "',
                                     `actual_installation_time_from` = '" . mysql_real_escape_string($_POST["actual_installation_time_from"]) . "',
-                                    `actual_installation_time_to` = '" . mysql_real_escape_string($_POST["actual_installation_time_to"]) . "', 
-                                    `completion` = '" . mysql_real_escape_string($_POST["completion"]) . "', 
+                                    `actual_installation_time_to` = '" . mysql_real_escape_string($_POST["actual_installation_time_to"]) . "',
+                                    `completion` = '" . mysql_real_escape_string($_POST["completion"]) . "',
                                     `note` = '" . mysql_real_escape_string($_POST["note"]) . "',
-                                    `join_type` = '" . mysql_real_escape_string($_POST["join_type"]) . "', 
+                                    `join_type` = '" . mysql_real_escape_string($_POST["join_type"]) . "',
                                     `ip_address` = '" . mysql_real_escape_string($_POST["ip_address"]) . "',
                                     `termination_date` = ".$termination_date.",
                                     `product_id` = '" . mysql_real_escape_string($_POST["product_id"]) . "'
@@ -44,7 +44,7 @@ if (isset($_POST["full_name"])) {
         if ($_POST["is_reseller"] != "1") {
             $_POST["is_reseller"] = "0";
         }
-        $result = mysql_query("Update `customers` set
+        $result = mysql_query($conn_routers,"Update `customers` set
                                     `username` = '" . mysql_real_escape_string($_POST["username"]) . "',
                                     `full_name` = '" . mysql_real_escape_string($_POST["full_name"]) . "',
                                     `email` = '" . mysql_real_escape_string($_POST["email"]) . "',
@@ -54,14 +54,14 @@ if (isset($_POST["full_name"])) {
                                     `order_id` = '" . mysql_real_escape_string($_POST["order_id"]) . "',
                                     `start_date` = '" . mysql_real_escape_string($_POST["start_date"]) . "',
                                     `reseller_id` = '" . mysql_real_escape_string($_POST["reseller_id"]) . "',
-                                    `parent_reseller` = '" . mysql_real_escape_string($_POST["parent_reseller"]) . "',    
+                                    `parent_reseller` = '" . mysql_real_escape_string($_POST["parent_reseller"]) . "',
                                     `is_reseller` = '" . mysql_real_escape_string($_POST["is_reseller"]) . "',
                                     `actual_installation_date` = '" . mysql_real_escape_string($_POST["actual_installation_date"]) . "',
                                     `actual_installation_time_from` = '" . mysql_real_escape_string($_POST["actual_installation_time_from"]) . "',
-                                    `actual_installation_time_to` = '" . mysql_real_escape_string($_POST["actual_installation_time_to"]) . "', 
-                                    `completion` = '" . mysql_real_escape_string($_POST["completion"]) . "', 
+                                    `actual_installation_time_to` = '" . mysql_real_escape_string($_POST["actual_installation_time_to"]) . "',
+                                    `completion` = '" . mysql_real_escape_string($_POST["completion"]) . "',
                                     `note` = '" . mysql_real_escape_string($_POST["note"]) . "',
-                                    `join_type` = '" . mysql_real_escape_string($_POST["join_type"]) . "', 
+                                    `join_type` = '" . mysql_real_escape_string($_POST["join_type"]) . "',
                                     `ip_address` = '" . mysql_real_escape_string($_POST["ip_address"]) . "',
                                     `termination_date` = ".$termination_date.",
                                     `product_id` = '" . mysql_real_escape_string($_POST["product_id"]) . "'
@@ -73,8 +73,8 @@ if (isset($_POST["full_name"])) {
         echo "<div class='alert alert-success'>done</div>";
 }
 
-$query = mysql_query("select * from `customers` where `customer_id`='" . $_GET["customer_id"] . "'");
-$row = mysql_fetch_array($query);
+$query = mysqli_query($conn_routers,"select * from `customers` where `customer_id`='" . $_GET["customer_id"] . "'");
+$row = mysqli_fetch_array($query);
 
 $sql = "select * from `customers` where `is_reseller`='1'";
 $reseller_result = $connection->query($sql);
@@ -84,7 +84,7 @@ $reseller_parent_result = $connection->query($sql);
 
 <title>Edit Customer</title>
 <div class="page-header">
-    <h4>Edit Customer</h4>    
+    <h4>Edit Customer</h4>
 </div>
 <form class="register-form" method="post">
 
@@ -125,9 +125,9 @@ $reseller_parent_result = $connection->query($sql);
         <input type="text"  name="product_id" value="<?= $row["product_id"]; ?>" class="form-control" placeholder="product ID"/>
 <?php
 $servername = "localhost";
-$username = "i3702914_wp1";
-$password = "D@fH(9@QUrGOC7Ki5&*61]&0";
-$dbname = "i3702914_wp1";
+$username = "root";
+$password = "";
+$dbname = "routers_2018_08_07";
 
 // Create connection
 $conn_wordpress = new mysqli($servername, $username, $password, $dbname);
@@ -151,7 +151,7 @@ ORDER BY wpp.ID ASC, FIELD ASC, wppm.meta_id DESC;";
                 $row_customer = $result_customer->fetch_assoc();
 
                 echo "<span style='color:red;'><b>".$row_customer["post_title"]."</b></span>";
-                
+
             }
 ?>
     </div>
@@ -207,7 +207,7 @@ ORDER BY wpp.ID ASC, FIELD ASC, wppm.meta_id DESC;";
                         echo "<option value='" . $reseller["customer_id"] . "'>" . $reseller["full_name"] . "</option>";
                 }
             }
-            ?>   
+            ?>
         </select>
     </div>
     <div class="form-group">
@@ -223,7 +223,7 @@ ORDER BY wpp.ID ASC, FIELD ASC, wppm.meta_id DESC;";
                         echo "<option value='" . $reseller["customer_id"] . "'>" . $reseller["full_name"] . "</option>";
                 }
             }
-            ?>   
+            ?>
         </select>
     </div>
     <div class="form-group">

@@ -36,11 +36,11 @@ $query = "SELECT
           resellers.`postal_code` as 'reseller_postal_code'
 
           FROM `orders`
-          left JOIN `order_options` on `order_options`.`order_id`= `orders`.`order_id`
-          left JOIN `customers` on `orders`.`customer_id`=`customers`.`customer_id`
-          left JOIN `customers` resellers on resellers.`customer_id` = `orders`.`reseller_id`
+          LEFT JOIN `order_options` ON `order_options`.`order_id`= `orders`.`order_id`
+          LEFT JOIN `customers` ON `orders`.`customer_id`=`customers`.`customer_id`
+          LEFT JOIN `customers` resellers ON resellers.`customer_id` = `orders`.`reseller_id`
 
-          where `orders`.`order_id`=?";
+          WHERE `orders`.`order_id`=?";
 
         $stmt1 = $dbTools->getConnection()->prepare($query);
 

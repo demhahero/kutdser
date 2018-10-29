@@ -13,7 +13,7 @@ $html = curl_exec($c);
 <script>
     $(document).ready(function () {
 
-        $.getJSON("<?= $api_url ?>reseller_edit_api.php?customer_id=<?= $_GET["customer_id"] ?>", function (result) {
+        $.getJSON("<?= $api_url ?>customers/reseller_edit_api.php?customer_id=<?= $_GET["customer_id"] ?>", function (result) {
                     $.each(result['resellers'], function (i, item) {
 
                         $("select[name=\"parent_reseller\"]").append($('<option>', {
@@ -51,7 +51,7 @@ $html = curl_exec($c);
                     var phone = $("input[name=\"phone\"]").val();
                     var reseller_commission_percentage=$("input[name=\"reseller_commission_percentage\"]").val();
 
-                    $.post("<?= $api_url ?>reseller_edit_api.php",
+                    $.post("<?= $api_url ?>customers/reseller_edit_api.php",
                             {
                               customer_id: customer_id,
                               full_name: full_name,
@@ -79,7 +79,7 @@ $html = curl_exec($c);
                     var username = $("input[name=\"username\"]").val();
                     var new_password = $("input[name=\"new_password\"]").val();
 
-                    $.post("<?= $api_url ?>reseller_edit_api.php",
+                    $.post("<?= $api_url ?>customers/reseller_edit_api.php",
                             {
                               customer_id: customer_id,
                               username: username,

@@ -10,16 +10,16 @@ if (isset($_GET["type"])) {
 }
 
 if (isset($_GET["customer_id"])) {
-    $result = mysql_query("DELETE FROM `customers` WHERE `customer_id` = '" . $_GET["customer_id"] . "'");
+    $result = mysqli_query($connection,"DELETE FROM `customers` WHERE `customer_id` = '" . $_GET["customer_id"] . "'");
     if ($result)
         echo "<div class='alert alert-success'>done</div>";
 }
 ?>
 <title><?php if($type == '') echo "Customers"; else echo "Resellers";?></title>
 <div class="page-header">
-    <h4><?php if($type == '') echo "Customers"; else echo "Resellers";?></h4>    
+    <h4><?php if($type == '') echo "Customers"; else echo "Resellers";?></h4>
 </div>
-<a href="create_customer.php" class="btn btn-primary">+ Create 1</a> 
+<a href="create_customer.php" class="btn btn-primary">+ Create 1</a>
 
 <br><br>
 <table id="myTable"  class="display table table-striped table-bordered">
@@ -33,8 +33,8 @@ if (isset($_GET["customer_id"])) {
 </thead>
 <tbody>
     <?php
-    $query = mysql_query("select * from `customers` where `is_reseller`='" . $type . "'");
-    while ($row = mysql_fetch_array($query)) {
+    $query = mysqli_query($connection,"select * from `customers` where `is_reseller`='" . $type . "'");
+    while ($row = mysqli_fetch_array($query)) {
         ?>
         <tr>
             <td style="width: 5%;"><?php echo $row["customer_id"]; ?></td>
@@ -71,7 +71,7 @@ if (isset($_GET["customer_id"])) {
         </tr>
         <?php
     }
-    ?>	
+    ?>
 </tbody>
 </table>
 

@@ -2,6 +2,9 @@
 include_once "../header.php";
 $month=isset($_GET["month"])?$_GET["month"]:5;
 $year=isset($_GET["year"])?$_GET["year"]:2018;
+
+include_once "../../ResellerPortal/tools/DBTools.php";
+$dbTools=new DBTools();
 ?>
 
 <?php
@@ -21,7 +24,7 @@ if (isset($_GET["modem_id"])) {
     $(document).ready(function () {
         $('.dataTables_empty').html('<div class="loader"></div>');
 
-        $.getJSON("<?= $api_url ?>orders_by_month_for_customer.php?customer_id=<?= $_GET["customer_id"] ?>&month=<?= $month ?>&year=<?= $year ?>", function (result) {
+        $.getJSON("<?= $api_url ?>customers/orders_by_month_for_customer.php?customer_id=<?= $_GET["customer_id"] ?>&month=<?= $month ?>&year=<?= $year ?>", function (result) {
           var total=0;
           var totalWoR=0;
 					var totalWT=0;
@@ -138,7 +141,7 @@ if (isset($_GET["modem_id"])) {
 
 <title>Customer by month</title>
 <div class="page-header">
-    <h4>Statistics for month <?= $_GET["month"] ?> year <?= $_GET["year"] ?> </h4>
+    <h4>Statistics for month <?= $month ?> year <?= $year ?> </h4>
     <h3 id="customer_header"></h3>
 </div>
 <form class="register-form form-inline" method="get">
@@ -175,50 +178,7 @@ if (isset($_GET["modem_id"])) {
 
 <br><br>
 <h5>Month Info</h5>
-<!--
-<table class="display table table-striped table-bordered">
-    <tr>
-        <td style="width:20%;">Product Title</td>
-        <td class="product-title"></td>
-    </tr>
-    <tr>
-        <td style="width:20%;">Product Price</td>
-        <td class="product-price"></td>
-    </tr>
-    <tr>
-        <td style="width:20%;">Remaining Days Price</td>
-        <td class="remaining-days-price"></td>
-    </tr>
-    <tr>
-        <td style="width:20%;">Router Price</td>
-        <td class="router-price"></td>
-    </tr>
-    <tr>
-        <td style="width:20%;">Modem Price</td>
-        <td class="modem-price"></td>
-    </tr>
-    <tr>
-        <td style="width:20%;">Setup Price</td>
-        <td class="setup-price"></td>
-    </tr>
-    <tr>
-        <td style="width:20%;">Additional Service Price</td>
-        <td class="additional-service-price"></td>
-    </tr>
-	<tr>
-        <td style="width:20%;">qst tax</td>
-        <td class="qst_tax"></td>
-    </tr>
-	<tr>
-        <td style="width:20%;">gst tax</td>
-        <td class="gst_tax"></td>
-    </tr>
-	<tr>
-        <td style="width:20%;">Total Price</td>
-        <td class="total-price"></td>
-    </tr>
-</table>
--->
+
 <table class="invoice display table table-striped table-bordered">
     <tr>
         <td >Product Title</td>

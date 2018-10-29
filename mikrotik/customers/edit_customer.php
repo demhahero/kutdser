@@ -13,7 +13,7 @@ $html = curl_exec($c);
 <script>
     $(document).ready(function () {
 
-        $.getJSON("<?= $api_url ?>customer_edit_api.php?customer_id=<?= $_GET["customer_id"] ?>", function (result) {
+        $.getJSON("<?= $api_url ?>customers/customer_edit_api.php?customer_id=<?= $_GET["customer_id"] ?>", function (result) {
 
                     $("input[name=\"address_line_1\"]").val(result['customer']['address_line_1']);
                     $("input[name=\"address_line_2\"]").val(result['customer']['address_line_2']);
@@ -27,7 +27,7 @@ $html = curl_exec($c);
                     var address_line_2 = $("input[name=\"address_line_2\"]").val();
                     var postal_code = $("input[name=\"postal_code\"]").val();
                     var city = $("input[name=\"city\"]").val();
-                    $.post("<?= $api_url ?>customer_edit_api.php",
+                    $.post("<?= $api_url ?>customers/customer_edit_api.php",
                             {customer_id: customer_id, address_line_1: address_line_1, address_line_2: address_line_2,
                                 postal_code: postal_code, city: city}
                     , function (data, status) {
@@ -69,7 +69,7 @@ $html = curl_exec($c);
 
 <title>Customer Details</title>
 <div class="page-header">
-    <a class="last" href="">Customer Details</a>    
+    <a class="last" href="">Customer Details</a>
 </div>
 
 

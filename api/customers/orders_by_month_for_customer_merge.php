@@ -10,7 +10,7 @@ if (
 //	(isset($_GET['customer_id']) && ctype_digit($_GET['customer_id']))
 ) {
 
-    include_once "dbconfig.php";
+    include_once "../dbconfig.php";
 
 
 //$customer_id=$_GET['customer_id'];
@@ -18,9 +18,7 @@ if (
     $month = $_GET['month'];
 
     $orders = $dbTools->customers_need_merge_monthly($year, $month);
-//$ordersMonthly=$dbTools->orders_by_month($customer_id,$year,$month);
-//$ordersYearly=$dbTools->orders_by_month_yearly($customer_id,$year,$month);
-//$orders=array_merge($ordersMonthly,$ordersYearly);
+
     $json = json_encode($orders);
 
 

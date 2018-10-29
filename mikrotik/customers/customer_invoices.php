@@ -1,7 +1,5 @@
 <?php
 include_once "../header.php";
-include_once "../../ResellerPortal/tools/DBTools.php";
-$dbTools=new DBTools();
 $customer_id=0;
 if(isset($_GET["customer_id"]))
   $customer_id = intval(filter_input(INPUT_GET, 'customer_id', FILTER_VALIDATE_INT));

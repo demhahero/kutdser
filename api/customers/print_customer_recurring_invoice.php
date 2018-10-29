@@ -1,49 +1,60 @@
 <?php
-
 include_once "../dbconfig.php";
 include "../../terms.php";
-require_once '../vendor/autoload.php';
+require_once '../../mikrotik/vendor/autoload.php';
 
 use Dompdf\Dompdf;
 use Dompdf\Options;
+if(
+	(isset($_GET['month']) && ctype_digit($_GET['month']) && ((int)$_GET['month'] >=1 && (int)$_GET['month'] <=12 ))
+	&&
+	(isset($_GET['year']) && ctype_digit($_GET['year']))
+	&&
+	(isset($_GET['customer_id']) && ctype_digit($_GET['customer_id']))
+	){
+
 
 $customer_id = intval(filter_input(INPUT_GET, 'customer_id', FILTER_VALIDATE_INT));
 $month = $_GET["month"];
 $year = intval(filter_input(INPUT_GET, 'year', FILTER_VALIDATE_INT));
 
-$customer = $dbTools->objCustomerTools($customer_id, 2);
+
+$ordersMonthly=$dbTools->orders_by_month($customer_id,$year,$month);
+
+$ordersYearly=$dbTools->orders_by_month_yearly($customer_id,$year,$month);
+
+
 
 $selectedDate = new DateTime("1" . "-" . $month . "-" . $year);
-$orders = $customer->getRecurringOrdersByDate($selectedDate);
+
+$orders=array_merge($ordersMonthly,$ordersYearly);
 
 $rent_router_cost = 0;
 $total_price_before_tax = 0;
 $total_price_after_tax = 0;
-$total_product_prices = 0;
 $additional_service_cost = 0;
 $qst_tax = 0;
 $gst_tax = 0;
 
-foreach ($orders as $order) {
-    if ($order->getProduct()->getCategory() == "internet") {
-        if ($order->getRouter() == "rent")
-            $rent_router_cost = $order->getRouterPrice();
 
-        $additional_service_cost = $order->getAdditionalServicePrice();
-    }
-    $total_product_prices += $order->getProductPrice();
+foreach ($orders as $order) {
+
+  $rent_router_cost += $order["monthInfo"][0]["router_price"];
+  $total_price_before_tax += $order["monthInfo"][0]["total_price_with_out_tax"];
+  $total_price_after_tax += $order["monthInfo"][0]["total_price_with_tax_p7"];
+  $additional_service_cost += $order["monthInfo"][0]["additional_service_price"];
+
+  $qst_tax += $order["monthInfo"][0]["qst_tax"];
+  $gst_tax += $order["monthInfo"][0]["gst_tax"];
+
 }
-$total_price_before_tax = $total_product_prices + $additional_service_cost + $rent_router_cost;
-$qst_tax = $total_price_before_tax * 0.09975;
-$gst_tax = $total_price_before_tax * 0.05;
-$total_price_after_tax = $total_price_before_tax + $qst_tax + $gst_tax;
 
 $html = $terms_header . '
-                    ' . $customer->getFullName() . '<br/>' . $customer->getAddress() . '								
+                    ' . $orders[0]["customer_name"] . '<br/>' . $orders[0]["address"] . '
                 </td>
 		<td class="address shipping-address">
                     <h3>Reseller:</h3>
-                    ' . $customer->getReseller()->getFullName() . '<br/>' . $customer->getReseller()->getAddress() . '
+                    ' . $orders[0]["reseller_name"] . '<br/>' . $orders[0]["reseller_address"] . '
 		</td>
 		<td class="order-data">
 			<table>
@@ -53,10 +64,10 @@ $html = $terms_header . '
 				</tr>
 				<tr class="order-date">
 					<th>Invoice:</th>
-					<td>#' . $year . $month . $customer->getCustomerId(). '</td>
+					<td>#' . $year . $month . $orders[0]["customer_id"]. '</td>
 				</tr>
-		
-							</table>			
+
+							</table>
 		</td>
 	</tr>
 </table>
@@ -72,23 +83,32 @@ $html = $terms_header . '
 	</thead>
 	<tbody>';
 foreach ($orders as $order):
+  $product_price=$order["monthInfo"][0]["product_price"];
+  $product_title=$order["monthInfo"][0]["product_title"];
+  $days=$order["monthInfo"][0]["days"];
+  if (isset($order["monthInfo"][0]["product_price_2"]) && $order["monthInfo"][0]["product_price_2"] !=="null")
+
+  {
+    $product_title=$order["monthInfo"][0]["product_title"]+" ("+$order["monthInfo"][0]["days"]+" days), "+$order["monthInfo"][0]["product_title_2"]+" ("+$order["monthInfo"][0]["days_2"]+" days)";
+    $product_price=$order["monthInfo"][0]["product_price"]+"$  ("+$order["monthInfo"][0]["product_price_previous"]+"$), "+$order["monthInfo"][0]["product_price_2"]+"$ ("+$order["monthInfo"][0]["product_price_current"]+"$)";
+  }
     $html .= '<tr class="415">
 		<td class="product">
-                    <span class="item-name">' . $order->getProduct()->getTitle() ." ". ($order->getTerminationDate() > $selectedDate)." ". '</span>
+                    <span class="item-name">' . $product_title ."  ". '</span>
                     <dl class="meta">																</dl>
 		</td>
 		<td class="quantity">1</td>
-		<td class="price"><span class="woocommerce-Price-amount amount"><span class="woocommerce-Price-currencySymbol">&#36;</span>' . $order->getProductPrice() . '</span></td>
+		<td class="price"><span class="woocommerce-Price-amount amount"><span class="woocommerce-Price-currencySymbol">&#36;</span>' . $product_price . '</span></td>
             </tr>';
 endforeach;
 $html .= '
-            
+
 	</tbody>
 	<tfoot>
 		<tr class="no-borders">
 			<td class="no-borders">
 				<div class="customer-notes">
-																			</div>				
+																			</div>
 			</td>
 			<td class="no-borders" colspan="2">
 				<table class="totals">
@@ -161,3 +181,4 @@ $dompdf->stream("dompdf_out.pdf", array("Attachment" => false));
 
 
 exit(0);
+}

@@ -10,7 +10,7 @@ if(
 	(isset($_GET['customer_id']) && ctype_digit($_GET['customer_id']))
 	){
 
-include_once "dbconfig.php";
+include_once "../dbconfig.php";
 
 
 $customer_id=$_GET['customer_id'];

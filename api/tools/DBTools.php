@@ -23,6 +23,7 @@ class DBTools {
     }
     /////required///
     public function getConnection() {
+            $this->conn_routers->query("SET CHARACTER SET utf8");
             return $this->conn_routers;
         }
     /////required///
@@ -985,7 +986,7 @@ class DBTools {
           array_push($order_rows,$order_row);
         }
         $customers=array();
-      for($i=0;$i<sizeof($order_rows);$i=$i+2){
+      for($i=0;$i<sizeof($order_rows)-1;$i=$i+2){
 
         $customer=array();
         $orderOne=$this->fillOrderInfo($order_rows[$i],$year,$month);
@@ -1197,7 +1198,9 @@ class DBTools {
 
               $query="SELECT orders.order_id as id,
                   orders.*,order_options.*,merchantrefs.*
-                  ,resellers.full_name as 'reseller_name',`customers`.`full_name` as 'customer_name'
+                  ,resellers.full_name as 'reseller_name',`customers`.`full_name` as 'customer_name',`customers`.`customer_id`
+                  ,`customers`.`address_line_1`,`customers`.`address_line_2`,`customers`.`postal_code`,`customers`.`city`,`customers`.`address`
+                  ,`resellers`.`address_line_1` as 'reseller_address_line_1',`resellers`.`address_line_2` as 'reseller_address_line_2',`resellers`.`postal_code` as 'reseller_postal_code',`resellers`.`city` as 'reseller_city',`resellers`.`address` as 'reseller_address'
                   from orders
                   INNER JOIN `customers` on `orders`.`customer_id`=`customers`.`customer_id`
                   INNER JOIN `customers` resellers on resellers.`customer_id` = `orders`.`reseller_id`
@@ -1225,6 +1228,7 @@ class DBTools {
                     $orderChild["displayed_order_id"] = (((0x0000FFFF & (int) $order_id) << 16) + ((0xFFFF0000 & (int) $order_id) >> 16));
 
           			$orderChild["order_id"]=$order_row["order_id"];
+                $orderChild["customer_id"]=$order_row["customer_id"];
                 /// discount fields
                 $orderChild["discount"]=$order_row["discount"];
                 $orderChild["discount_duration"]=$order_row["discount_duration"];
@@ -1237,6 +1241,8 @@ class DBTools {
                 $orderChild["join_type"]=$order_row["join_type"];
                 $orderChild["reseller_name"]=$order_row["reseller_name"];
                 $orderChild["customer_name"]=$order_row["customer_name"];
+                $orderChild["address"]=$order_row["address_line_1"] . " " . $order_row["address_line_2"] . " " . $order_row["postal_code"] . " " . $order_row["city"] . " " . $order_row["address"];
+                $orderChild["reseller_address"]=$order_row["reseller_address_line_1"] . " " . $order_row["reseller_address_line_2"] . " " . $order_row["reseller_postal_code"] . " " . $order_row["reseller_city"] . " " . $order_row["reseller_address"];
           			$orderChild["creation_date"] = $order_row["creation_date"];
           			$orderChild["total_price"]=is_numeric($order_row["total_price"])?$order_row["total_price"]:0;
           			$orderChild["product_price"]=is_numeric($order_row["product_price"])?$order_row["product_price"]:0;
@@ -1747,7 +1753,9 @@ class DBTools {
 
           $query="SELECT orders.order_id as id,
               orders.*,order_options.*,merchantrefs.*
-              ,resellers.full_name as 'reseller_name',`customers`.`full_name` as 'customer_name'
+              ,resellers.full_name as 'reseller_name',`customers`.`full_name` as 'customer_name',`customers`.`customer_id`
+              ,`customers`.`address_line_1`,`customers`.`address_line_2`,`customers`.`postal_code`,`customers`.`city`,`customers`.`address`
+              ,`resellers`.`address_line_1` as 'reseller_address_line_1',`resellers`.`address_line_2` as 'reseller_address_line_2',`resellers`.`postal_code` as 'reseller_postal_code',`resellers`.`city` as 'reseller_city',`resellers`.`address` as 'reseller_address'
               from orders
               INNER JOIN `customers` on `orders`.`customer_id`=`customers`.`customer_id`
               INNER JOIN `customers` resellers on resellers.`customer_id` = `orders`.`reseller_id`
@@ -1769,6 +1777,7 @@ class DBTools {
 
       			$orderChild = array();
             $order_row["order_id"]=$order_row["id"];
+            $orderChild["customer_id"]=$order_row["customer_id"];
             $orderChild["displayed_order_id"]=$order_row["order_id"];
             $order_id=$order_row["order_id"];
             if ((int) $order_id > 10380)
@@ -1787,6 +1796,8 @@ class DBTools {
             $orderChild["join_type"]=$order_row["join_type"];
             $orderChild["reseller_name"]=$order_row["reseller_name"];
             $orderChild["customer_name"]=$order_row["customer_name"];
+            $orderChild["address"]=$order_row["address_line_1"] . " " . $order_row["address_line_2"] . " " . $order_row["postal_code"] . " " . $order_row["city"] . " " . $order_row["address"];
+            $orderChild["reseller_address"]=$order_row["reseller_address_line_1"] . " " . $order_row["reseller_address_line_2"] . " " . $order_row["reseller_postal_code"] . " " . $order_row["reseller_city"] . " " . $order_row["reseller_address"];
       			$orderChild["creation_date"] = $order_row["creation_date"];
             $orderChild["total_price"]=is_numeric($order_row["total_price"])?$order_row["total_price"]:0;
       			$orderChild["product_price"]=is_numeric($order_row["product_price"])?$order_row["product_price"]:0;
@@ -2570,6 +2581,7 @@ class DBTools {
 
       			array_push($orders,$orderChild);
       		}
+
       	return $orders;
     }
 

@@ -6,7 +6,7 @@ include_once "../header.php";
     $(document).ready(function () {
         $('.dataTables_empty').html('<div class="loader"></div>');
 
-        $.getJSON("<?= $api_url ?>orders_by_month_for_customer_merge.php?month=7&year=2018", function (result) {
+        $.getJSON("<?= $api_url ?>customers/orders_by_month_for_customer_merge.php?month=9&year=2018", function (result) {
             $.each(result['customers'], function (i, field) {
                 table.row.add([
                     field['customer_name'],
@@ -48,7 +48,7 @@ include_once "../header.php";
 
 <title>Customers</title>
 <div class="page-header">
-    <a class="last" href="">Customers</a>    
+    <a class="last" href="">Customers</a>
 </div>
 <table id="myTable" class="display table table-striped table-bordered">
     <thead>
