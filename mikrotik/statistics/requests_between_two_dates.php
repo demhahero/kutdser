@@ -17,7 +17,7 @@ if (isset($_GET["date1"])) {
 <script>
     $(document).ready(function () {
         $('.dataTables_empty').html('<div class="loader"></div>');
-        $.getJSON("<?= $api_url ?>requests_between_two_dates.php?date1=<?= $date1 ?>&date2=<?= $date2 ?>&type=<?= $type ?>", function (result) {
+        $.getJSON("<?= $api_url ?>statistics/requests_between_two_dates.php?date1=<?= $date1 ?>&date2=<?= $date2 ?>&type=<?= $type ?>", function (result) {
                     $.each(result['requests'], function (i, field) {
                         action_on_date = "";
                         if (field['action_on_date'] != null) {
@@ -25,16 +25,16 @@ if (isset($_GET["date1"])) {
                             action_on_date = action_on_date[0];
                         }
                         table.row.add([
-                            '<a href="request_details.php?request_id=' + field['request_id'] + '" >' + field['request_id'] + '</a>',
-                            field['order']["0"]["order_id"],
-                            field['customer']["0"]["full_name"],
-                            field['reseller']["0"]["full_name"],
+                            '<a href="<?=$site_url?>/requests/request_details.php?request_id=' + field['request_id'] + '" >' + field['request_id'] + '</a>',
+                            field["order_id"],
+                            field["full_name"],
+                            field["reseller_name"],
                             field['action'],
                             field['product_title'],
                             action_on_date,
                             field['creation_date'],
                             field['verdict'],
-                            field['admin']["0"]["username"]
+                            field["username"]
                         ]).draw(false);
                     });
 
@@ -67,7 +67,7 @@ if (isset($_GET["date1"])) {
 
 <title>Statistics - Requests</title>
 <div class="page-header">
-    <a class="last" href="">Statistics - Requests</a>    
+    <a class="last" href="">Statistics - Requests</a>
 </div>
 <form class="register-form form-inline" method="get">
     <div class="form-group">

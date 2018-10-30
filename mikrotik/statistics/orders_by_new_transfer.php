@@ -18,17 +18,17 @@ if (isset($_GET["date1"])) {
     $(document).ready(function () {
         $('.dataTables_empty').html('<div class="loader"></div>');
 
-        $.getJSON("<?= $api_url ?>orders_by_new_transfer.php?date1=<?= $date1 ?>&date2=<?= $date2 ?>&cable_subscriber=<?= $cable_subscriber ?>", function (result) {
+        $.getJSON("<?= $api_url ?>statistics/orders_by_new_transfer.php?date1=<?= $date1 ?>&date2=<?= $date2 ?>&cable_subscriber=<?= $cable_subscriber ?>", function (result) {
                     $.each(result['orders'], function (i, field) {
                         table.row.add([
                             '<a href="order_details.php?order_id=' + field['order_id'] + '" >' + field['displayed_order_id'] + '</a>',
-                            '<a href="<?= $site_url . "/edit_customer.php?customer_id=" ?>' + field['customer']["0"]["customer_id"] + '">' + field['customer']["0"]["full_name"] + '</a>',
-                            '<a href="<?= $site_url . "/edit_customer.php?customer_id=" ?>' + field['reseller']["0"]["customer_id"] + '">' + field['reseller']["0"]["full_name"] + '</a>',
+                            '<a href="<?=$site_url?>/customers/edit_customer.php?customer_id=' + field["customer_id"] + '">' + field["full_name"] + '</a>',
+                            '<a href="<?=$site_url?>/customers/edit_reseller.php?customer_id=' + field["reseller_id"] + '">' + field["reseller_name"] + '</a>',
                             field["product_title"],
                             field['creation_date'],
                             field['status'],
                             field['cable_subscriber'],
-                            "<a  class=\"btn btn-primary btn-xs\" target='_blank' href='<?= $site_url ?>/orders/print_order.php?order_id=" + field['order_id'] + "'><i class=\"fa fa-print\"></i> Print </a>"
+                            "<a  class=\"btn btn-primary btn-xs\" target='_blank' href='<?= $api_url ?>print/print_order.php?order_id=" + field['order_id'] + "'><i class=\"fa fa-print\"></i> Print </a>"
                         ]).draw(false);
                     });
                 });
@@ -60,7 +60,7 @@ if (isset($_GET["date1"])) {
 
 <title>Statistics - Orders New/Transfer</title>
 <div class="page-header">
-    <a class="last" href="">Statistics - Orders New/Transfer</a>    
+    <a class="last" href="">Statistics - Orders New/Transfer</a>
 </div>
 <form class="register-form form-inline" method="get">
     <div class="form-group">

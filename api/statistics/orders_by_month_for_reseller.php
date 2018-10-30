@@ -9,14 +9,29 @@ if (
         (isset($_GET['reseller_id']) && ctype_digit($_GET['reseller_id']))
 ) {
 
-    include_once "dbconfig.php";
+    include_once "../dbconfig.php";
 
 
     $reseller_id = $_GET['reseller_id'];
     $year = $_GET['year'];
     $month = $_GET['month'];
 
-    $getReseller = $dbTools->query("SELECT full_name,customer_id,reseller_commission_percentage from customers where customer_id=" . $reseller_id);
+    $query="SELECT `full_name`,
+                    `customer_id`,
+                    `reseller_commission_percentage`
+            FROM `customers`
+            WHERE `customer_id`=?";
+
+    $stmt1 = $dbTools->getConnection()->prepare($query);
+
+    $stmt1->bind_param('s',
+                      $reseller_id);
+
+
+    $stmt1->execute();
+
+    $getReseller = $stmt1->get_result();
+
 
     $reseller = array();
     while ($reseller_row = $dbTools->fetch_assoc($getReseller)) {
@@ -26,7 +41,21 @@ if (
 
     }
 
-    $getCustomers = $dbTools->query("SELECT full_name,customer_id,reseller_commission_percentage from customers where reseller_id=" . $reseller_id);
+    $query="SELECT `full_name`,
+                  `customer_id`,
+                  `reseller_commission_percentage`
+            FROM `customers`
+            WHERE `reseller_id`=?";
+    $stmt1 = $dbTools->getConnection()->prepare($query);
+
+    $stmt1->bind_param('s',
+                      $reseller_id);
+
+
+    $stmt1->execute();
+
+    $getCustomers = $stmt1->get_result();
+
 
     $start_active_date = null;
     $customers = array();
