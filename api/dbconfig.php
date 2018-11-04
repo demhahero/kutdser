@@ -19,6 +19,7 @@ if (strpos($_SERVER['REQUEST_URI'], 'mikrotik') !== false) {
   $site_url="http://localhost/kutdser/mikrotik";
   $api_url = "http://localhost/kutdser/api/";
 
+
   if ($page != "login.php") {
       $session_id = stripslashes($_SESSION["session_id"]);
       $admin_result = $dbTools->query("SELECT * FROM `admins` WHERE `session_id`='" . $session_id . "' AND `session_id`!=''");
@@ -26,11 +27,12 @@ if (strpos($_SERVER['REQUEST_URI'], 'mikrotik') !== false) {
           header('Location: '.$site_url.'/login.php');
           die();
       }
+
       $username = $admin_row["username"];
       $admin_id = $admin_row["admin_id"];
   }
 }
-else{
+else if (strpos($_SERVER['REQUEST_URI'], 'ResellerPortal') !== false) {
   include $_SERVER['DOCUMENT_ROOT']."/kutdser/api/tools/DBTools.php";
   $dbTools = new DBTools($servername,$dbusername,$dbpassword,$dbname);
 
@@ -57,5 +59,31 @@ else{
           header('Location: '.$site_url.'/login.php');
       }
   }
+}
+else if (strpos($_SERVER['REQUEST_URI'], 'api') !== false) {
+  include $_SERVER['DOCUMENT_ROOT']."/kutdser/api/tools/DBTools.php";
+  $dbTools = new DBTools($servername,$dbusername,$dbpassword,$dbname);
+  $site_url="http://localhost/kutdser/mikrotik";
+  $api_url = "http://localhost/kutdser/api/";
+
+
+      $session_id = stripslashes($_SESSION["session_id"]);
+      $admin_result = $dbTools->query("SELECT * FROM `admins` WHERE `session_id`='" . $session_id . "' AND `session_id`!=''");
+      if(!$admin_row = $admin_result->fetch_assoc()){
+        $query = $dbTools->query("SELECT * FROM `customers` WHERE `session_id`='" . $session_id . "'");
+        if(!$row  = $query->fetch_assoc()) {
+          echo "{\"error\":\"you do not have permission\"}";
+            exit();
+        }
+        $username = $row["username"];
+        $reseller_id = $row["customer_id"];
+        if($row["is_new_system"] == "1")
+            $is_new_system = true;
+            exit();
+      }
+
+      $username = $admin_row["username"];
+      $admin_id = $admin_row["admin_id"];
+
 }
 ?>
