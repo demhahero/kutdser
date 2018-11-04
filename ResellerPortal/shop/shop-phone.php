@@ -58,29 +58,29 @@ include_once "../header.php";
                             <div class="panel-body">
                                 <select name="speed" class="form-control">
                                     <option price='29.9' value='383'>Internet 5 Mbps ($29.9)</option>
-                                    <option price='34.9' value='335'>Internet 10 Mbps ($34.9)</option>	
-                                    <option price='39.9' value='380'>Internet 15 Mbps ($39.9)</option>	
-                                    <option price='44.9' value='381'>Internet 20 Mbps ($44.9)</option>	
-                                    <option price='49.9' value='414'>Internet 30 Mbps ($49.9)</option>	
-                                    <option price='59.9' value='416'>Internet 60 Mbps ($59.9)</option>	
-                                    <option price='79.9' value='418'>Internet 120 Mbps ($79.9)</option>	
-                                    <option price='99.9' value='419'>Internet 200 Mbps ($99.9)</option>	
-                                    <option price='159.9' value='420'>Internet 940 Mbps ($159.9)</option>		
-                                    <option price='322.92' value='687'>Internet 5 Mbps Yearly ($322.92)</option>	
-                                    <option price='376.9' value='689'>Internet 10 Mbps Yearly ($376.9)</option>	
-                                    <option price='430.9' value='690'>Internet 15 Mbps Yearly ($430.9)</option>	
-                                    <option price='484.9' value='692'>Internet 20 Mbps Yearly ($484.9)</option>	
-                                    <option price='538.9' value='694'>Internet 30 Mbps Yearly ($538.9)</option>	
-                                    <option price='646.9' value='695'>Internet 60 Mbps Yearly ($646.9)</option>	
-                                    <option price='754.9' value='696'>Internet 120 Mbps Yearly ($754.9)</option>	
-                                    <option price='970.9' value='697'>Internet 200 Mbps Yearly ($970.9)</option>	
-                                    <option price='1998.9' value='698'>Internet 940 Mbps Yearly ($1998.9)</option>	
+                                    <option price='34.9' value='335'>Internet 10 Mbps ($34.9)</option>
+                                    <option price='39.9' value='380'>Internet 15 Mbps ($39.9)</option>
+                                    <option price='44.9' value='381'>Internet 20 Mbps ($44.9)</option>
+                                    <option price='49.9' value='414'>Internet 30 Mbps ($49.9)</option>
+                                    <option price='59.9' value='416'>Internet 60 Mbps ($59.9)</option>
+                                    <option price='79.9' value='418'>Internet 120 Mbps ($79.9)</option>
+                                    <option price='99.9' value='419'>Internet 200 Mbps ($99.9)</option>
+                                    <option price='159.9' value='420'>Internet 940 Mbps ($159.9)</option>
+                                    <option price='322.92' value='687'>Internet 5 Mbps Yearly ($322.92)</option>
+                                    <option price='376.9' value='689'>Internet 10 Mbps Yearly ($376.9)</option>
+                                    <option price='430.9' value='690'>Internet 15 Mbps Yearly ($430.9)</option>
+                                    <option price='484.9' value='692'>Internet 20 Mbps Yearly ($484.9)</option>
+                                    <option price='538.9' value='694'>Internet 30 Mbps Yearly ($538.9)</option>
+                                    <option price='646.9' value='695'>Internet 60 Mbps Yearly ($646.9)</option>
+                                    <option price='754.9' value='696'>Internet 120 Mbps Yearly ($754.9)</option>
+                                    <option price='970.9' value='697'>Internet 200 Mbps Yearly ($970.9)</option>
+                                    <option price='1998.9' value='698'>Internet 940 Mbps Yearly ($1998.9)</option>
                                 </select>
                             </div>
                         </div>
                         </p>
                     </div>
-                </div>	
+                </div>
                 <div class="row" style="width:100% !important;">
                     <div class="col-sm-12" >
                         <p class="rounded form-row form-row-wide custom_check-service-availabilty  ">
@@ -94,7 +94,7 @@ include_once "../header.php";
                         </div>
                         </p>
                     </div>
-                </div>	
+                </div>
                 <div class="row" style="width:100% !important;">
                     <div class="col-sm-12" >
                         <p class="rounded form-row form-row-wide custom_modem  ">
@@ -103,15 +103,15 @@ include_once "../header.php";
                             <div class="panel-body">
                                 <label class="radio-inline">
                                     <input type="radio" checked  class="input-text plan plan-monthly custom-options custom_field" data-price="" name="options[plan]" value="monthly" />Monthly Payment ($60.00 New Installation Fees <b>OR</b> $19.90 Transfer Fees for <span style="color:red;">current Cable subscriber</span>)<br/>
-                                </label><br/>	
-                                <label class="radio-inline">	
+                                </label><br/>
+                                <label class="radio-inline">
                                     <input type="radio" class="input-text plan plan-monthly-2 custom-options custom_field" data-price="" name="options[plan]" value="yearly"   />Yearly Contract, Payment Monthly (Free Installation)<br/>
                                 </label><br/>
                             </div>
                         </div>
                         </p>
                     </div>
-                </div>	
+                </div>
                 <div class="row" style="width:100% !important;">
                     <div class="col-sm-6" >
                         <p class="rounded form-row form-row-wide custom_modem  ">
@@ -128,7 +128,7 @@ include_once "../header.php";
                                 <div class="modem-inventory-list">
                                     <select name="options[modem_id]">
                                         <?php
-                                        $result_modems = $conn_routers->query("select * from `modems` where `reseller_id`='" . $reseller_id . "' and `customer_id`='0'");
+                                        $result_modems = $dbToolsReseller->query("select * from `modems` where `reseller_id`='" . $reseller_id . "' and `customer_id`='0'");
                                         while ($row_modem = $result_modems->fetch_assoc()) {
                                             echo "<option value=\"" . $row_modem["modem_id"] . "\">" . $row_modem["mac_address"] . "</option>";
                                         }
@@ -136,7 +136,7 @@ include_once "../header.php";
                                     </select>
                                 </div>
                                 <br/>
-                                <label class="radio-inline">		
+                                <label class="radio-inline">
                                     <input type="radio" class="input-text modem-off modem custom-options custom_field" data-price="20" name="options[modem]" value="own_modem" />I have my own modem
                                 </label><br/><br/>
                                 <div class="modem-info">
@@ -157,13 +157,13 @@ include_once "../header.php";
                             <div class="panel-body">
                                 <label class="radio-inline">
                                     <input type="radio" class="input-text custom-options custom_field rent-router" data-price="2.90" name="options[router]" value="rent" />Rent WIFI Router MikroTik Hap Series ($2.90)<br/>
-                                </label><br/>	
-                                <label class="radio-inline">	
+                                </label><br/>
+                                <label class="radio-inline">
                                     <input type="radio" class="input-text custom-options custom_field" data-price="74.00" name="options[router]" value="buy_hap_ac_lite"   />Buy WIFI Router MikroTik Hap ac lite ($74.00)<br/>
-                                </label><br/>	
-                                <label class="radio-inline">	
+                                </label><br/>
+                                <label class="radio-inline">
                                     <input type="radio" class="input-text custom-options custom_field" data-price="39.90" name="options[router]" value="buy_hap_mini"   />Buy WIFI Router MikroTik Hap mini ($39.90)<br/>
-                                </label><br/>		
+                                </label><br/>
                                 <label class="radio-inline">
                                     <input type="radio" class="input-text router-off custom-options custom_field" data-price="0" name="options[router]" value="dont_need" />I don't need a router
                                 </label>
@@ -181,7 +181,7 @@ include_once "../header.php";
                                 <label class="radio-inline">
                                     <input type="radio" class="subscriber subscriber-on input-text custom-options custom_field" data-price="0" name="options[cable_subscriber]" value="yes" />Yes<br/>
                                 </label><br/>
-                                <label class="radio-inline">		
+                                <label class="radio-inline">
                                     <input type="radio" class="subscriber subscriber-off input-text custom-options custom_field" data-price="0" name="options[cable_subscriber]" value="no" />No<br/>
                                 </label>
                                 </br>
@@ -253,7 +253,7 @@ include_once "../header.php";
                                         <input type="radio" class="input-text custom-options custom_field" data-price="0" name="options[installation_time_1]" value="after 5:00 PM" />after 5:00 PM
                                     </label>
                                     <label class="radio-inline small">
-                                        <input type="radio" class="input-text custom-options custom_field" data-price="0" name="options[installation_time_1]" value="All Day " />All Day  
+                                        <input type="radio" class="input-text custom-options custom_field" data-price="0" name="options[installation_time_1]" value="All Day " />All Day
                                     </label><br>
                                     <b>2nd choice</b>
                                     <div class="date2">
@@ -272,7 +272,7 @@ include_once "../header.php";
                                         <input type="radio" class="input-text custom-options custom_field" data-price="0" name="options[installation_time_2]" value="after 5:00 PM " />after 5:00 PM
                                     </label>
                                     <label class="radio-inline small">
-                                        <input type="radio" class="input-text custom-options custom_field" data-price="0" name="options[installation_time_2]" value="All Day " />All Day  
+                                        <input type="radio" class="input-text custom-options custom_field" data-price="0" name="options[installation_time_2]" value="All Day " />All Day
                                     </label><br>
                                     <b>3rd choice</b>
                                     <div class="date3">
@@ -291,7 +291,7 @@ include_once "../header.php";
                                         <input type="radio" class="input-text custom-options custom_field" data-price="0" name="options[installation_time_3]" value="after 5:00 PM " />after 5:00 PM
                                     </label>
                                     <label class="radio-inline small">
-                                        <input type="radio" class="input-text custom-options custom_field" data-price="0" name="options[installation_time_3]" value="All Day " />All Day  
+                                        <input type="radio" class="input-text custom-options custom_field" data-price="0" name="options[installation_time_3]" value="All Day " />All Day
                                     </label><br>
                                 </label>
                             </div>
@@ -300,7 +300,7 @@ include_once "../header.php";
                         </p>
                     </div>
 
-                </div>    
+                </div>
                 <div class="row" style="width:100% !important;">
                     <div class="col-sm-6" >
                         <p class="rounded form-row form-row-wide custom_check-service-availabilty  ">
@@ -320,7 +320,7 @@ include_once "../header.php";
                     <select name="customer_id" class="form-control customer_list">
                         <option value="0">New Customer</option>
                         <?php
-                        $result_customers = $conn_routers->query("select * from `customers` where `reseller_id`='" . $reseller_id . "'");
+                        $result_customers = $dbToolsReseller->query("select * from `customers` where `reseller_id`='" . $reseller_id . "'");
                         while ($row_customer = $result_customers->fetch_assoc()) {
                             echo "<option value=\"" . $row_customer["customer_id"] . "\">" . $row_customer["full_name"] . "</option>";
                         }
@@ -363,7 +363,7 @@ include_once "../header.php";
                         <li class="list-group-item">Tax Fees (QST 9.975%) <span class="badge qst-cost"></span></li>
                         <li class="list-group-item">Tax Fees (GST 5%) <span class="badge gst-cost"></span></li>
                         <li class="list-group-item">Total <span class="badge total"></span></li>
-                    </ul> 
+                    </ul>
                 </div>
                 <br/>
                 <br/>
@@ -399,7 +399,7 @@ include_once "../header.php";
                 <br/>
                 <input type="submit" class="btn btn-primary btn-block btn-lg checkout-button"  value="Checkout!">
                 <br/>
-            </div>     
+            </div>
 
         </div>
     </div>
@@ -407,7 +407,7 @@ include_once "../header.php";
 
 <script type="text/javascript">
 
-</script> 
+</script>
 <?php
 include_once "../footer.php";
 ?>

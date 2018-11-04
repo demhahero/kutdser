@@ -4,7 +4,7 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 include '../dbconfig.php';
 
-$orders_query = $conn_routers->query("select * from `orders`");
+$orders_query = $dbToolsReseller->query("select * from `orders`");
 while ($orders_row = $orders_query->fetch_assoc()) {
 
     $order_query = $conn_wordpress->query("select
@@ -30,7 +30,7 @@ while ($orders_row = $orders_query->fetch_assoc()) {
     max( CASE WHEN pm.meta_key = '_paid_date' and p.ID = pm.post_id THEN pm.meta_value END ) as paid_date,
     ( select group_concat( order_item_name separator '|' ) from wp_woocommerce_order_items where order_id = p.ID ) as order_items
 from
-    wp_posts p 
+    wp_posts p
     join wp_postmeta pm on p.ID = pm.post_id
     join wp_woocommerce_order_items oi on p.ID = oi.order_id
 where
@@ -55,21 +55,21 @@ p.ID");
                 echo $wp_woocommerce_order_items_row["order_item_name"] . " - "
                 . $wp_woocommerce_order_itemmeta_row["meta_key"]
                 . " : " . $wp_woocommerce_order_itemmeta_row["meta_value"] . "<br/>";
-                
+
                 if($wp_woocommerce_order_items_row["order_item_name"] == "Options Costs" && $wp_woocommerce_order_itemmeta_row["meta_key"] == "_fee_amount" ){
                     //echo "update `orders` set `setup_costs`='".$wp_woocommerce_order_itemmeta_row["meta_value"]."' "
                             //. "where `order_id`='".$orders_row["order_id"]."'";
-                    //$conn_routers->query("update `orders` set `setup_costs`='".$wp_woocommerce_order_itemmeta_row["meta_value"]."' "
+                    //$dbToolsReseller->query("update `orders` set `setup_costs`='".$wp_woocommerce_order_itemmeta_row["meta_value"]."' "
                           //  . "where `order_id`='".$orders_row["order_id"]."'");
-                    
+
                 }
-                
+
             }
         }
     }
-    
+
     $merchantref = uniqid();
-                    $result_merchantrefs = $conn_routers->query("insert into `merchantrefs` ("
+                    $result_merchantrefs = $dbToolsReseller->query("insert into `merchantrefs` ("
                     . "`merchantref`, "
                     . "`customer_id`, "
                     . "`order_id`, "

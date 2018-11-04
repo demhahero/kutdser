@@ -14,7 +14,7 @@ include_once "header.php";
 </thead>
 <tbody>
     <?php
-    $query = mysql_query("select * from `notes` where `customer_id` in "
+    $query = $dbToolsReseller->query("select * from `notes` where `customer_id` in "
             . "( select `customer_id` from `customers` where `reseller_id` ='" . $reseller_id . "') "
             . "ORDER BY `note_id` desc");
     while ($row = mysql_fetch_array($query)) {
@@ -23,7 +23,7 @@ include_once "header.php";
             <td><?php echo $row["note_id"]; ?></td>
             <td>
                 <?php
-                $query_cutomer = mysql_query("select * from `customers` where `customer_id` = '" . $row["customer_id"] . "'");
+                $query_cutomer = $dbToolsReseller->query("select * from `customers` where `customer_id` = '" . $row["customer_id"] . "'");
                 $row_customer = mysql_fetch_array($query_cutomer);
                 echo $row_customer["full_name"];
                 ?>
@@ -34,7 +34,7 @@ include_once "header.php";
         </tr>
         <?php
     }
-    ?>	
+    ?>
 </tbody>
 </table>
 

@@ -13,7 +13,7 @@ $year = intval(filter_input(INPUT_GET, 'year', FILTER_VALIDATE_INT));
 
 
 $sql = "select * from `customers` where `customer_id`='" . $customer_id . "'";
-$result = $connection->query($sql);
+$result = $dbToolsReseller->query($sql);
 
 if ($result->num_rows > 0) {
     $row = $result->fetch_assoc();
@@ -151,9 +151,9 @@ p + p {
 	margin-top: 1.25em;
 }
 
-a { 
-	border-bottom: 1px solid; 
-	text-decoration: none; 
+a {
+	border-bottom: 1px solid;
+	text-decoration: none;
 }
 
 /* Basic Table Styling */
@@ -243,7 +243,7 @@ table.order-details {
 
 .order-details tr {
 	page-break-inside: always;
-	page-break-after: auto;	
+	page-break-after: auto;
 }
 
 .order-details td,
@@ -388,7 +388,7 @@ Invoice</h1>
 	<tr>
 		<td class="address billing-address">
                     <!-- <h3>Billing Address:</h3> -->
-                    ' . $full_name . '<br/>' . $address . '								
+                    ' . $full_name . '<br/>' . $address . '
                 </td>
 		<td class="address shipping-address">
 					</td>
@@ -402,8 +402,8 @@ Invoice</h1>
 					<th>Invoice For:</th>
 					<td>' . $month . "-" . $year . '</td>
 				</tr>
-		
-							</table>			
+
+							</table>
 		</td>
 	</tr>
 </table>
@@ -431,7 +431,7 @@ Invoice</h1>
 		<tr class="no-borders">
 			<td class="no-borders">
 				<div class="customer-notes">
-																			</div>				
+																			</div>
 			</td>
 			<td class="no-borders" colspan="2">
 				<table class="totals">
@@ -491,7 +491,7 @@ The next following Terms and Conditions will be apply to all AM PRO TELECOM Serv
 
 <h2>Service Charge:</h2><br/>
 The services that we provide are prepaid services. your first payment includes one-time fee, and after that it will be monthly payment depending on the plan that you registered in. you will be responsible to make all the payment in time before the due date. Balance that remain unpaid after the due date will be charged interest  rate of 2% pre month.
-In case of a failure to make payment, AM Pro Telecom have the right to suspend and or terminate your service at any time with or without further notice. To reactivate or re-installation the service you may be charged a reactivation or re-installation fee. 
+In case of a failure to make payment, AM Pro Telecom have the right to suspend and or terminate your service at any time with or without further notice. To reactivate or re-installation the service you may be charged a reactivation or re-installation fee.
 <br/><br/><br/>
 
 <h2>Services Installation:</h2><br/>
@@ -509,7 +509,7 @@ There is a fee of $90 will be applied to all our services.
 <br/><br/><br/>
 
 <h2>Limited  Liability:</h2><br/>
-AM Pro Telecom will make every effort to provide hight quality service. however, if the services are interrupted or have lower performed than what expected for more than 72 consecutive hours, AM Pro Telecom&rsquo;s liability will be limited to crediting you the service fee only for the period in question. 
+AM Pro Telecom will make every effort to provide hight quality service. however, if the services are interrupted or have lower performed than what expected for more than 72 consecutive hours, AM Pro Telecom&rsquo;s liability will be limited to crediting you the service fee only for the period in question.
 <br/><br/>
 
 

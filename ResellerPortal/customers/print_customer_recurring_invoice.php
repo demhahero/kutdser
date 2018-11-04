@@ -11,7 +11,7 @@ $customer_id = intval(filter_input(INPUT_GET, 'customer_id', FILTER_VALIDATE_INT
 $month = $_GET["month"];
 $year = intval(filter_input(INPUT_GET, 'year', FILTER_VALIDATE_INT));
 
-$customer = $dbTools->objCustomerTools($customer_id, 2);
+$customer = $dbToolsReseller->objCustomerTools($customer_id, 2);
 
 $selectedDate = new DateTime("1" . "-" . $month . "-" . $year);
 $orders = $customer->getRecurringOrdersByDate($selectedDate);
@@ -39,7 +39,7 @@ $gst_tax = $total_price_before_tax * 0.05;
 $total_price_after_tax = $total_price_before_tax + $qst_tax + $gst_tax;
 
 $html = $terms_header . '
-                    ' . $customer->getFullName() . '<br/>' . $customer->getAddress() . '								
+                    ' . $customer->getFullName() . '<br/>' . $customer->getAddress() . '
                 </td>
 		<td class="address shipping-address">
                     <h3>Reseller:</h3>
@@ -55,8 +55,8 @@ $html = $terms_header . '
 					<th>Invoice:</th>
 					<td>#' . $year . $month . $customer->getCustomerId(). '</td>
 				</tr>
-		
-							</table>			
+
+							</table>
 		</td>
 	</tr>
 </table>
@@ -82,13 +82,13 @@ foreach ($orders as $order):
             </tr>';
 endforeach;
 $html .= '
-            
+
 	</tbody>
 	<tfoot>
 		<tr class="no-borders">
 			<td class="no-borders">
 				<div class="customer-notes">
-																			</div>				
+																			</div>
 			</td>
 			<td class="no-borders" colspan="2">
 				<table class="totals">

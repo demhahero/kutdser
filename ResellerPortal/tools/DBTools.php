@@ -19,12 +19,12 @@ include "RouterTools.php";
  *
  * @author breeder1
  */
-class DBTools {
+class DBToolsReseller {
 
     private $db_host = "localhost";
     private $db_username = "root";
     private $db_password = "";
-    private $db_name = 'router'; //database name
+    private $db_name = 'routers_2018_10_17'; //database name
     private $conn_routers;
     private $query_result;
 
@@ -34,7 +34,10 @@ class DBTools {
             die("Connection failed: " . $this->conn_routers->connect_error);
         }
     }
-
+    public function getConnection() {
+            $this->conn_routers->query("SET CHARACTER SET utf8");
+            return $this->conn_routers;
+        }
     public function query($queryString) {
         return $this->query_result = $this->conn_routers->query($queryString);
     }

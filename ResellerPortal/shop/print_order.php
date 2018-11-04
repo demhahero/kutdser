@@ -8,7 +8,7 @@ use Dompdf\Dompdf;
 use Dompdf\Options;
 
 $order_id = intval(filter_input(INPUT_GET, 'order_id', FILTER_VALIDATE_INT));
-$order = $dbTools->objOrderTools($order_id, 3);
+$order = $dbToolsReseller->objOrderTools($order_id, 3);
 
 $qst_tax = number_format((float) $order->getQSTTax(), 2, '.', '');
 $gst_tax = number_format((float) $order->getGSTTax(), 2, '.', '');

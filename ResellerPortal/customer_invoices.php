@@ -6,7 +6,7 @@ include_once "header.php";
 $customer_id = intval(filter_input(INPUT_GET, 'customer_id', FILTER_VALIDATE_INT));
 
 $sql = "select * from `customers` where `customer_id`='" . $customer_id . "'";
-$result = $connection->query($sql);
+$result = $dbToolsReseller->query($sql);
 
 if ($result->num_rows > 0) {
     $row = $result->fetch_assoc();

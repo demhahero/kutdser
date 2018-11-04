@@ -1,9 +1,9 @@
 <?php
 include_once "../header.php";
-$dbTools->query("SET CHARACTER SET utf8");
+$dbToolsReseller->query("SET CHARACTER SET utf8");
 
-$reseller = $dbTools->query("SELECT `discount_expire_date`,`has_discount`,`free_modem`,`free_router`,`free_adapter`,`free_installation`,`free_transfer`,`full_name` FROM `customers` WHERE `customer_id` = '" . $reseller_id . "'");
-$reseller_row=$dbTools->fetch_assoc($reseller);
+$reseller = $dbToolsReseller->query("SELECT `discount_expire_date`,`has_discount`,`free_modem`,`free_router`,`free_adapter`,`free_installation`,`free_transfer`,`full_name` FROM `customers` WHERE `customer_id` = '" . $reseller_id . "'");
+$reseller_row=$dbToolsReseller->fetch_assoc($reseller);
 
 $today_date = new DateTime();
 $discount_expire_date=(isset($reseller_row['discount_expire_date']) && strlen($reseller_row['discount_expire_date'])>0)?new DateTime($reseller_row['discount_expire_date']):new DateTime($today_date->format('Y-m-d'));
@@ -32,12 +32,12 @@ else {
 }
 
 
-$products = $dbTools->query("SELECT * FROM `products` INNER JOIN `reseller_discounts` on `products`.`product_id`=`reseller_discounts`.`product_id` WHERE `reseller_discounts`.`reseller_id`='" . $reseller_id . "' and `products`.`product_id` NOT IN ('699','700')");
+$products = $dbToolsReseller->query("SELECT * FROM `products` INNER JOIN `reseller_discounts` on `products`.`product_id`=`reseller_discounts`.`product_id` WHERE `reseller_discounts`.`reseller_id`='" . $reseller_id . "' and `products`.`product_id` NOT IN ('699','700')");
 
 if($products->num_rows ==0)
-$products = $dbTools->query("SELECT * FROM `products`where `products`.`product_id` NOT IN ('699','700')");
+$products = $dbToolsReseller->query("SELECT * FROM `products`where `products`.`product_id` NOT IN ('699','700')");
 $products_rows=[];
-while($products_row=$dbTools->fetch_assoc($products))
+while($products_row=$dbToolsReseller->fetch_assoc($products))
 {
   array_push($products_rows,$products_row);
 }
@@ -46,7 +46,7 @@ while($products_row=$dbTools->fetch_assoc($products))
 ?>
 
 <!-- Include SmartWizard CSS -->
-<link href="../dist/css/smart_wizard.css" rel="stylesheet" type="text/css" />
+<link href="<?= $site_url ?>/css/smart_wizard.css" rel="stylesheet" type="text/css" />
 
 <!-- Optional SmartWizard theme -->
 <link href="<?= $site_url ?>/css/smart_wizard_theme_circles.css" rel="stylesheet" type="text/css" />
@@ -219,7 +219,7 @@ while($products_row=$dbTools->fetch_assoc($products))
                                     <div class="modem-inventory-list">
                                         <select name="options[modem_id]">
                                             <?php
-                                            $result_modems = $conn_routers->query("select * from `modems` where `reseller_id`='" . $reseller_id . "' and `customer_id`='0'");
+                                            $result_modems = $dbToolsReseller->query("select * from `modems` where `reseller_id`='" . $reseller_id . "' and `customer_id`='0'");
                                             while ($row_modem = $result_modems->fetch_assoc()) {
                                                 echo "<option value=\"" . $row_modem["modem_id"] . "\">" . $row_modem["mac_address"] . "[" . $row_modem["type"] . " | " . $row_modem["serial_number"] . "]" . "</option>";
                                             }
@@ -522,7 +522,7 @@ while($products_row=$dbTools->fetch_assoc($products))
                     <select name="customer_id" class="form-control customer_list">
                         <option value="0">New Customer</option>
                         <?php
-                        $reseller = $dbTools->objCustomerTools($reseller_id, 2);
+                        $reseller = $dbToolsReseller->objCustomerTools($reseller_id, 2);
                         if (count($reseller->getResellerCustomers()) > 0)
                             foreach ($reseller->getResellerCustomers() as $customer) {
                                 echo "<option type='"

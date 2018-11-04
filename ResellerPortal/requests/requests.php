@@ -4,7 +4,7 @@ include_once "../header.php";
 
 <title>Requests</title>
 <div class="page-header">
-    <h4>Requests</h4>    
+    <h4>Requests</h4>
 </div>
 <table id="myTable"  class="display table table-striped table-bordered">
     <thead>
@@ -17,7 +17,7 @@ include_once "../header.php";
 </thead>
 <tbody>
     <?php
-    $requests = $dbTools->request_query("select * from `requests` where `reseller_id`='" . $reseller_id . "'", 2);
+    $requests = $dbToolsReseller->request_query("select * from `requests` where `reseller_id`='" . $reseller_id . "'", 2);
     foreach ($requests as $request) {
         ?>
         <tr>
@@ -30,7 +30,7 @@ include_once "../header.php";
         </tr>
         <?php
     }
-    ?>	
+    ?>
 </tbody>
 </table>
 

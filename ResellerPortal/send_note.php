@@ -8,7 +8,7 @@ $date = date("Y-m-d h:i:sa");
 $customer_id = intval(filter_input(INPUT_GET, 'customer_id', FILTER_VALIDATE_INT));
 if (isset($_POST["text"])) {
 
-    $result = mysql_query("INSERT INTO `notes` (
+    $result = $dbToolsReseller->query("INSERT INTO `notes` (
         			`customer_id` ,
 				`text` ,
 				`datetime`,
@@ -22,7 +22,7 @@ if (isset($_POST["text"])) {
 				);");
 
     if ($result) {
-        $query_cutomer = mysql_query("select * from `customers` where `customer_id` = '" . $customer_id . "'");
+        $query_cutomer = $dbToolsReseller->query("select * from `customers` where `customer_id` = '" . $customer_id . "'");
         $row_customer = mysql_fetch_array($query_cutomer);
 
         $to = 'info@amprotelecom.com';
@@ -45,7 +45,7 @@ if (isset($_POST["text"])) {
     <div class="form-group">
         <label>Customer:</label>
         <?php
-        $query_cutomer = mysql_query("select * from `customers` where `customer_id` = '" . $customer_id . "'");
+        $query_cutomer = $dbToolsReseller->query("select * from `customers` where `customer_id` = '" . $customer_id . "'");
         $row_customer = mysql_fetch_array($query_cutomer);
         echo $row_customer["full_name"];
         ?>

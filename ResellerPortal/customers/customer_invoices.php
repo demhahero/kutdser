@@ -4,11 +4,11 @@ include_once "../header.php";
 
 <?php
 $customer_id = intval(filter_input(INPUT_GET, 'customer_id', FILTER_VALIDATE_INT));
-$customer = $dbTools->objCustomerTools($customer_id);
+$customer = $dbToolsReseller->objCustomerTools($customer_id);
 ?>
 <title><?= $customer->getFullName() ?> - Invoices</title>
 <div class="page-header">
-    <h4><?= $customer->getFullName() ?> - Invoices</h4>    
+    <h4><?= $customer->getFullName() ?> - Invoices</h4>
 </div>
 <table id="myTable" class="display table table-striped table-bordered">
     <thead>

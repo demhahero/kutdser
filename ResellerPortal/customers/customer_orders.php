@@ -4,7 +4,7 @@ include_once "../header.php";
 
 <title>Customer's Orders</title>
 <div class="page-header">
-    <h4>Customer's Orders</h4>    
+    <h4>Customer's Orders</h4>
 </div>
 <table id="myTable" class="display table table-striped table-bordered">
     <thead>
@@ -17,7 +17,7 @@ include_once "../header.php";
 <tbody>
     <?php
     $customer_id = intval($_GET["customer_id"]);
-    $orders = $dbTools->order_query("select * from `orders` where `customer_id`='" . $customer_id . "'", 3);
+    $orders = $dbToolsReseller->order_query("select * from `orders` where `customer_id`='" . $customer_id . "'", 3);
     foreach ($orders as $order) {
         ?>
         <tr>
@@ -36,7 +36,7 @@ include_once "../header.php";
         </tr>
         <?php
     }
-    ?>	
+    ?>
 </tbody>
 </table>
 

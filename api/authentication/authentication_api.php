@@ -4,13 +4,21 @@ if(isset($_POST["action"]))
 {
   if($_POST["action"]==="login" && isset($_POST["username"]) && isset($_POST["password"]))
   {
-    include_once $_SERVER['DOCUMENT_ROOT']."/kutdser/mikrotik/db_credentials.php";
+    include_once $_SERVER['DOCUMENT_ROOT']."/kutdser/api/db_credentials.php";
     include "../tools/DBTools.php";
     $dbTools = new DBTools($servername,$dbusername,$dbpassword,$dbname);
 
+    $query="SELECT * FROM `admins` WHERE `username`=?";
+    $query_update="UPDATE `admins` SET `session_id`=? WHERE `username`=?";
+    if(isset($_POST["reseller"]))// check if login from mikrotik or resellerPortal
+    {
+      $query="SELECT * FROM `customers` WHERE `username`=?";
+      $query_update="UPDATE `customers` SET `session_id`=? WHERE `customer_id`=?";
+    }
+
     $username = stripslashes(filter_input(INPUT_POST, 'username', FILTER_SANITIZE_SPECIAL_CHARS));
     $password = stripslashes(filter_input(INPUT_POST, 'password', FILTER_SANITIZE_SPECIAL_CHARS));
-    $query="SELECT * FROM `admins` WHERE `username`=?";
+
     $stmt1 = $dbTools->getConnection()->prepare($query);
 
     $param_value=$username;
@@ -26,9 +34,8 @@ if(isset($_POST["action"]))
     if($admin_row){
         if (password_verify($password, $admin_row['password'])) {
             $session_id = uniqid('', true);
-            $query_update="UPDATE `admins` SET `session_id`=? WHERE `username`=?";
 
-            $stmt = $dbTools->getConnection()->prepare($query_update);
+
 
             $stmt = $dbTools->getConnection()->prepare($query_update);
             /* BK: always check whether the prepare() succeeded */
@@ -40,11 +47,21 @@ if(isset($_POST["action"]))
             /* Bind our params */
             /* BK: variables must be bound in the same order as the params in your SQL.
              * Some people prefer PDO because it supports named parameter. */
-             $stmt->bind_param('ss',
-                               $session_id,
-                               $username
-                               ); // 's' specifies the variable type => 'string'
+             if(isset($_POST["reseller"]))// check if login from mikrotik or resellerPortal
+             {
+               $session_id=$admin_row["session_id"];
+               $stmt->bind_param('ss',
+                                 $session_id,
+                                 $admin_row["customer_id"]
+                                 ); // 's' specifies the variable type => 'string'
+             }
+             else{
 
+               $stmt->bind_param('ss',
+               $session_id,
+               $username
+               ); // 's' specifies the variable type => 'string'
+             }
 
             /* Execute the prepared Statement */
             $status = $stmt->execute();
@@ -56,7 +73,15 @@ if(isset($_POST["action"]))
 
             if($status)
               {
-                $_SESSION["session_id"] = $session_id;
+                // if(isset($_POST["reseller"]))// check if login from mikrotik or resellerPortal
+                // {
+                //   setcookie("session_id", $session_id, time() + (86400 * 30), "/");
+                // }
+                // else
+                 {
+                  $_SESSION["session_id"] = $session_id;
+                }
+
 
                   echo "{\"login\" :", "true"
                     , ",\"message\":\"login success\""

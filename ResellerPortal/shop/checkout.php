@@ -61,10 +61,10 @@ if ($product_type == "internet") {
       on `products`.`product_id`=`reseller_discounts`.`product_id`
       WHERE `reseller_discounts`.`reseller_id`='" . $reseller_id . "'
       and `products`.`product_id`='".$product_id."'";
-    $result_product = $dbTools->query($sql);
+    $result_product = $dbToolsReseller->query($sql);
 
     if($result_product->num_rows ==0)
-    $result_product = $dbTools->query("SELECT * FROM `products` where `products`.`product_id`='".$product_id."'");
+    $result_product = $dbToolsReseller->query("SELECT * FROM `products` where `products`.`product_id`='".$product_id."'");
 
 
     if ($result_product->num_rows > 0) {
@@ -235,10 +235,10 @@ if ($product_type == "internet") {
       on `products`.`product_id`=`reseller_discounts`.`product_id`
       WHERE `reseller_discounts`.`reseller_id`='" . $reseller_id . "'
       and `products`.`product_id`='".$product_id."'";
-    $result_product = $dbTools->query($sql);
+    $result_product = $dbToolsReseller->query($sql);
 
     if($result_product->num_rows ==0)
-    $result_product = $dbTools->query("SELECT * FROM `products` where `products`.`product_id`='".$product_id."'");
+    $result_product = $dbToolsReseller->query("SELECT * FROM `products` where `products`.`product_id`='".$product_id."'");
 
 
     if ($result_product->num_rows > 0) {
@@ -355,7 +355,7 @@ $merchantref = uniqid();
 $secure_card_merchantref = false;
 if (intval($_POST["customer_id"]) > 0) {
     $secure_card_merchantref_sql = "select * from `merchantrefs` where `customer_id`='" . intval($_POST["customer_id"]) . "' and `is_credit`='yes'";
-    $secure_card_merchantref_result = $conn_routers->query($secure_card_merchantref_sql);
+    $secure_card_merchantref_result = $dbToolsReseller->query($secure_card_merchantref_sql);
     if ($secure_card_merchantref_result->num_rows > 0) {
         $secure_card_merchantref_row = $secure_card_merchantref_result->fetch_assoc();
         $secure_card_merchantref = $secure_card_merchantref_row["merchantref"];

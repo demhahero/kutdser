@@ -4,19 +4,40 @@ include_once "dbconfig.php";
 <!doctype html>
 <html>
     <head>
-        <link rel="shortcut icon" href="<?= $site_url ?>/img/favicon.png" />
+      <link rel="shortcut icon" href="<?=$site_url?>/img/favicon.png" />
 
-        <link rel="stylesheet" type="text/css" href="<?= $site_url ?>/css/datatables.min.css"/>
+      <link rel="stylesheet" type="text/css" href="<?=$site_url?>/css/datatables.min.css"/>
 
-        <script type="text/javascript" src="<?= $site_url ?>/js/datatables.min.js"></script>
+      <script type="text/javascript" src="<?=$site_url?>/js/datatables.min.js"></script>
 
-        <script src='<?= $site_url ?>/js/script.js'></script>
-        <link rel="stylesheet" href="<?= $site_url ?>/css/template.css">
+      <script src='<?=$site_url?>/js/script.js'></script>
+      <link rel="stylesheet" href="<?=$site_url?>/css/template.css">
 
-        <script src=https://www.amprotelecom.com/wp-content/plugins/woocommerce-custom-options-lite/assets/js/options.js></script>
+      <script src=https://www.amprotelecom.com/wp-content/plugins/woocommerce-custom-options-lite/assets/js/options.js></script>
 
-        <script src=https://www.amprotelecom.com/wp-content/plugins/woocommerce-custom-options-lite/assets/js/bootstrap-datepicker.min.js></script>
-        <link rel="stylesheet" href="<?= $site_url ?>/css/bootstrap-datepicker3.css">
+      <script src=https://www.amprotelecom.com/wp-content/plugins/woocommerce-custom-options-lite/assets/js/bootstrap-datepicker.min.js></script>
+      <link rel="stylesheet" href="<?=$site_url?>/css/bootstrap-datepicker3.css">
+
+        <script>
+          $(document).ready(function () {
+            $(".logout").click(function(){
+              $.post("<?= $api_url ?>authentication/authentication_api.php",
+                      {
+                        action:"logout"
+                      }
+              , function (data_response, status) {
+                  data_response = $.parseJSON(data_response);
+                  if (data_response.logout == true) {
+                    window.location.href = '<?=$site_url?>/login.php';
+                  } else
+                  {
+                      alert("logout failed");
+
+                    }
+              });
+            });
+          });
+          </script>
     </head>
 
     <body>
@@ -55,7 +76,7 @@ include_once "dbconfig.php";
 
                     </ul>
                     <ul class="nav navbar-nav navbar-right">
-                        <li><a href="<?= $site_url ?>/?do=logout">Logout</a></li>
+                        <li><a class="logout" href="#">Logout</a></li>
                     </ul>
                 </div><!--/.nav-collapse -->
 
@@ -78,11 +99,17 @@ include_once "dbconfig.php";
                         <li><a href="<?= $site_url ?>/shop/shop.php">Shop</a></li>
                         <li><a href="<?= $site_url ?>/requests/requests.php">Requests</a></li>
                         <li><a href="<?= $site_url ?>/customers/my_resellers.php">My Resellers</a></li>
+                        <?PHP if ($reseller_id==="190")
+                        {
+                          ?>
                         <li><a href="<?= $site_url ?>/customers/statistics.php">Statistics</a></li>
+                        <?PHP
+                        }
+                        ?>
                     </ul>
                     <ul class="nav navbar-nav navbar-right">
                         <li><a  style="color:red" href="#">Hello "<?= $username; ?>"</a></li>
-                        <li><a href="<?= $site_url ?>/?do=logout">Logout</a></li>
+                        <li><a class="logout" href="#">Logout</a></li>
                     </ul>
                 </div><!--/.nav-collapse -->
             <?php } ?>

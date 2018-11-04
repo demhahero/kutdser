@@ -30,7 +30,7 @@ if ($_GET["do"] == "register") {
             $is_credit = "yes";
 
             //Create new customer
-            $result_customer = $conn_routers->query("INSERT INTO `customers` (
+            $query="INSERT INTO `customers` (
                 `full_name` ,
                 `address_line_1` ,
                 `address_line_2` ,
@@ -40,22 +40,57 @@ if ($_GET["do"] == "register") {
                 `phone`,
                 `is_reseller`,
                 `reseller_id`,
+                `address`,
+                `stripe_id`,
+                `order_id`,
+                `product_id`,
+                `start_date`,
+                `username`,
+                `password`,
+                `session_id`,
+                `actual_installation_date`,
+                `actual_installation_time_from`,
+                `actual_installation_time_to`,
+                `mac_address`,
+                `completion`,
+                `join_type`,
+                `ip_address`,
                 `note`
             )
             VALUES (
-                '" . mysql_real_escape_string($_POST["full_name"]) . "',"
-                    . " '" . mysql_real_escape_string($_POST["address_line_1"]) . "',"
-                    . " '" . mysql_real_escape_string($_POST["address_line_2"]) . "',"
-                    . " '" . mysql_real_escape_string($_POST["postal_code"]) . "',"
-                    . " '" . mysql_real_escape_string($_POST["city"]) . "',"
-                    . " '" . mysql_real_escape_string($_POST["email"]) . "',"
-                    . " '" . mysql_real_escape_string($_POST["phone"]) . "',"
+                '" . mysqli_real_escape_string($dbToolsReseller->getConnection(),$_POST["full_name"]) . "',"
+                    . " '" . mysqli_real_escape_string($dbToolsReseller->getConnection(),$_POST["address_line_1"]) . "',"
+                    . " '" . mysqli_real_escape_string($dbToolsReseller->getConnection(),$_POST["address_line_2"]) . "',"
+                    . " '" . mysqli_real_escape_string($dbToolsReseller->getConnection(),$_POST["postal_code"]) . "',"
+                    . " '" . mysqli_real_escape_string($dbToolsReseller->getConnection(),$_POST["city"]) . "',"
+                    . " '" . mysqli_real_escape_string($dbToolsReseller->getConnection(),$_POST["email"]) . "',"
+                    . " '" . mysqli_real_escape_string($dbToolsReseller->getConnection(),$_POST["phone"]) . "',"
                     . " '0' ,"
                     . " '" . $reseller_id . "' ,"
-                    . " '" . mysql_real_escape_string($_POST["note"]) . "'
-            );");
+                    . " '' ,"
+                    . " '' ,"
+                    . " 0 ,"
+                    . " 0 ,"
+                    . " '1990-01-01' ,"
+                    . " '' ,"
+                    . " '' ,"
+                    . " '' ,"
+                    . " '1990-01-01' ,"
+                    . " '' ,"
+                    . " '' ,"
+                    . " '' ,"
+                    . " '' ,"
+                    . " '' ,"
+                    . " '' ,"
+                    . " '" . mysqli_real_escape_string($dbToolsReseller->getConnection(),$_POST["note"]) . "'
+            );";
+            //$result_customer = $dbToolsReseller->query($query);
 
-            $customer_id = $conn_routers->insert_id; //New customer's ID
+            $customer_id=-1;
+                if($dbToolsReseller->query($query)===TRUE){
+                  $last_insert_id=mysqli_fetch_assoc( $dbToolsReseller->query("SELECT last_insert_id() as 'customer_id'"));
+                  $customer_id=$last_insert_id["customer_id"];
+                }//New customer's ID
         } else {
             $customer_id = $_POST["customer_id"];
             $is_credit = "no";
@@ -68,7 +103,7 @@ if ($_GET["do"] == "register") {
             $extra_order_recurring_status = "";
         }
 
-        $result_product = $conn_routers->query("select * from `products` where `product_id`='" . $product_id . "'");
+        $result_product = $dbToolsReseller->query("select * from `products` where `product_id`='" . $product_id . "'");
         $row_product = $result_product->fetch_assoc();
         //2- Create new Order
         $order_query="insert into `orders` ("
@@ -81,7 +116,9 @@ if ($_GET["do"] == "register") {
                 . "`product_category`, "
                 . "`product_subscription_type`, "
                 . "`admin_id`, "
-                . "`extra_order_recurring_status` "
+                . "`extra_order_recurring_status`, "
+                . "`vl_number` "
+
                 . ") VALUES ("
                 . "'" . $product_id . "',"
                 . "'" . $creation_date . "', "
@@ -92,13 +129,18 @@ if ($_GET["do"] == "register") {
                 . "'" . $row_product["category"] . "', "
                 . "'" . $row_product["subscription_type"] . "', "
                 . "N'0', "
-                . "'" . $extra_order_recurring_status . "'"
+                . "'" . $extra_order_recurring_status . "', "
+                . "N''"
                 . ")";
 
-        $result_order = $conn_routers->query($order_query);
 
-        $order_id = $conn_routers->insert_id; //New order's ID
+        //$result_order = $dbToolsReseller->query($order_query);
 
+        $order_id=-1;
+            if($dbToolsReseller->query($order_query)===TRUE){
+              $last_insert_id=mysqli_fetch_assoc( $dbToolsReseller->query("SELECT last_insert_id() as 'order_id'"));
+              $order_id=$last_insert_id["order_id"];
+            }
 
         if (isset($_POST["options"])) {
 
@@ -215,6 +257,11 @@ if ($_GET["do"] == "register") {
                     . "`free_modem`, "
                     . "`free_adapter`, "
                     . "`free_installation`, "
+                    . "`completion`, "
+                    . "`adapter`, "
+                    . "`actual_installation_time_from`, "
+                    . "`actual_installation_time_to`, "
+                    . "`join_type`, "
                     . "`free_transfer`"
                     . ") VALUES ('"
                     . $order_id . "', "
@@ -256,22 +303,27 @@ if ($_GET["do"] == "register") {
                     . "'" . $options['free_modem'] . "', "
                     . "'" . $options['free_adapter'] . "', "
                     . "'" . $options['free_installation'] . "', "
+                    . "'', "
+                    . "'', "
+                    . "'', "
+                    . "'', "
+                    . "'', "
                     . "'" . $options['free_transfer'] . "'"
                     . ")";
             //3- Add order options
 
-            $result_order_options = $conn_routers->query($order_option_query);
+            $result_order_options = $dbToolsReseller->query($order_option_query);
 
             //Assgin the modem to the new customer if it is from inventory
             if ($options['modem'] == "inventory") {
-                $conn_routers->query("update `modems` set `customer_id`='" . $customer_id . "' where `modem_id`='" . $options['modem_id'] . "'");
+                $dbToolsReseller->query("update `modems` set `customer_id`='" . $customer_id . "' where `modem_id`='" . $options['modem_id'] . "'");
             }
         }
 
         //if existed customer, do not add new merchantref
         if (!isset($_POST["existed_merchant_reference"])) {
             //4- insert Order Merchant Ref
-            $result_merchantrefs = $conn_routers->query("insert into `merchantrefs` ("
+            $result_merchantrefs = $dbToolsReseller->query("insert into `merchantrefs` ("
                     . "`merchantref`, "
                     . "`customer_id`, "
                     . "`order_id`, "
@@ -285,7 +337,7 @@ if ($_GET["do"] == "register") {
                     . "'internet_order'"
                     . ")");
         } else {
-            $result_merchantrefs = $conn_routers->query("insert into `merchantrefs` ("
+            $result_merchantrefs = $dbToolsReseller->query("insert into `merchantrefs` ("
                     . "`merchantref`, "
                     . "`customer_id`, "
                     . "`order_id`, "
@@ -300,8 +352,8 @@ if ($_GET["do"] == "register") {
                     . ")");
         }
 
-        
-        if ($result_customer && $result_order && $result_order_options && $result_merchantrefs)
+
+        if ($customer_id>0 && $order_id>0 && $result_order_options && $result_merchantrefs)
         {
             $orid = (((0x0000FFFF & (int) $order_id) << 16) + ((0xFFFF0000 & (int) $order_id) >> 16));
             echo $order_id . "_" . (((0x0000FFFF & (int) $order_id) << 16) + ((0xFFFF0000 & (int) $order_id) >> 16));
@@ -310,7 +362,7 @@ if ($_GET["do"] == "register") {
                 $printOrder = new PrintOrder();
                 file_put_contents('last_order.pdf', $printOrder->output($order_id));
 
-                $to = mysqli_real_escape_string($conn_routers,$_POST["email"]);
+                $to = mysqli_real_escape_string($dbToolsReseller->getConnection(),$_POST["email"]);
                 $body = "Dear Customer,\nWe would like to thank you for using our services,\nYour order (".$orid.") has been received and your invoice is attached\nTo finalize your order, please read our Terms and Conditions on (https://www.amprotelecom.com/terms-and-conditions/) and agree by replying to this email with 'I agree'\nBest,\nAmProTelecom INC.";
 
                 // Create the Transport

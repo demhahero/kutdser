@@ -10,8 +10,8 @@ use Dompdf\Options;
 class PrintOrder {
 
     function output($order_id) {
-        global $dbTools, $terms_header, $terms_footer;
-        $order = $dbTools->objOrderTools($order_id, 3);
+        global $dbToolsReseller, $terms_header, $terms_footer;
+        $order = $dbToolsReseller->objOrderTools($order_id, 3);
 
         $qst_tax = number_format((float) $order->getQSTTax(), 2, '.', '');
         $gst_tax = number_format((float) $order->getGSTTax(), 2, '.', '');
@@ -26,7 +26,7 @@ class PrintOrder {
         $product_price = number_format((float) $order->getProductPrice(), 2, '.', '');
 
         $html = $terms_header . '
-                    ' . $order->getCustomer()->getFullName() . '<br/>' . $order->getCustomer()->getAddress() . '								
+                    ' . $order->getCustomer()->getFullName() . '<br/>' . $order->getCustomer()->getAddress() . '
                 </td>
 		<td class="address shipping-address">
                     <h3>Reseller:</h3>
@@ -42,8 +42,8 @@ class PrintOrder {
 					<th>Order:</th>
 					<td>#' . $order->getDisplayedID() . '</td>
 				</tr>
-		
-							</table>			
+
+							</table>
 		</td>
 	</tr>
 </table>
@@ -71,7 +71,7 @@ class PrintOrder {
 		<tr class="no-borders">
 			<td class="no-borders">
 				<div class="customer-notes">
-																			</div>				
+																			</div>
 			</td>
 			<td class="no-borders" colspan="2">
 				<table class="totals">

@@ -41,7 +41,7 @@ $year=isset($_GET["year"])?$_GET["year"]:2018;
         $('.dataTables_empty').html('<div class="loader"></div>');
 
 
-        $.getJSON("<?= $api_url ?>orders_by_month_for_reseller.php?reseller_id=<?= $reseller_id ?>&month=<?= $month ?>&year=<?= $year ?>", function (result) {
+        $.getJSON("<?= $api_url ?>statistics/orders_by_month_for_reseller.php?reseller_id=<?= $reseller_id ?>&month=<?= $month ?>&year=<?= $year ?>", function (result) {
           var total=0;
           var totalWoR=0;
 					var totalWT=0;

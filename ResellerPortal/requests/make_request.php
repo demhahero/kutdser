@@ -11,14 +11,14 @@ if (isset($_POST["action"])) {
 
     $action_on_date = new DateTime(($_POST["action_on_date"]));
 
-    $product = $dbTools->objProductTools($_POST["action_value"]);
+    $product = $dbToolsReseller->objProductTools($_POST["action_value"]);
 
-    $requestTools = $dbTools->objRequestTools(null);
-    $requestTools->setReseller($dbTools->objCustomerTools($reseller_id));
+    $requestTools = $dbToolsReseller->objRequestTools(null);
+    $requestTools->setReseller($dbToolsReseller->objCustomerTools($reseller_id));
     $requestTools->setAction(($_POST["action"]));
     $requestTools->setActionValue(($_POST["action_value"]));
     $requestTools->setNote(($_POST["note"]));
-    $requestTools->setOrder($dbTools->objOrderTools($order_id));
+    $requestTools->setOrder($dbToolsReseller->objOrderTools($order_id));
     $requestTools->setCreationDate($creation_date);
     $requestTools->setActionOnDate($action_on_date);
 
@@ -48,7 +48,7 @@ if (isset($_POST["action"])) {
 
         $(".moving-field").hide();
         $(".cusotmer-info-field").hide();
-        
+
         $(".swap-change").hide();
         $("select[name=\"action\"]").change(function () {
 
@@ -96,11 +96,11 @@ if (isset($_POST["action"])) {
             var address_line_1 = $("input[name=\"address_line_1\"]").val();
             var address_line_2 = $("input[name=\"address_line_2\"]").val();
             var postal_code = $("input[name=\"postal_code\"]").val();
-            
+
             var full_name = $("input[name=\"full_name\"]").val();
             var email = $("input[name=\"email\"]").val();
             var phone = $("input[name=\"phone\"]").val();
-            
+
             //Swap modem
             var modem_id = $("select[name=\"modem_id\"]").val();
 
@@ -149,11 +149,11 @@ if (isset($_POST["action"])) {
     <div class="form-group">
         <label>Customer:</label>
         <?php
-        $order_result = $conn_routers->query("select * from `orders` where `order_id`='" . $order_id . "'");
+        $order_result = $dbToolsReseller->query("select * from `orders` where `order_id`='" . $order_id . "'");
         if ($order_row = $order_result->fetch_assoc()) {
 
             $customer_sql = "select * from `customers` where `customer_id`='" . $order_row["customer_id"] . "'";
-            $customer_result = $conn_routers->query($customer_sql);
+            $customer_result = $dbToolsReseller->query($customer_sql);
 
             if ($customer_result->num_rows > 0) {
                 $customer_row = $customer_result->fetch_assoc();
@@ -199,7 +199,7 @@ if (isset($_POST["action"])) {
         <input type="text" name="postal_code" class="form-control"/>
     </div>
 
-    
+
     <div class="form-group cusotmer-info-field">
         <label>Full Name:</label>
         <input type="text" name="full_name" value="<?=$customer_row["full_name"]?>" class="form-control"/>
@@ -229,7 +229,7 @@ if (isset($_POST["action"])) {
         <select name="modem_id" class="form-control">
             <option value="0" selected>Select Modem</option>
             <?php
-            $result_modems = $conn_routers->query("select * from `modems` where `reseller_id`='" . $reseller_id . "' and `customer_id`='0'");
+            $result_modems = $dbToolsReseller->query("select * from `modems` where `reseller_id`='" . $reseller_id . "' and `customer_id`='0'");
             while ($row_modem = $result_modems->fetch_assoc()) {
                 echo "<option value=\"" . $row_modem["modem_id"] . "\">" . $row_modem["mac_address"] . "[" . $row_modem["type"] . " | " . $row_modem["serial_number"] . "]" . "</option>";
             }
@@ -241,13 +241,14 @@ if (isset($_POST["action"])) {
         <label>New Modem:</label>
         <select name="modem_id" class="form-control">
             <?php
-            $result_modems = $conn_routers->query("select * from `modems` where `reseller_id`='" . $reseller_id . "' and `customer_id`='0'");
+            $result_modems = $dbToolsReseller->query("select * from `modems` where `reseller_id`='" . $reseller_id . "' and `customer_id`='0'");
             while ($row_modem = $result_modems->fetch_assoc()) {
                 echo "<option value=\"" . $row_modem["modem_id"] . "\">" . $row_modem["mac_address"] . "[" . $row_modem["type"] . " | " . $row_modem["serial_number"] . "]" . "</option>";
             }
             ?>
         </select>
     </div>
+
 
 
     <div class="form-group">

@@ -4,7 +4,7 @@ include_once "../header.php";
 
 <title>Orders</title>
 <div class="page-header">
-    <h4>Orders</h4>    
+    <h4>Orders</h4>
 </div>
 <table id="myTable"  class="display table table-striped table-bordered">
     <thead>
@@ -19,17 +19,17 @@ include_once "../header.php";
 </thead>
 <tbody>
     <?php
-    $orders = $dbTools->query("SELECT `orders`.order_id,`orders`.creation_date,`orders`.status,`orders`.reseller_id,`orders`.customer_id,
+    $orders = $dbToolsReseller->query("SELECT `orders`.order_id,`orders`.creation_date,`orders`.status,`orders`.reseller_id,`orders`.customer_id,
     orders.product_title,orders.product_category,orders.product_subscription_type,resellers.full_name as 'reseller_name',
     `customers`.`full_name` as 'customer_name', `order_options`.`modem_mac_address`, `order_options`.`cable_subscriber`,
     requests.`product_title` as 'request_product_title'
-FROM `orders` 
-inner JOIN `order_options` on `order_options`.`order_id`= `orders`.`order_id` 
-inner JOIN `customers` on `orders`.`customer_id`=`customers`.`customer_id` 
+FROM `orders`
+inner JOIN `order_options` on `order_options`.`order_id`= `orders`.`order_id`
+inner JOIN `customers` on `orders`.`customer_id`=`customers`.`customer_id`
 INNER JOIN `customers` resellers on resellers.`customer_id` = `orders`.`reseller_id`
 left JOIN `requests` on requests.`order_id` = `orders`.`order_id` and requests.`verdict`='approve'
 where `orders`.reseller_id='".$reseller_id."'");
-    while($row = $dbTools->fetch_assoc($orders)) {
+    while($row = $dbToolsReseller->fetch_assoc($orders)) {
         if ((int) $row["order_id"] > 10380)
             $displayed_order_id = (((0x0000FFFF & (int) $row["order_id"]) << 16) + ((0xFFFF0000 & (int) $row["order_id"]) >> 16));
         else
@@ -55,7 +55,7 @@ where `orders`.reseller_id='".$reseller_id."'");
         </tr>
         <?php
     }
-    ?>	
+    ?>
 </tbody>
 </table>
 

@@ -15,8 +15,8 @@ include_once "../header.php";
 </thead>
 <tbody>
     <?php
-    $query = mysql_query("select * from `customers` where `reseller_id` in (select `customer_id` from `customers` where `parent_reseller` = '".$reseller_id."')");
-    while ($row = mysql_fetch_array($query)) {
+    $query = $dbToolsReseller->query("select * from `customers` where `reseller_id` in (select `customer_id` from `customers` where `parent_reseller` = '".$reseller_id."')");
+    while ($row = mysqli_fetch_array($query)) {
         ?>
         <tr>
             <td style="width: 7%;"><?php echo $row["customer_id"]; ?></td>
@@ -39,7 +39,7 @@ include_once "../header.php";
         </tr>
         <?php
     }
-    ?>	
+    ?>
 </tbody>
 </table>
 

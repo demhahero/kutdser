@@ -4,7 +4,7 @@ include_once "../header.php";
 
 <title>Order Details</title>
 <div class="page-header">
-    <h4>Order Details</h4>    
+    <h4>Order Details</h4>
 </div>
 
 <a target="_blank" href="<?= $site_url ?>/shop/print_order.php?order_id=<?php echo $_GET["order_id"]; ?>" class="btn btn-success print-button">Print</a>
@@ -13,12 +13,12 @@ include_once "../header.php";
 <div>
     <table class="display table table-striped table-bordered">
         <?php
-        $order = $dbTools->objOrderTools($_GET["order_id"]);
+        $order = $dbToolsReseller->objOrderTools($_GET["order_id"]);
         ?>
         <tr>
             <td style="width:20%;">order ID</td>
             <td><?=$order->getDisplayedID() ?></td>
-        </tr>   
+        </tr>
         <tr>
             <td>Completion</td>
             <td>
@@ -194,25 +194,25 @@ include_once "../header.php";
             <td>
                 <?=$order->getAdditionalService()?>
             </td>
-        </tr>  
+        </tr>
         <tr>
             <td>Actual installation date:</td>
             <td>
                 <?php if($order->getActualInstallationDate() != null) echo $order->getActualInstallationDate()->format("Y-m-d"); ?>
             </td>
-        </tr> 
+        </tr>
         <tr>
             <td>Actual installation time from:</td>
             <td>
                 <?= $order->getActualInstallationTimeFrom(); ?>
             </td>
-        </tr> 
+        </tr>
         <tr>
             <td>Actual installation time to:</td>
             <td>
                 <?= $order->getActualInstallationTimeTo(); ?>
             </td>
-        </tr> 
+        </tr>
     </table>
 </div>
 

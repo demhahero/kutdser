@@ -6,7 +6,7 @@ include_once "header.php";
 $customer_id = intval(filter_input(INPUT_GET, 'customer_id', FILTER_VALIDATE_INT));
 
 $sql = "select * from `customers` where `customer_id`='" . $customer_id . "'";
-$result = $connection->query($sql);
+$result = $dbToolsReseller->query($sql);
 
 if ($result->num_rows > 0) {
     $row = $result->fetch_assoc();
@@ -22,7 +22,7 @@ if ($result->num_rows > 0) {
     $actual_installation_time_from = $row["actual_installation_time_from"];
     $actual_installation_time_to = $row["actual_installation_time_to"];
     $completion = $row["completion"];
-    
+
 }
 
 $servername = "localhost";
@@ -112,7 +112,7 @@ if ($result->num_rows > 0) {
             <td>Note</td>
             <td><a href="send_note.php?customer_id=<?= $customer_id ?>" class="btn btn-primary">Send Note</a></td>
         </tr>
-        
+
     </tbody>
 </table>
 
@@ -126,7 +126,7 @@ if ($result->num_rows > 0) {
 </thead>
 <tbody>
     <?php
-    $query = mysql_query("select * from `customer_log` where `customer_id`='" . $customer_id . "'");
+    $query = $dbToolsReseller->query("select * from `customer_log` where `customer_id`='" . $customer_id . "'");
     while ($row = mysql_fetch_array($query)) {
         ?>
         <tr>
@@ -148,7 +148,7 @@ if ($result->num_rows > 0) {
         </tr>
     <?php
 }
-?>	
+?>
 </tbody>
 </table>
 

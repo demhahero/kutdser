@@ -5,7 +5,7 @@
 include_once "../dbconfig.php";
 $reseller_id = "4";
 
-$customer_query = $conn_routers->query("select * from `customers` where reseller_id='".$reseller_id."'");
+$customer_query = $dbToolsReseller->query("select * from `customers` where reseller_id='".$reseller_id."'");
 $customer_counter = 0;
 while ($customer_row = $customer_query->fetch_assoc()) {
 
@@ -23,7 +23,7 @@ while ($customer_row = $customer_query->fetch_assoc()) {
     }
 
 
-    $product_query = $conn_routers->query("select * from `products` where product_id='" . $customer_row["product_id"] . "' ");
+    $product_query = $dbToolsReseller->query("select * from `products` where product_id='" . $customer_row["product_id"] . "' ");
     $product_row = $product_query->fetch_assoc();
 
     if ($customer_row["join_type"] == "new")
@@ -124,7 +124,7 @@ while ($customer_row = $customer_query->fetch_assoc()) {
             . "'" . $customer_row["join_type"] . "', "
             . "'" . $adapter . "'"
             . ");";
-    
+
     $merchantref_insert = "insert into `merchantrefs` ("
             . "`merchantref`, "
             . "`customer_id`, "
@@ -138,24 +138,22 @@ while ($customer_row = $customer_query->fetch_assoc()) {
             . "'yes', "
             . "'internet_order'"
             . ");";
-    
+
     //$merchantref_insert = "delete from `merchantrefs` where `order_id`='" . $customer_row["order_id"] . "';";
-    
+
     $customer_counter++;
     //echo $customer_row["order_id"] ." , ";
     //echo $orders_insert;
     //echo "<br/>";
     echo $merchantref_insert;
     echo "<br/>";
-    
+
     //echo $order_options_insert;
     //echo "<br/>";
 
-    //$conn_routers->query($orders_insert);
-    //$conn_routers->query($merchantref_insert);
-    //$conn_routers->query($order_options_insert);
+    //$dbToolsReseller->query($orders_insert);
+    //$dbToolsReseller->query($merchantref_insert);
+    //$dbToolsReseller->query($order_options_insert);
 }
 
 echo $customer_counter;
-
-
