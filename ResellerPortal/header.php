@@ -1,5 +1,6 @@
 <?php
-include_once "dbconfig.php";
+if(!@include_once "../../api/dbconfig.php")
+  include_once "../api/dbconfig.php";
 ?>
 <!doctype html>
 <html>
