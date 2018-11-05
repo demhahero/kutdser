@@ -1,6 +1,5 @@
 <?php
 include_once "../header.php";
-
 $month=isset($_GET["month"])?$_GET["month"]:5;
 $year=isset($_GET["year"])?$_GET["year"]:2018;
 ?>
@@ -9,10 +8,8 @@ $year=isset($_GET["year"])?$_GET["year"]:2018;
     $(document).ready(function () {
       $('.print_form').hide();
       var tableDetailsTag=$('#resellerTableDetails');
-
       var tableDetails=tableDetailsTag.DataTable({"pageLength": 14,"ordering": false});
         $('.dataTables_empty').html('<div class="loader"></div>');
-
       var customersData=[];
       var tableTag=$('#resellerTable');
       var table=tableTag.DataTable( {
@@ -20,7 +17,8 @@ $year=isset($_GET["year"])?$_GET["year"]:2018;
             //alert( 'DataTables has redrawn the table' );
             $('[data-toggle="tooltip"]').tooltip();
         },
-        dom: 'Bfrtip',
+        "scrollX": true,   // enables horizontal scrolling
+        "dom": 'Bfrtip',
         buttons: [
             //'copy', 'csv', 'excel', 'pdf', 'print'
             {
@@ -38,23 +36,18 @@ $year=isset($_GET["year"])?$_GET["year"]:2018;
         }
     } );
         $('.dataTables_empty').html('<div class="loader"></div>');
-
-
         $.getJSON("<?= $api_url ?>statistics/orders_by_month_for_reseller.php?reseller_id=<?= $_GET["reseller_id"] ?>&month=<?= $month ?>&year=<?= $year ?>", function (result) {
           var total=0;
           var totalCB=0;
           var totalWoR=0;
 					var totalWT=0;
           var table_header="";
-
           var total_terminated_orders=0;
           var total_new_orders=0;
           var total_transfer_orders=0;
-
           $.each(result['customers'], function (index, customers) {
-
         					$.each(customers['orders'], function (i, field) {
-                    table_header=field["reseller_name"]+"'s Customers";
+                    table_header=field["reseller_name"]+"'s Customers STATISTICS for month <?=$month?> and year <?=$year?>";
                     $(".last").html(table_header);
                     var product_price;
                     var product_title;
@@ -71,19 +64,14 @@ $year=isset($_GET["year"])?$_GET["year"]:2018;
                         +'<td style="width:20%;">'+field["recurring_date"]+'</td>'
                         +'<td>'+field["product_price"]+'</td>'
       							+'</tr>');
-
-
-
                     $.each(field["requests"], function (i2, field2) {
                         $("table.requests").append('<tr><td>' + field2["action"] + '</td><td>' + field2["action_on_date"] + '</td><td>' + field2["product_title"] + "" + '</td><td>' + field2["product_price"] + '$</td></tr>');
                     });
-
                     				$.each(field["monthInfo"], function (i2, monthInfo) {
                     					var product_price=parseFloat(monthInfo["product_price"]).toFixed(2);
                     					var product_title=monthInfo["product_title"];
                     					var days=monthInfo["days"];
                               if (typeof monthInfo["product_price_2"] !== 'undefined' && monthInfo["product_price_2"] !== null)
-
                     					{
                     						product_title=monthInfo["product_title"]+" ("+monthInfo["days"]+" days), "+monthInfo["product_title_2"]+" ("+monthInfo["days_2"]+" days)";
                     						product_price=monthInfo["product_price"].toFixed(2)+"$  ("+monthInfo["product_price_previous"]+"$), "+monthInfo["product_price_2"].toFixed(2)+"$ ("+monthInfo["product_price_current"]+"$)";
@@ -101,7 +89,6 @@ $year=isset($_GET["year"])?$_GET["year"]:2018;
                     					$(".total-price").html(monthInfo["total_price"]);
                     					*/
                               var discountText=" ";
-
                               if(field['discount']!=="0")
                                 discountText+="Product discount "+field['discount']+"%,";
                               if(field['free_router']==="yes")
@@ -111,13 +98,13 @@ $year=isset($_GET["year"])?$_GET["year"]:2018;
                               if(field['free_setup']==="yes")
                                 discountText+="Free Setup,";
                               discountText=discountText.substring(0, discountText.length-1);
-                              var tooltipTex='</br><button type="button" class="btn btn-secondary" data-toggle="tooltip" data-html="true" title="'+discountText+'">'
-                                                  +'<i class="fa fa-tags"></i>'
-                                                +'</button>';
+                              // var tooltipTex='</br><button type="button" class="btn btn-secondary" data-toggle="tooltip" data-html="true" title="'+discountText+'">'
+                              //                     +'<i class="fa fa-tags"></i>'
+                              //                   +'</button>';
+                              var tooltipTex='</br>With offer';
                               if(discountText.length===0){
                                 tooltipTex="";
                               }
-
                               var total_commission_base_amount_long=parseFloat((monthInfo["total_price_with_out_router"]*(result['reseller']["reseller_commission_percentage"]/100)));
                               total_commission_base_amount=total_commission_base_amount_long.toFixed(2);
                               totalCB+= parseFloat(monthInfo["total_price_with_out_router"]);
@@ -125,8 +112,6 @@ $year=isset($_GET["year"])?$_GET["year"]:2018;
                     					total+= parseFloat(monthInfo["total_price_with_out_tax"]);
                     					totalWT+= parseFloat(monthInfo["total_price_with_tax_p7"]);
                               var join_type=(field['cable_subscriber']==='yes')?"transfer":"new";
-
-
                               customersData[customers['customer_id']]=[];
                               customersData[customers['customer_id']].push({
                                 name:"ID",
@@ -184,12 +169,9 @@ $year=isset($_GET["year"])?$_GET["year"]:2018;
                                 name:"Total With Tax",
                                 value:monthInfo["total_price_with_tax_p7"]
                               });
-
-
                               table.row.add([
-
                                   customers['customer_id']+
-                                  '<a target="_blank" href="<?=$site_url?>/orders/print_order.php?order_id='
+                                  '<a target="_blank" href="<?=$api_url?>print/print_order.php?order_id='
                                           + field["order_id"] + '" class="btn btn-primary btn-xs"><i class="fa fa-print"></i> Print </a>'
                                   ,
                                   customers['full_name'],
@@ -200,10 +182,13 @@ $year=isset($_GET["year"])?$_GET["year"]:2018;
                                   monthInfo["action"]+tooltipTex,
                                   monthInfo["total_price_with_out_tax"],
                                   monthInfo["total_price_with_tax_p7"],
-                                  '<a data-id="'+customers['customer_id']+'" type="button" class="btn btn-primary openPopup" >Details</a>'
+                                  field['payment_method'],
+                                  field['start_active_date'],
+                                  join_type,
+                                  field['recurring_date'],
+                                  result['reseller']["reseller_commission_percentage"]+"%",
+                                  '<a data-id="'+customers['customer_id']+'" type="button" class="btn btn-primary openPopup" >Details</a>',
                               ]).draw(false);
-
-
                               if(join_type==='new' && monthInfo["action"].includes('order'))
                               {
                                 total_new_orders++;
@@ -236,19 +221,15 @@ $year=isset($_GET["year"])?$_GET["year"]:2018;
                     */
                     });
                 });
-
                 });
                 $('.print_form').show();
                 $('#print_total_commission_base_amount').val(totalWoR.toFixed(2));
                 var MyMessageBottom='Commission Base amount :'+totalCB.toFixed(2)+'$, '
-
       							+'Total Price for subtotal :'+total.toFixed(2)+'$, '
       							+'Total Price for all orders With Tax :'+totalWT.toFixed(2)+'$';
                  MyMessageBottom+='Total Terminated Orders :'+total_terminated_orders+', '
-
       							+'Total New Orders :'+total_new_orders+', '
       							+'Total Transfer Order :'+total_transfer_orders+'';
-
                 var buttonCommon = {
                                         exportOptions: {
                                             format: {
@@ -258,7 +239,7 @@ $year=isset($_GET["year"])?$_GET["year"]:2018;
                                                     {
                                                       customeData=data.substr(0, data.indexOf('<'));
                                                     }
-                                                    else if(column === 9){
+                                                    else if(column === 14){
                                                       customeData="";
                                                     }
                                                     return customeData;
@@ -272,6 +253,7 @@ $year=isset($_GET["year"])?$_GET["year"]:2018;
                       $('[data-toggle="tooltip"]').tooltip();
                   },
                   dom: 'Bfrtip',
+                  "scrollX": true,
                   buttons: [
                       //'copy', 'csv', 'excel', 'pdf', 'print'
                       $.extend( true, {}, buttonCommon, {
@@ -304,9 +286,7 @@ $year=isset($_GET["year"])?$_GET["year"]:2018;
                 tableTag.DataTable(tableOptions);
                 //$('.openPopup').click(function() {
                   $( "#resellerTable tbody" ).on( "click", ".openPopup", function() {
-
                   $('#myModal').modal({show:true});
-
                   var customer_id = $(this).attr('data-id');
                   tableDetails.clear().draw();
                   customersData[customer_id].map((item)=>{
@@ -315,7 +295,6 @@ $year=isset($_GET["year"])?$_GET["year"]:2018;
                         item.value
                     ]).draw(false);
                   })
-
                 });
                 ////////////// add total prices for Commission base, all orders with tax and subtotal
       					$("#totalTable").append('<tr>'
@@ -330,7 +309,6 @@ $year=isset($_GET["year"])?$_GET["year"]:2018;
       							+'</tr>');
               ////////////////////////// add total terminated, new and transfer orders
                 $("#totalTable").append('<tr>'
-
                     +'<td colspan="2" class="bg-default">Total Terminated Orders </td>'
       							+'<td class="bg-default">'+total_terminated_orders+'</td>'
       							+'<td  class="bg-default">Total New Orders</td>'
@@ -338,12 +316,8 @@ $year=isset($_GET["year"])?$_GET["year"]:2018;
       							+'<td colspan="2" class="bg-default">Total Transfer Orders</td>'
       							+'<td class="bg-default">'+total_transfer_orders+'</td>'
       							+'</tr>');
-
                 });
-
             });
-
-
 </script>
 <style>
     .loader {
@@ -356,13 +330,11 @@ $year=isset($_GET["year"])?$_GET["year"]:2018;
         -webkit-animation: spin 2s linear infinite; /* Safari */
         animation: spin 2s linear infinite;
     }
-
     /* Safari */
     @-webkit-keyframes spin {
         0% { -webkit-transform: rotate(0deg); }
         100% { -webkit-transform: rotate(360deg); }
     }
-
     @keyframes spin {
         0% { transform: rotate(0deg); }
         100% { transform: rotate(360deg); }
@@ -405,7 +377,7 @@ $year=isset($_GET["year"])?$_GET["year"]:2018;
     </div>
     <input type="submit" class="btn btn-default" value="Search">
 </form>
-<form target="_blank" action="print_statement.php" class="print_form" method="POST">
+<form target="_blank" action="<?= $api_url ?>print/print_statement.php" class="print_form" method="POST">
   <input name="reseller_id" type="hidden" value="<?= $_GET["reseller_id"] ?>"/>
   <input name="month" type="hidden" value="<?= $month ?>"/>
   <input name="year" type="hidden" value="<?= $year ?>"/>
@@ -416,16 +388,21 @@ $year=isset($_GET["year"])?$_GET["year"]:2018;
 <table id="resellerTable" class="display table table-striped table-bordered">
     <thead>
 
-    <th >ID</th>
-    <th >Full Name</th>
-    <th >Product</th>
-    <th >Product Price</th>
-    <th >Commission base amount</th>
-    <th >Monthly commission</th>
-    <th >Type</th>
-    <th >Subtotal</th>
-    <th >total with Tax </th>
-    <th >More Info</th>
+    <th style="width:50px">ID</th>
+    <th style="width:100px">Full Name</th>
+    <th style="width:100px">Product</th>
+    <th style="width:50px">Product Price</th>
+    <th style="width:100px">Commission base amount</th>
+    <th style="width:100px">Monthly commission</th>
+    <th style="width:50px">Type</th>
+    <th style="width:50px">Subtotal</th>
+    <th style="width:50px">total with Tax </th>
+    <th style="width:50px">Payment Method</th>
+    <th style="width:100px">Start Date</th>
+    <th style="width:50px">Join Type</th>
+    <th style="width:100px">Recurring Start Date</th>
+    <th style="width:50px">Reseller Commission percentage</th>
+    <th style="width:50px">More Info</th>
 </thead>
 <tbody>
 

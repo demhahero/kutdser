@@ -15,10 +15,10 @@ $page = basename($_SERVER['REQUEST_URI'], '?' . $_SERVER['QUERY_STRING']);
 
 if (strpos($_SERVER['REQUEST_URI'], 'mikrotik') !== false) {
 
-    include $_SERVER['DOCUMENT_ROOT'] . "/kutdser/api/tools/DBTools.php";
+    include $_SERVER['DOCUMENT_ROOT'] . $root_folder."/api/tools/DBTools.php";
     $dbTools = new DBTools($servername, $dbusername, $dbpassword, $dbname);
-    $site_url = "http://localhost/kutdser/mikrotik";
-    $api_url = "http://localhost/kutdser/api/";
+    $site_url = $root_url."/mikrotik";
+    $api_url = $root_url."/api/";
 
 
     if ($page != "login.php") {
@@ -33,13 +33,13 @@ if (strpos($_SERVER['REQUEST_URI'], 'mikrotik') !== false) {
         $admin_id = $admin_row["admin_id"];
     }
 } else if (strpos($_SERVER['REQUEST_URI'], 'ResellerPortal') !== false) {
-    include $_SERVER['DOCUMENT_ROOT'] . "/kutdser/api/tools/DBTools.php";
+    include $_SERVER['DOCUMENT_ROOT'] . $root_folder."/api/tools/DBTools.php";
     $dbTools = new DBTools($servername, $dbusername, $dbpassword, $dbname);
 
-    include $_SERVER['DOCUMENT_ROOT'] . "/kutdser/ResellerPortal/tools/DBTools.php";
+    include $_SERVER['DOCUMENT_ROOT'] . $root_folder."/ResellerPortal/tools/DBTools.php";
     $dbToolsReseller = new DBToolsReseller($servername, $dbusername, $dbpassword, $dbname);
-    $site_url = "http://localhost/kutdser/ResellerPortal";
-    $api_url = "http://localhost/kutdser/api/";
+    $site_url = $root_url."/ResellerPortal";
+    $api_url = $root_url."/api/";
     if ($page != "login.php") {
 
         $session_id = stripslashes($_SESSION["session_id"]);
@@ -61,18 +61,18 @@ if (strpos($_SERVER['REQUEST_URI'], 'mikrotik') !== false) {
     }
 } else if (strpos($_SERVER['REQUEST_URI'], 'api') !== false) {
 
-    include $_SERVER['DOCUMENT_ROOT'] . "/kutdser/api/tools/DBTools.php";
+    include $_SERVER['DOCUMENT_ROOT'] . $root_folder."/api/tools/DBTools.php";
     $dbTools = new DBTools($servername, $dbusername, $dbpassword, $dbname);
-    $site_url = "http://localhost/kutdser/mikrotik";
-    $api_url = "http://localhost/kutdser/api/";
+    $site_url = $root_url."/mikrotik";
+    $api_url = $root_url."/api/";
 
 
     $session_id = stripslashes($_SESSION["session_id"]);
     $admin_result = $dbTools->query("SELECT * FROM `admins` WHERE `session_id`='" . $session_id . "' AND `session_id`!=''");
-    
+
     if (!$admin_row = $admin_result->fetch_assoc()) {
         $query = $dbTools->query("SELECT * FROM `customers` WHERE `session_id`='" . $session_id . "'");
-        
+
         if (!$row = $query->fetch_assoc()) {
             echo "{\"error\":\"you do not have permission\"}";
             exit();

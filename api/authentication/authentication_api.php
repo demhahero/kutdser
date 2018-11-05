@@ -4,7 +4,7 @@ if(isset($_POST["action"]))
 {
   if($_POST["action"]==="login" && isset($_POST["username"]) && isset($_POST["password"]))
   {
-    include_once $_SERVER['DOCUMENT_ROOT']."/kutdser/api/db_credentials.php";
+    include "../db_credentials.php";
     include "../tools/DBTools.php";
     $dbTools = new DBTools($servername,$dbusername,$dbpassword,$dbname);
 

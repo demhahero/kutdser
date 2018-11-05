@@ -2,7 +2,7 @@
 
 include_once "../dbconfig.php";
 include "../../terms.php";
-require_once '../vendor/autoload.php';
+require_once '../../mikrotik/vendor/autoload.php';
 
 use Dompdf\Dompdf;
 use Dompdf\Options;
@@ -25,13 +25,41 @@ $gst_tax = ($total_commission_base_amount) * 0.05;
 $total_commission_base_amount_with_tax = $total_commission_base_amount + $qst_tax + $gst_tax;
 $total_commission_base_amount_with_tax=number_format((float) $total_commission_base_amount_with_tax, 2, '.', '');
 
-$reseller = $dbTools->objCustomerTools($reseller_id);
+
+$query = "SELECT
+
+          `customers`.`full_name`,
+          `customers`.`address`,
+          `customers`.`city`,
+          `customers`.`address_line_1`,
+          `customers`.`address_line_2`,
+          `customers`.`postal_code`
+
+          FROM  `customers`
+          WHERE `customers`.`customer_id`=?";
+
+$stmt1 = $dbTools->getConnection()->prepare($query);
+
+
+$stmt1->bind_param('s',
+                  $reseller_id
+                  ); // 's' specifies the variable type => 'string'
+
+
+$stmt1->execute();
+
+$result1 = $stmt1->get_result();
+$reseller = $dbTools->fetch_assoc($result1);
+
+$reseller["full_address"]=$reseller['address'].$reseller['city']." " .
+        $reseller['address_line_1']." ".$reseller['address_line_2']." " .
+        $reseller['postal_code'];
 
 $statement_no=$reseller_id."0".$year."0".$month;
 
 $displayed_statement_no=(((0x0000FFFF & (int) $statement_no) << 16) + ((0xFFFF0000 & (int) $statement_no) >> 16));
 $html = $terms_header . '
-                    ' . $reseller->getFullName() . '<br/>' . $reseller->getAddress() . '
+                    ' . $reseller["full_name"] . '<br/>' . $reseller["full_address"] . '
                 </td>
     <td></td>
 		<td class="order-data">
