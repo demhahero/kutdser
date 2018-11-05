@@ -140,6 +140,10 @@ while ($row = mysqli_fetch_array($queryRecords)) {
       $action_on_date = explode(' ', $row['action_on_date']);
       $action_on_date = $action_on_date[0];
   }
+  if($row["action"]==="change_speed" && is_numeric($row["modem_id"])  && (int)$row["modem_id"] >0)
+  {
+    $row["action"]="swap modem and change speed";
+  }
     $data[0] = '<a href="request_details.php?request_id='.$row['request_id'].'" >'.$row['request_id'].'</a>';
     $data[1] = $row['order_id'];
     $data[2] = $row['full_name'];
