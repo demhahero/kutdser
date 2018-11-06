@@ -68,7 +68,7 @@ $html = $terms_header . '
 				</tr>
                                 <tr class="order-date">
 					<th>Invoice for:</th>
-					<td>'.$year .'/'. $month.'</td>
+					<td>'.$year .'/'. $month.'</td> 
 				</tr>
 							</table>
 		</td>

@@ -388,4 +388,4 @@ if ($_GET["do"] == "makePDF") {
     echo "<script>window.location.href ='" . $filePath . "'</script>";
 
     exit(0);
-}
+} 
