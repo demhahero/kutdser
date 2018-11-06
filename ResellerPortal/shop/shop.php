@@ -602,7 +602,7 @@ while($products_row=$dbToolsReseller->fetch_assoc($products))
                             ?>
                                 <option value="cache_on_delivery">Cache on delivery</option>
                             <?php
-                            }
+                            } 
                             ?>
                         </select>
                     </div>
