@@ -5,6 +5,7 @@ include_once "header.php";
 ?>
 
 <?php
+include_once "../api/dbconfig.php";
 
 function random_str($length, $keyspace = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ') {
     $str = '';
@@ -18,11 +19,11 @@ function random_str($length, $keyspace = '0123456789abcdefghijklmnopqrstuvwxyzAB
 $date = new DateTime();
 
 if (isset($_POST["full_name"])) {
-    $password = password_hash($_POST["password"], PASSWORD_DEFAULT);
-    if ($_POST["is_reseller"] != "1")
-        $_POST["is_reseller"] = "0";
 
-    $result = mysql_query("INSERT INTO `customers` (
+    $password = password_hash($_POST["password"], PASSWORD_DEFAULT);
+
+
+    $customer_query = "INSERT INTO `customers` (
         			`username` ,
 				`password` ,
 				`full_name` ,
@@ -35,19 +36,36 @@ if (isset($_POST["full_name"])) {
                                 `session_id`
 				)
 				VALUES (
-            '" . mysql_real_escape_string($_POST["username"]) . "',"
-            . " '" . mysql_real_escape_string($password) . "',"
-            . " '" . mysql_real_escape_string($_POST["full_name"]) . "',"
-            . " '" . mysql_real_escape_string($_POST["address"]) . "',"
-            . " '" . mysql_real_escape_string($_POST["email"]) . "',"
-            . " '" . mysql_real_escape_string($_POST["phone"]) . "',"
-            . " '" . mysql_real_escape_string($_POST["is_reseller"]) . "' ,"
-            . " '" . mysql_real_escape_string($_POST["reseller_id"]) . "' ,"
+            ?,"
+            . " ?,"
+            . " ?,"
+            . " ?,"
+            . " ?,"
+            . " ?,"
             . " '1' ,"
-            . " '" . random_str(32) . "'"
-            . ");");
-    $customer_id = mysql_insert_id();
-    if ($result) {
+            . " '0' ,"
+            . " '1' ,"
+            . " ?"
+            . ")";
+
+    $stmt1 = $dbTools->getConnection()->prepare($customer_query);
+
+ 
+    $param_value1 = ($_POST["username"]);
+    $param_value2 = ($password);
+    $param_value3 = ($_POST["full_name"]);
+    $param_value4 = ($_POST["address"]);
+    $param_value5 = ($_POST["email"]);
+    $param_value6 = ($_POST["phone"]);
+    $param_value7 = random_str(32);
+    $stmt1->bind_param('sssssss', $param_value1, $param_value2, $param_value3, $param_value4, $param_value5,
+            $param_value6, $param_value7
+    ); // 's' specifies the variable type => 'string'
+
+
+    
+
+    if ($stmt1->execute()) {
         //header("Location: customers.php");
         //die();
         echo "<div class='alert alert-success'>done</div>";
@@ -55,10 +73,6 @@ if (isset($_POST["full_name"])) {
 }
 
 
-
-
-$sql = "select * from `customers` where `is_reseller`='1'";
-$result = $connection->query($sql);
 ?>
 
 <title>Create Customer</title>
@@ -90,23 +104,7 @@ $result = $connection->query($sql);
         <label>Address:</label>
         <textarea type="text" name="address" class="form-control" /></textarea>
     </div>
-    <div class="form-group">
-        <label>Is Reseller:</label>
-        <input type="checkbox" name="is_reseller" value="1" class="form-control" />
-    </div>
-    <div class="form-group">
-        <label>Reseller:</label>
-        <select  name="reseller_id" class="form-control">
-            <option value="0">No Reseller</option>
-            <?php
-            if ($result->num_rows > 0) {
-                while ($row = $result->fetch_assoc()) {
-                    echo "<option value='" . $row["customer_id"] . "'>" . $row["full_name"] . "</option>";
-                }
-            }
-            ?>   
-        </select>
-    </div>
+
     <input type="submit" class="btn btn-default" value="create">
 </form>
 
