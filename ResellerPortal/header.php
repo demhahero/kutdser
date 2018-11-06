@@ -8,6 +8,7 @@ if(!@include_once "../../api/dbconfig.php")
       <link rel="shortcut icon" href="<?=$site_url?>/img/favicon.png" />
 
       <link rel="stylesheet" type="text/css" href="<?=$site_url?>/css/datatables.min.css"/>
+      <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css" rel="stylesheet">
 
       <script type="text/javascript" src="<?=$site_url?>/js/datatables.min.js"></script>
 
