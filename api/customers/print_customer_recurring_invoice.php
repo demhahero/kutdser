@@ -59,14 +59,17 @@ $html = $terms_header . '
 		<td class="order-data">
 			<table>
 				<tr class="invoice-date">
-					<th>Invoice Date:</th>
+					<th style="width:90px;">Invoice Date:</th>
 					<td>' . date("Y/m/d") . '</td>
 				</tr>
 				<tr class="order-date">
-					<th>Invoice:</th>
+					<th>Invoice No.:</th>
 					<td>#' . $year . $month . $orders[0]["customer_id"]. '</td>
 				</tr>
-
+                                <tr class="order-date">
+					<th>Invoice for:</th>
+					<td>'.$year .'/'. $month.'</td>
+				</tr>
 							</table>
 		</td>
 	</tr>

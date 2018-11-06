@@ -596,7 +596,14 @@ while($products_row=$dbToolsReseller->fetch_assoc($products))
                             <option value="Visa Credit">Visa Credit</option>
                             <option value="Debit MasterCard">Debit MasterCard</option>
                             <option value="Visa Debit">Visa Debit</option>
-                            <option value="cache_on_delivery">Cache on delivery</option>
+                            <?php 
+                            if($reseller_id=="11" || $reseller_id=="12" || $reseller_id=="174" || $reseller_id=="175" || $reseller_id=="319" || $reseller_id=="1553" || $reseller_id=="1641" || $reseller_id=="1827" || $reseller_id=="1830")
+                            {
+                            ?>
+                                <option value="cache_on_delivery">Cache on delivery</option>
+                            <?php
+                            }
+                            ?>
                         </select>
                     </div>
                     <div class="form-group">
