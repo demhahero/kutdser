@@ -52,7 +52,7 @@ if (isset($_POST["action"])) {
         $(".swap-change").hide();
         $("select[name=\"action\"]").change(function () {
 
-          var data_value=$(this).find(':selected').data('value');
+            var data_value = $(this).find(':selected').data('value');
 
             if (data_value == "change_speed") {
                 $(".action-value").show();
@@ -160,6 +160,26 @@ if (isset($_POST["action"])) {
                 echo $full_name = $customer_row["full_name"];
             }
         }
+
+        $order_options_result = $dbToolsReseller->query("select * from `order_options` where `order_id`='" . $order_id . "'");
+        if ($order_options_row = $order_options_result->fetch_assoc()) {
+            if ($order_options_row["cable_subscriber"] == "yes") {
+                $cancellation_date = $order_options_row["cancellation_date"];
+                $start_date = new DateTime($cancellation_date);
+            } else {
+                $installation_date_1 = $order_options_row["installation_date_1"];
+                $start_date = new DateTime($installation_date_1);
+            }
+            if ($start_date->format('d') == "01") { //if start date = 1st day of month, add one year only
+                $start_date->add(new DateInterval('P1M'));
+                $subscription_start_date = $start_date->format('d-m-Y');
+            } else { // if not 1st day, add 1 year plus one month
+                $start_date->add(new DateInterval('P2M'));
+                $start_date->modify('first day of this month');
+                $subscription_start_date = $start_date->format('d-m-Y');
+            }
+            $today_date = new DateTime();
+        }
         ?>
     </div>
     <div class="form-group">
@@ -169,9 +189,15 @@ if (isset($_POST["action"])) {
     <div class="form-group">
         <label>Action:</label>
         <select name="action" class="form-control">
-            <option data-value="change_speed" value="change_speed">Change speed</option>
+            <?php
+            if ($start_date < $today_date) {
+                ?>
+                <option data-value="change_speed" value="change_speed">Change speed</option>
+                <option data-value="swap_change_speed" value="change_speed">Swap Modem and Change speed</option>
+                <?php
+            }
+            ?>
             <option data-value="swap_modem" value="swap_modem">Swap Modem</option>
-            <option data-value="swap_change_speed" value="change_speed">Swap Modem and Change speed</option>
             <option data-value="moving" value="moving">Moving</option>
             <option data-value="terminate" value="terminate">Terminate</option>
             <option data-value="customer_information_modification" value="customer_information_modification">Customer Information Modification</option>
@@ -202,15 +228,15 @@ if (isset($_POST["action"])) {
 
     <div class="form-group cusotmer-info-field">
         <label>Full Name:</label>
-        <input type="text" name="full_name" value="<?=$customer_row["full_name"]?>" class="form-control"/>
+        <input type="text" name="full_name" value="<?= $customer_row["full_name"] ?>" class="form-control"/>
     </div>
     <div class="form-group cusotmer-info-field">
         <label>Email:</label>
-        <input type="text" name="email" value="<?=$customer_row["email"]?>" class="form-control"/>
+        <input type="text" name="email" value="<?= $customer_row["email"] ?>" class="form-control"/>
     </div>
     <div class="form-group cusotmer-info-field">
         <label>Phone:</label>
-        <input type="text" name="phone" value="<?=$customer_row["phone"]?>" class="form-control"/>
+        <input type="text" name="phone" value="<?= $customer_row["phone"] ?>" class="form-control"/>
     </div>
 
     <div class="form-group action-value">
