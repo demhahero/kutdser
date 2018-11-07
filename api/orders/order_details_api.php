@@ -55,6 +55,61 @@ if(isset($_POST["action"]))
         , ",\"error\":true}";
     }
   }
+  else if($_POST["action"]==="edit_order" && isset($_POST["edit_id"]))
+  {
+      include_once "../dbconfig.php";
+      $edit_id=$_POST["edit_id"];
+      $dateNow=new DateTime();
+      $dateNowString=$dateNow->format("Y-m-d");
+      $status=$_POST["status"];
+      $completion=$_POST["completion"];
+      $actual_installation_date=$_POST["actual_installation_date"];
+      $update_date=$dateNowString;
+      $admin_id_copy=$admin_id;
+      $actual_installation_time_from=$_POST["actual_installation_time_from"];
+      $actual_installation_time_to=$_POST["actual_installation_time_to"];
+      $vl_number=$_POST["vl_number"];
+
+
+        $query = "UPDATE `orders` INNER JOIN `order_options` ON `orders`.`order_id` = `order_options`.`order_id`
+                  SET
+                  `status`=?,
+                  `completion`=?,
+                  `actual_installation_date`=?,
+                  `update_date`=?,
+                  `admin_id`=?,
+                  `actual_installation_time_from`=?,
+                  `actual_installation_time_to`=?,
+                  `vl_number`=?
+                  WHERE `orders`.`order_id`=?";
+
+
+        $stmt1 = $dbTools->getConnection()->prepare($query);
+
+        $stmt1->bind_param('sssssssss',
+                          $status,
+                          $completion,
+                          $actual_installation_date,
+                          $update_date,
+                          $admin_id_copy,
+                          $actual_installation_time_from,
+                          $actual_installation_time_to,
+                          $vl_number,
+                          $edit_id);
+
+
+        $stmt1->execute();
+
+        $order = $stmt1->get_result();
+        if ($stmt1->errno==0) {
+            echo "{\"edited\" :true,\"error\" :\"null\"}";
+        } else {
+
+            echo "{\"edited\" :\"false\",\"error\" :\"failed to insert value\"}";
+        }
+
+
+  }
 }else
 {
   echo "{\"message\" :", "\"you don't have access to this page\""

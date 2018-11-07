@@ -1,5 +1,8 @@
 <?php
 include_once "../header.php";
+$edit_id=0;
+if(isset($_GET["order_id"]))
+  $edit_id=intval($_GET["order_id"]);
 ?>
 
 <script>
@@ -153,6 +156,36 @@ include_once "../header.php";
                     });
         });
 
+        $( ".update-form" ).submit(function( event ) {
+            event.preventDefault();
+
+            var status=$("select[name=\"status\"]").val();
+            var completion=$("input[name=\"completion\"]").val();
+            var vl_number=$("input[name=\"vl_number\"]").val();
+            var actual_installation_date=$("input[name=\"actual_installation_date\"]").val();
+            var actual_installation_time_from=$("input[name=\"actual_installation_time_from\"]").val();
+            var actual_installation_time_to=$("input[name=\"actual_installation_time_to\"]").val();
+
+            $.post("<?= $api_url ?>orders/order_details_api.php",
+                    {
+                      "action":"edit_order",
+                      "edit_id":<?=$edit_id?>,
+                      "status": status,
+                      "completion": completion,
+                      "vl_number": vl_number,
+                      "actual_installation_date": actual_installation_date,
+                      "actual_installation_time_from": actual_installation_time_from,
+                      "actual_installation_time_to" : actual_installation_time_to
+                    }
+            , function (data, status) {
+                data = $.parseJSON(data);
+                if (data.edited == true) {
+                    alert("value updated");
+
+                } else
+                    alert("Error: "+data.error);
+            });
+          });
 
         $(".submit").click(function () {
             <?php
@@ -389,7 +422,7 @@ include_once "../header.php";
 
 
 
-<form class="register-form" method="post">
+<form class="update-form" >
 
     <i>Last Update by <span id="admin_user_name"></span></i><br/><br/>
     <div class="form-group">
