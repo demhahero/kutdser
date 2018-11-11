@@ -159,6 +159,21 @@ $request_id = intval($_GET["request_id"]);
               if(data.request_row.verdict.length<=0)
               {
                 $("#no_verdict").show();
+
+                if(data.request_row.action==="terminate" && Date.parse(data.request_order_row.start_active_date) >= Date.parse(data.request_row.action_on_date) )// 1 = greater, -1 = less than, 0 = equal
+                {
+                  $("input[name=\"fees_charged\"]").val("0");
+                }
+                else if(data.request_row.action==="terminate" || data.request_row.action==="moving")
+                {
+                  $("input[name=\"fees_charged\"]").val("82");
+                }else if(data.request_row.action==="change_speed")
+                {
+                  $("input[name=\"fees_charged\"]").val("7");
+                }
+                else{
+                  $("input[name=\"fees_charged\"]").val("0");
+                }
                 $("#moving_approved").hide();
                 $("#moving_approved").hide();
               }else
@@ -199,6 +214,7 @@ $("#no_verdict").submit(function(e){
   var product_subscription_type=$("input[name=\"product_subscription_type\"]").val();
   var customer_id=$("input[name=\"customer_id\"]").val();
   var verdict=$("select[name=\"verdict\"]").val();
+  var fees_charged=$("input[name=\"fees_charged\"]").val();
 
   $.post("<?= $api_url ?>requests/request_details_api.php"
     ,{
@@ -215,7 +231,8 @@ $("#no_verdict").submit(function(e){
           "product_category":product_category,
           "product_subscription_type":product_subscription_type,
           "customer_id":customer_id,
-          "verdict":verdict
+          "verdict":verdict,
+          "fees_charged":fees_charged
 
       }, function (data) {
 
@@ -257,14 +274,19 @@ $("#no_verdict").submit(function(e){
           <input type="hidden" name="email" />
           <input type="hidden" name="customer_id" />
           <input type="hidden" name="order_id" />
-
+          <div class="form-group">
             <label for="email">Verdict:</label>
             <select  name="verdict" class="form-control">
                 <option  value="approve">approve</option>
                 <option  value="disapprove">disapprove</option>
             </select>
+          </div>
+          <div class="form-group">
+            <label for="email">Fees charged:</label>
+            <input type="number" name="fees_charged" style="width:100px;" value="0"/> $
+          </div>
         </div>
-        <input type="submit" class="btn btn-default" value="Submit">
+        <input type="submit" class="btn btn-primary" value="Submit">
     </form>
 
           <div id="moving_approved">

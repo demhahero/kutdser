@@ -163,7 +163,8 @@ $request_row["product_subscription_type"]=$product_subscription_type;
               $param_value5=$_POST["product_title"];
               $param_value6=$_POST["product_category"];
               $param_value7=$_POST["product_subscription_type"];
-              $param_value8=$_POST["request_id"];
+              $param_value8=$_POST["fees_charged"];
+              $param_value9=$_POST["request_id"];
 
 
               $query_update_request = "UPDATE `requests` SET
@@ -173,12 +174,13 @@ $request_row["product_subscription_type"]=$product_subscription_type;
                                       `product_price`=?,
                                       `product_title`=?,
                                       `product_category`=?,
-                                      `product_subscription_type`=?
+                                      `product_subscription_type`=?,
+                                      `fees_charged`=?
                                       WHERE `requests`.`request_id`=?";
 
                 $stmt1 = $dbTools->getConnection()->prepare($query_update_request);
 
-                $stmt1->bind_param('ssssssss',
+                $stmt1->bind_param('sssssssss',
                                   $param_value1,
                                   $param_value2,
                                   $param_value3,
@@ -186,7 +188,8 @@ $request_row["product_subscription_type"]=$product_subscription_type;
                                   $param_value5,
                                   $param_value6,
                                   $param_value7,
-                                  $param_value8);
+                                  $param_value8,
+                                  $param_value9);
 
 
                 $stmt1->execute();
@@ -264,20 +267,24 @@ $request_row["product_subscription_type"]=$product_subscription_type;
               $param1=$admin_id;
               $param2=$_POST["verdict"];
               $param3=$verdict_date->format('Y-m-d');
-              $param4=$_POST["request_id"];
+              $param4=$_POST["fees_charged"];
+              $param5=$_POST["request_id"];
+
 
               $query_update_request = "UPDATE `requests` SET
                                           `admin_id`=?,
                                           `verdict`=?,
-                                          `verdict_date`=?
+                                          `verdict_date`=?,
+                                          `fees_charged`=?
                                           WHERE `requests`.`request_id`=?";
               $stmt2 = $dbTools->getConnection()->prepare($query_update_request);
 
-              $stmt2->bind_param('ssss',
+              $stmt2->bind_param('sssss',
                                 $param1,
                                 $param2,
                                 $param3,
-                                $param4);
+                                $param4,
+                                $param5);
 
 
               $stmt2->execute();
