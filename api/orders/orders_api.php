@@ -117,7 +117,7 @@ while ($row = mysqli_fetch_array($queryRecords)) {
     $data[3] = $row['product_title'];
     $data[4] = $row['creation_date'];
     $data[5] = $row['status'];
-    $data[6] = '<a target="_blank" href="' . $site_url . '/orders/print_order.php?order_id='
+    $data[6] = '<a target="_blank" href="' . $api_url . 'print/print_order.php?order_id='
             . $row['order_id'] . '" class="btn btn-primary btn-xs"><i class="fa fa-print"></i> Print </a>';
     $all_data[] = $data;
 }
