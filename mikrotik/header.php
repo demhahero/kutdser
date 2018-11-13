@@ -1,6 +1,6 @@
 <?php
-if(!@include_once "../../api/dbconfig.php")
-  include_once "../api/dbconfig.php";
+if (!@include_once "../../api/dbconfig.php")
+    include_once "../api/dbconfig.php";
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -42,38 +42,48 @@ if(!@include_once "../../api/dbconfig.php")
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
         <script type="text/javascript" src="https://cdn.datatables.net/v/bs/jszip-2.5.0/dt-1.10.18/b-1.5.2/b-html5-1.5.2/datatables.min.js"></script>
         <script>
-          $(document).ready(function () {
-            $(".logout").click(function(){
-              $.post("<?= $api_url ?>authentication/authentication_api.php",
-                      {
-                        action:"logout"
-                      }
-              , function (data_response, status) {
-                  data_response = $.parseJSON(data_response);
-                  if (data_response.logout == true) {
-                    window.location.href = '<?=$site_url?>/login.php';
-                  } else
-                  {
-                      alert("logout failed");
+            $(document).ready(function () {
+                $(".logout").click(function () {
+                    $.post("<?= $api_url ?>authentication/authentication_api.php",
+                            {
+                                action: "logout"
+                            }
+                    , function (data_response, status) {
+                        data_response = $.parseJSON(data_response);
+                        if (data_response.logout == true) {
+                            window.location.href = '<?= $site_url ?>/login.php';
+                        } else
+                        {
+                            alert("logout failed");
 
+                        }
+                    });
+                });
+                $.post("<?= $api_url ?>orders/order_sent_count_api.php",
+                        {
+                            action: "get_total_order_sent"
+                        }
+                , function (response, status) {
+                    response = $.parseJSON(response);
+                    if (!response.error) {
+                        $('#total_order_sent').html(response.total_order_sent);
+                    } else {
+                        $('#total_order_sent').html(0);
                     }
-              });
+                }
+                );
             });
-            $.post("<?= $api_url ?>orders/order_sent_count_api.php",
-    				 {
-    					 action:"get_total_order_sent"
-    				 }
-             , function (response, status) {
-            		 response = $.parseJSON(response);
-            		 if (!response.error) {
-                   $('#total_order_sent').html(response.total_order_sent);
-                 }
-                 else{
-                   $('#total_order_sent').html(0);
-                 }
-               }
-             );
-          });
+
+            (function worker() {
+                $.get("<?= $api_url ?>orders/new_orders_notification.php", function (data) {
+                    // Now that we've completed the request schedule the next one.
+                    
+                    if(data != "0"){
+                       alert("New Order(s) has(have) been sent"); 
+                    }
+                    setTimeout(worker, 60000);
+                });
+            })();
         </script>
     </head>
 
