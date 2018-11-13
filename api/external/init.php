@@ -1,5 +1,5 @@
 <?php
-include_once $_SERVER['DOCUMENT_ROOT']."/kutdser/mikrotik/db_credentials.php";
+include "../db_credentials.php";
 include "../tools/DBTools.php";
 $dbTools = new DBTools($servername,$dbusername,$dbpassword,$dbname);
 
