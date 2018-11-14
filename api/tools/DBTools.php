@@ -28,6 +28,7 @@ class DBTools {
         }
     /////required///
     public function query($queryString) {
+        $this->conn_routers->query("SET CHARACTER SET utf8");
         return $this->query_result = $this->conn_routers->query($queryString);
     }
     public function fetch_assoc($query_result) {
