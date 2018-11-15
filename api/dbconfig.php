@@ -68,10 +68,19 @@ if (strpos($_SERVER['REQUEST_URI'], 'mikrotik') !== false) {
 
 
     $session_id = stripslashes($_SESSION["session_id"]);
+
+    if ($session_id == FALSE)
+    {
+      echo "{\"error\":\"you do not have permission\"}";
+      exit();
+    }
+
+
     $admin_result = $dbTools->query("SELECT * FROM `admins` WHERE `session_id`='" . $session_id . "' AND `session_id`!=''");
 
     if (!$admin_row = $admin_result->fetch_assoc()) {
         $query = $dbTools->query("SELECT * FROM `customers` WHERE `session_id`='" . $session_id . "'");
+
 
         if (!$row = $query->fetch_assoc()) {
             echo "{\"error\":\"you do not have permission\"}";
@@ -94,11 +103,12 @@ if (strpos($_SERVER['REQUEST_URI'], 'mikrotik') !== false) {
 
 
     $session_id = stripslashes($_SESSION["session_id"]);
-    $admin_result = $dbTools->query("SELECT * FROM `admins` WHERE `session_id`='" . $session_id . "' AND `session_id`!=''");
     
+    $admin_result = $dbTools->query("SELECT * FROM `admins` WHERE `session_id`='" . $session_id . "' AND `session_id`!=''");
+
     if (!$admin_row = $admin_result->fetch_assoc()) {
         $query = $dbTools->query("SELECT * FROM `customers` WHERE `session_id`='" . $session_id . "'");
-        
+
         if (!$row = $query->fetch_assoc()) {
             echo "{\"error\":\"you do not have permission\"}";
             exit();
