@@ -22,6 +22,12 @@ $query = "SELECT
           `order_options`.`product_price`,
           `orders`.`product_title`,
 
+          `order_options`.`cable_subscriber`,
+          `order_options`.`cancellation_date`,
+          `order_options`.`installation_date_1`,
+          `orders`.`creation_date`,
+          `orders`.`product_category`,
+
           `customers`.`full_name`,
           `customers`.`address`,
           `customers`.`city`,
@@ -65,9 +71,33 @@ $query = "SELECT
                 $result['reseller_postal_code'];
 
 
+//////// print remaining days duration
+$duration_of_remaining_days="";
+$start_active_date_string="";
+if($result["product_category"]==="phone"){
+$start_active_date_string=$result["creation_date"];
+}
+else if($result["product_category"]==="internet"){
+if($result["cable_subscriber"]==="yes"){
+  $start_active_date_string=$result["cancellation_date"];
+}
+else {
+  $start_active_date_string=$result["installation_date_1"];
+}
+}
+
+$start_active_date = new DateTime($start_active_date_string);
+$end_of_month = new DateTime($start_active_date->format('Y-m-d'));
+$end_of_month->modify('last day of this month');
+if((int)$start_active_date->format('d')>1)
+$duration_of_remaining_days="<br/>".$start_active_date->format('d M')." to ".$end_of_month->format('d M');
+///////////end print remaining days duration
+
+
 $qst_tax = number_format((float) $result["qst_tax"], 2, '.', '');
 $gst_tax = number_format((float) $result["gst_tax"], 2, '.', '');
 $price_of_remaining_days = number_format((float) $result["remaining_days_price"], 2, '.', '');
+
 $installation_transfer_cost = number_format((float) $result["setup_price"], 2, '.', '');
 $router_cost = number_format((float) $result["router_price"], 2, '.', '');
 $modem_cost = number_format((float) $result["modem_price"], 2, '.', '');
@@ -130,7 +160,7 @@ $html = $terms_header . '
 					<tfoot>
                                                 <tr class="fee_419">
                                                     <td class="no-borders"></td>
-                                                    <th class="description">Remaining days</th>
+                                                    <th class="description">Remaining days '.$duration_of_remaining_days.'</th>
                                                     <td class="price"><span class="totals-price"><span class="woocommerce-Price-amount amount"><span class="woocommerce-Price-currencySymbol">&#36;</span>' . $price_of_remaining_days . '</span></span></td>
 						</tr>
                                                 <tr class="fee_419">
@@ -191,6 +221,7 @@ $html = $terms_header . '
 </table>
 
 ' . $terms_footer;
+
 
 
 // instantiate and use the dompdf class
