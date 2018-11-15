@@ -85,5 +85,31 @@ if (strpos($_SERVER['REQUEST_URI'], 'mikrotik') !== false) {
 
     $username = $admin_row["username"];
     $admin_id = $admin_row["admin_id"];
+}  else if (strpos($_SERVER['REQUEST_URI'], 'ipspeedlist') !== false) {
+
+    include $_SERVER['DOCUMENT_ROOT'] . "/api/tools/DBTools.php";
+    $dbTools = new DBTools($servername, $dbusername, $dbpassword, $dbname);
+    $site_url = "https://www.amprotelecom.com/mikrotik";
+    $api_url = "https://www.amprotelecom.com/api/";
+
+
+    $session_id = stripslashes($_SESSION["session_id"]);
+    $admin_result = $dbTools->query("SELECT * FROM `admins` WHERE `session_id`='" . $session_id . "' AND `session_id`!=''");
+    
+    if (!$admin_row = $admin_result->fetch_assoc()) {
+        $query = $dbTools->query("SELECT * FROM `customers` WHERE `session_id`='" . $session_id . "'");
+        
+        if (!$row = $query->fetch_assoc()) {
+            echo "{\"error\":\"you do not have permission\"}";
+            exit();
+        }
+        $username = $row["username"];
+        $reseller_id = $row["customer_id"];
+        if ($row["is_new_system"] == "1")
+            $is_new_system = true;
+    }
+
+    $username = $admin_row["username"];
+    $admin_id = $admin_row["admin_id"];
 }
 ?>
