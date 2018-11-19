@@ -206,6 +206,7 @@ if(isset($_GET["order_id"]))
                 data = $.parseJSON(data);
                 if (data.inserted == true) {
                     alert("Log inserted");
+                    $("textarea[name=\"note\"]").val("");
                     //location.reload();
                     customerLog(current_customer_id);
                 } else
