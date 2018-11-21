@@ -2,32 +2,96 @@
 
 include_once "../dbconfig.php";
 include "../../terms.php";
-require_once '../vendor/autoload.php';
+require_once '../../mikrotik/vendor/autoload.php';
 
 use Dompdf\Dompdf;
 use Dompdf\Options;
 
-$order_id = intval(filter_input(INPUT_GET, 'order_id', FILTER_VALIDATE_INT));
-$order = $dbTools->objOrderTools($order_id, 3);
 
-$moving_fees=82;///////// to change moving fees just change this number
-$qst_tax=$moving_fees*0.09975;
-$gst_tax=$moving_fees*0.05;
-$sub_total=$moving_fees;
-$total_price=$moving_fees+$qst_tax+$gst_tax;
+$request_id = intval(filter_input(INPUT_GET, 'request_id', FILTER_VALIDATE_INT));
+$query = "SELECT
+          `orders`.`order_id` as 'customer_order_id',
 
-$moving_fees = number_format((float)$moving_fees, 2, '.', '');
+          `requests`.`action` ,
+          `requests`.`modem_id`,
+          `requests`.`fees_charged`,
+
+          `customers`.`full_name` as 'customer_full_name',
+          `customers`.`address` as 'customer_address',
+          `customers`.`city` as 'customer_city',
+          `customers`.`address_line_1` as 'customer_address_line_1',
+          `customers`.`address_line_2` as 'customer_address_line_2',
+          `customers`.`postal_code` as 'customer_postal_code',
+          resellers.`full_name` as 'reseller_full_name',
+          resellers.`address` as 'reseller_address',
+          resellers.`city` as 'reseller_city',
+          resellers.`address_line_1` as 'reseller_address_line_1',
+          resellers.`address_line_2` as 'reseller_address_line_2',
+          resellers.`postal_code` as 'reseller_postal_code'
+
+          FROM `orders`
+          LEFT JOIN `requests` ON `requests`.`order_id` = `orders`.`order_id`
+          LEFT JOIN `customers` ON `orders`.`customer_id`=`customers`.`customer_id`
+          LEFT JOIN `customers` resellers ON resellers.`customer_id` = `orders`.`reseller_id`
+
+          WHERE `requests`.`request_id`=?";
+
+        $stmt1 = $dbTools->getConnection()->prepare($query);
+
+
+
+
+        $stmt1->bind_param('s',
+                          $request_id
+                          ); // 's' specifies the variable type => 'string'
+
+
+        $stmt1->execute();
+
+        $result1 = $stmt1->get_result();
+        $result = $dbTools->fetch_assoc($result1);
+        if($result["action"]==="change_speed" && is_numeric($result["modem_id"])  && (int)$result["modem_id"] >0)
+        {
+          $result["action"]="swap_modem_and_change_speed";
+        }
+        $result["displayed_order_id"]=$result["customer_order_id"];
+        if ((int) $result["customer_order_id"] > 10380)
+            $result["displayed_order_id"] = (((0x0000FFFF & (int) $result["customer_order_id"]) << 16).((0xFFFF0000 & (int) $result["customer_order_id"]) >> 16));
+        $result["full_address"]=$result['customer_address'].$result['customer_city']." " .
+                $result['customer_address_line_1']." ".$result['customer_address_line_2']." " .
+                $result['customer_postal_code'];
+        $result["reseller_full_address"]=$result['reseller_address'].$result['reseller_city']." " .
+                $result['reseller_address_line_1']." ".$result['reseller_address_line_2']." " .
+                $result['reseller_postal_code'];
+
+$title_array= array(
+    "change_speed" => 'Change speed request',
+    "customer_information_modification" => 'Customer information modification request',
+    "moving" => 'Moving address request',
+    "swap_modem" => 'Swap modem requst',
+    "terminate" => 'Terminate request',
+    "swap_modem_and_change_speed" => 'Swap modem and change speed request',
+);
+
+$request_fees=$result['fees_charged'];
+$title=$title_array[$result["action"]];
+$qst_tax=$request_fees*0.09975;
+$gst_tax=$request_fees*0.05;
+$sub_total=$request_fees;
+$total_price=$request_fees+$qst_tax+$gst_tax;
+
+$request_fees = number_format((float)$request_fees, 2, '.', '');
 $qst_tax = number_format((float)$qst_tax, 2, '.', '');
 $gst_tax = number_format((float) $gst_tax, 2, '.', '');
 $sub_total = number_format((float)$sub_total, 2, '.', '');
 $total_price = number_format((float) $total_price, 2, '.', '');
 
 $html = $terms_header . '
-                    ' . $order->getCustomer()->getFullName() . '<br/>' . $order->getCustomer()->getAddress() . '
+                    ' . $result["customer_full_name"] . '<br/>' . $result["full_address"] . '
                 </td>
 		<td class="address shipping-address">
                     <h3>Reseller:</h3>
-                    ' . $order->getReseller()->getFullName() . '<br/>' . $order->getReseller()->getAddress() . '
+                    ' . $result["reseller_full_name"] . '<br/>' . $result["reseller_full_address"] . '
 		</td>
 		<td class="order-data">
 			<table>
@@ -37,7 +101,7 @@ $html = $terms_header . '
 				</tr>
 				<tr class="order-date">
 					<th>Order:</th>
-					<td>#' . $order->getDisplayedID() . '</td>
+					<td>#' . $result["displayed_order_id"] . '</td>
 				</tr>
 
 							</table>
@@ -57,11 +121,11 @@ $html = $terms_header . '
 	<tbody>
             <tr class="415">
 		<td class="product">
-                    <span class="item-name">Moving address request</span>
+                    <span class="item-name">'.$title.'</span>
                     <dl class="meta">																</dl>
 		</td>
 		<td class="quantity">1</td>
-		<td class="price"><span class="woocommerce-Price-amount amount"><span class="woocommerce-Price-currencySymbol">&#36;</span>' . $moving_fees . '</span></td>
+		<td class="price"><span class="woocommerce-Price-amount amount"><span class="woocommerce-Price-currencySymbol">&#36;</span>' . $request_fees . '</span></td>
             </tr>
 	</tbody>
 	<tfoot>
@@ -107,7 +171,6 @@ $html = $terms_header . '
 </table>
 
 ' . $terms_footer;
-
 
 
 // instantiate and use the dompdf class

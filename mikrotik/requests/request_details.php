@@ -184,7 +184,7 @@ $request_id = intval($_GET["request_id"]);
                 $("#verdict_found").show();
                 if(data.request_row.action === "moving" && data.request_row.verdict === "approve")
                 {
-                  $("#moving_approved").html('<a target="_blank" href="<?= $site_url ?>/requests/print_request.php?order_id='+ data.request_row.order_id+' class="btn btn-primary btn-xs"><i class="fa fa-print"></i> Print Invoice </a>');
+                  $("#moving_approved").html('<a target="_blank" href="<?= $api_url ?>print/print_request.php?request_id=<?=$request_id?>" class="btn btn-primary btn-xs"><i class="fa fa-print"></i> Print Invoice </a>');
                   $("#moving_approved").show();
                 }
                 else{
