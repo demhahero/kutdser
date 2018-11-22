@@ -3,7 +3,7 @@ include "./init.php";
 
 if(isset($_POST["action"]))
 {
-  if($_POST["action"]==="login")
+  if($_POST["action"]==="get_customer_info")
   {
 
     $query="SELECT * FROM `customers` WHERE `customer_id`=?";

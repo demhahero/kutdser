@@ -1,6 +1,6 @@
 <?php
 include "../db_credentials.php";
-include "../tools/DBTools.php";
+include_once "../tools/DBTools.php";
 $dbTools = new DBTools($servername,$dbusername,$dbpassword,$dbname);
 
 // Function to get the client IP address
@@ -25,7 +25,7 @@ function get_client_ip() {
 $ip_address = get_client_ip();
 
 
-$query="SELECT `customer_id` FROM `customers` WHERE `ip_address`=?";
+$query="SELECT `customer_id` FROM `modems` WHERE `ip_address`=?";
 $stmt1 = $dbTools->getConnection()->prepare($query);
 
 $param_value=$ip_address;

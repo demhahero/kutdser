@@ -1,13 +1,177 @@
 <?php
-include './init.php';
-include 'GlobalOnePaymentXMLTools.php';
+require_once './init.php';
+require_once 'GlobalOnePaymentXMLTools.php';
+require_once 'print_order_class.php';
 require_once '../../mikrotik/swiftmailer/vendor/autoload.php';
 
+function validateChooseProduct($data) {
+    if ($data["product_type"] === "internet") {
+        //If own_moden selected, you have to enter modem information
+        if ($data["options"]["modem"] == "own_modem") {
+            if (strlen($data["options"]["modem_serial_number"]) < 3
+                    || strlen($data["options"]["modem_mac_address"]) < 3
+                    || strlen($data["options"]["modem_modem_type"]) < 3
+                    ) {
+                $message="Enter modem information";
+                return $message;
+            }
+        } else if ($data["options"]["modem"] === "inventory") { // if inventory selected and has no modem
+            if ($data["options"]["modem_id"] == null) {
+                $message="You have no modems in your inventory";
+                return $message;
+            }
+        }
+
+        //If customer is currently a cable subscriber, he has to enter his provider name and cancellation date.
+        if ($data["options"]["cable_subscriber"] === "yes") {
+            if ((strlen($data["options"]["current_cable_provider"]) < 3 && strlen($data["options"]["subscriber_other"]) < 3)
+                    || strlen($data["options"]["cancellation_date"]) < 3
+                    ) {
+                $message="Enter current provider's name and cancellation date";
+                return $message;
+            }
+        }
+
+        //If customer is not a cable subscriber, he has to pick dates and times for installation
+        if ($data["options"]["cable_subscriber"] === "no") {
+            if (strlen($data["options"]["installation_date_1"]) < 3
+                    || strlen($data["options"]["installation_date_2"]) < 3
+                    || strlen($data["options"]["installation_date_3"]) < 3
+                    || strlen($data["options"]["installation_time_1"]) < 3
+                    || strlen($data["options"]["installation_time_2"]) < 3
+                    || strlen($data["options"]["installation_time_3"]) < 3
+                    ) {
+                $message="Enter three dates and times for installation";
+                return $message;
+            }
+        }
+
+        return true;
+    } else if ($data["product_type"] === "phone") { // Check if he did not enter his current phone number
+        if ($data["options"]["you_have_phone_number"] === "yes"
+                && strlen($data["options"]["current_phone_number"]) <=3) {
+            $message="Enter your current phone number";
+            return $message;
+        }
+        return true;
+    }
+}
+
+function validateCustomerInformation($data,$customer_id) {
+    if ($customer_id <= 0 ) {
+        if (strlen($data["full_name"]) < 3
+                || strlen($data["email"]) < 3
+                || strlen($data["phone"]) < 3
+                || strlen($data["address_line_1"]) < 3
+                || strlen($data["postal_code"]) < 3
+                || strlen($data["city"]) < 3) {
+            $message="Missing customer info";
+            return $message;
+        }
+    }
+    return true;
+}
+
+function validateCardInfo($data) {
+    if (strlen($data["card_holders_name"]) < 3
+            || strlen($data["card_cvv"]) != 3
+            || strlen($data["card_number"]) < 3
+            || strlen($data["card_expiry"]) != 4) {
+        $message="Missing card info";
+        return $message;
+    }
+    return true;
+}
+
+function validateOrder($data,$dbTools,$customer_id){
+  if($customer_id>0)
+  {
+    // check what product does the customer already have
+    $query="SELECT `product_category` FROM `orders` WHERE `customer_id`=?";
+    $stmt1 = $dbTools->getConnection()->prepare($query);
+
+    $param_value=$customer_id;
+    $stmt1->bind_param('s',
+                      $param_value
+                      ); // 's' specifies the variable type => 'string'
+
+
+    $stmt1->execute();
+
+    $orders_result = $stmt1->get_result();
+    if($stmt1->affected_rows>1){
+      return "You already purchased all our products before. if you want to change your internet speed or anything else please make a request";
+
+    }
+    $order_row = $dbTools->fetch_assoc($orders_result);
+    if($order_row["product_category"]===$data["product_type"])
+    {
+      return "You already purchased this product before. please request other products to purchase";
+
+    }
+  }
+  return true;
+}
+
+
+///////////////////////////
+if(!isset($_POST["product"]))
+{
+  echo "{\"error\":true,\"message\":\"No product provided\"}";
+  exit();
+}
+$query="SELECT `category` FROM `products` WHERE `product_id`=?";
+$stmt1 = $dbTools->getConnection()->prepare($query);
+
+$param_value=$_POST["product"];
+$stmt1->bind_param('s',
+                  $param_value
+                  ); // 's' specifies the variable type => 'string'
+
+
+$stmt1->execute();
+
+$product_result = $stmt1->get_result();
+$product_row = $dbTools->fetch_assoc($product_result);
+
+if(!$product_row)
+{
+  echo "{\"error\":true,\"message\":\"No such product found\"}";
+  exit();
+}
+$_POST["product_type"]=$product_row["category"];
+
+$validate_message1= validateChooseProduct($_POST);
+$validate_message2= validateCustomerInformation($_POST,$customer_id);
+$validate_message3= validateCardInfo($_POST);
+$validate_message4= validateOrder($_POST,$dbTools,$customer_id);
+if($validate_message1!==true )
+{
+  echo "{\"error\":true,\"message\":\"".$validate_message1."\"}";
+  exit();
+}
+if($validate_message2!==true )
+{
+  echo "{\"error\":true,\"message\":\"".$validate_message2."\"}";
+  exit();
+}
+if($validate_message3!==true )
+{
+  echo "{\"error\":true,\"message\":\"".$validate_message3."\"}";
+  exit();
+}
+if($validate_message4!==true )
+{
+  echo "{\"error\":true,\"message\":\"".$validate_message4."\"}";
+  exit();
+}
 
 $mGlobalOnePaymentXMLTools = new GlobalOnePaymentXMLTools();
 //Get unique random merchant reference
 $merchantref = uniqid();
 $_POST["merchant_reference"]=$merchantref;
+$_POST["merchantref"]=$merchantref;
+
 
 $reseller_id=190;// id for AmProTelecom reseller
 $product_id = intval($_POST["product"]);
@@ -22,13 +186,13 @@ if(!isset($_POST["options"]["inventory_modem_price"]))
 {
   $_POST["options"]["inventory_modem_price"]="no";
 }
-$_POST["options"]["free_modem"] = $_POST['free_modem'];
-$_POST["options"]["free_router"] = $_POST['free_router'];
-$_POST["options"]["free_adapter"] = $_POST['free_adapter'];
-$_POST["options"]["free_installation"] = $_POST['free_installation'];
-$_POST["options"]["free_transfer"] = $_POST['free_transfer'];
-$_POST["options"]["discount"] = 0;
-$_POST["options"]["discount_duration"] = "three_months";
+// $_POST["options"]["free_modem"] = $_POST['free_modem'];
+// $_POST["options"]["free_router"] = $_POST['free_router'];
+// $_POST["options"]["free_adapter"] = $_POST['free_adapter'];
+// $_POST["options"]["free_installation"] = $_POST['free_installation'];
+// $_POST["options"]["free_transfer"] = $_POST['free_transfer'];
+// $_POST["options"]["discount"] = 0;
+// $_POST["options"]["discount_duration"] = "three_months";
 
 //if user selects phone change product type to phone
 $product_type = "internet";
@@ -222,7 +386,7 @@ if ($product_type == "internet") {
     if ($_POST["options"]["router"] == "rent") { //If rent router, add $2.90 on the recurring amount
 
         // if(!($has_discount && $free_router))
-        // $subscription_recurring_amount += 2.90;
+        $subscription_recurring_amount += 2.90;
     }
     else if($_POST["options"]["router"] == "rent_hap_lite") { //If rent hap lite router, add $4.90 on the recurring amount
       $subscription_recurring_amount +=4.90;
@@ -233,7 +397,7 @@ if ($product_type == "internet") {
 
     //Get product info
 
-    // $subscription_period_type = "MONTHLY";
+    $subscription_period_type = "MONTHLY";
     // $sql="SELECT * FROM `products` INNER JOIN `reseller_discounts`
     //   on `products`.`product_id`=`reseller_discounts`.`product_id`
     //   WHERE `reseller_discounts`.`reseller_id`='" . $reseller_id . "'
@@ -386,15 +550,17 @@ if ($customer_id > 0) {
 }
 if ($secure_card_merchantref == false) {
   $message=$mGlobalOnePaymentXMLTools->secureCardRegister("CARD_" . $_POST["merchant_reference"], $_POST["card_number"], $_POST["card_type"], $_POST["card_expiry"], $_POST["card_holders_name"], $_POST["card_cvv"]);
+
   if($message!=true)
   {
-    echo $message;
+    echo "{\"error\":true,\"message\":\"".$message."\"}";
     exit();
   }
   $message=$mGlobalOnePaymentXMLTools->subscriptionRegister("SS_" . $_POST["merchant_reference"], "CARD_" . $_POST["merchant_reference"], $_POST["subscription_start_date"], $_POST["recurring_amount"], $_POST["initial_amount"], $_POST["period_type"]);
+
   if($message!=true)
   {
-    echo $message;
+    echo "{\"error\":true,\"message\":\"".$message."\"}";
     exit();
   }
   $message=true;
@@ -405,9 +571,7 @@ if ($secure_card_merchantref == false) {
       $product_id = $_POST["product"];
 
       if (isset($_POST["full_name"])) {
-
           if ($customer_id == 0) {
-
 
               $is_credit = "yes";
 
@@ -492,16 +656,9 @@ if ($secure_card_merchantref == false) {
 
               $stmt2->execute();
 
-              $customer_product = $stmt2->get_result();
               $customer_id=-1;
-                  if($customer_product){
-                    $query="SELECT last_insert_id() as 'customer_id'";
-                    $stmt3 = $dbTools->getConnection()->prepare($query);
-                    $stmt3->execute();
-
-                    $last_insert = $stmt3->get_result();
-                    $last_insert_id = $dbTools->fetch_assoc($last_insert);
-                    $customer_id=$last_insert_id["customer_id"];
+                  if($stmt2->insert_id>0){
+                    $customer_id=$stmt2->insert_id;
                   }//New customer's ID
           } else {
               // $customer_id = $_POST["customer_id"];
@@ -583,22 +740,17 @@ if ($secure_card_merchantref == false) {
 
           $order_result = $stmt_order->get_result();
           $order_id=-1;
-              if($order_result){
-                $query="SELECT last_insert_id() AS 'order_id'";
-                $stmt_order_id = $dbTools->getConnection()->prepare($query);
-                $stmt_order_id->execute();
+              if($stmt_order->insert_id>0){
 
-                $last_insert = $stmt_order_id->get_result();
-                $last_insert_id = $dbTools->fetch_assoc($last_insert);
+                $order_id=$stmt_order->insert_id;
 
-                $order_id=$last_insert_id["order_id"];
               }
 
           if (isset($_POST["options"])) {
 
 
-
-              $options = json_decode($_POST['options'], true);
+              //$options = json_decode($_POST['options'], true);
+              $options = $_POST['options'];
               $properties=[
                 "order_id"
                 ,"plan"
@@ -820,7 +972,7 @@ if ($secure_card_merchantref == false) {
 
             $stmt_order_options->execute();
 
-            $result_order_options = $stmt_order_options->get_result();
+            $result_order_options = $stmt_order_options->affected_rows>0?true:false;
 
               //Assgin the modem to the new customer if it is from inventory
               if ($options['modem'] == "inventory") {
@@ -844,6 +996,7 @@ if ($secure_card_merchantref == false) {
 
           //if existed customer, do not add new merchantref
           if ($secure_card_merchantref==false) {
+
               //4- insert Order Merchant Ref
               $param_value1=$_POST["merchantref"];
               $param_value2=$customer_id;
@@ -864,6 +1017,7 @@ if ($secure_card_merchantref == false) {
                       . ")";
               $stmt_merchantrefs = $dbTools->getConnection()->prepare($query_merchantrefs);
 
+
               $stmt_merchantrefs->bind_param('ssss',
                                 $param_value1,
                                 $param_value2,
@@ -874,7 +1028,7 @@ if ($secure_card_merchantref == false) {
 
               $stmt_merchantrefs->execute();
 
-              $result_merchantrefs = $stmt_merchantrefs->get_result();
+              $result_merchantrefs = $stmt_merchantrefs->affected_rows>0?true:false;
           } else {
               $param_value1=$_POST["merchantref"];
               $param_value2=$customer_id;
@@ -905,10 +1059,9 @@ if ($secure_card_merchantref == false) {
 
 
               $stmt_merchantrefs->execute();
+              $result_merchantrefs = $stmt_merchantrefs->affected_rows>0?true:false;
 
-              $result_merchantrefs = $stmt_merchantrefs->get_result();
           }
-
 
           if ($customer_id>0 && $order_id>0 && $result_order_options && $result_merchantrefs)
           {
@@ -919,7 +1072,7 @@ if ($secure_card_merchantref == false) {
                   $printOrder = new PrintOrder();
                   file_put_contents('last_order.pdf', $printOrder->output($order_id));
 
-                  $to = mysqli_real_escape_string($dbToolsReseller->getConnection(),$_POST["email"]);
+                  $to = mysqli_real_escape_string($dbTools->getConnection(),$_POST["email"]);
                   $body = "Dear Customer,\nWe would like to thank you for using our services,\nYour order (".$orid.") has been received and your invoice is attached\nTo finalize your order, please read our Terms and Conditions on (https://www.amprotelecom.com/terms-and-conditions/) and agree by replying to this email with 'I agree'\nBest,\nAmProTelecom INC.";
 
                   // Create the Transport
@@ -929,41 +1082,49 @@ if ($secure_card_merchantref == false) {
                   ;
 
                   // Create the Mailer using your created Transport
-                  $mailer = new Swift_Mailer($transport);
-
-                  // Create a message
-                  $message = (new Swift_Message('AmProTelecom INC. - Your Order'))
-                          ->setFrom(['info@amprotelecom.com' => 'AmProTelecom INC.'])
-                          ->setTo([$to, 'info@amprotelecom.com'])
-                          ->setBody($body)
-                          ->attach(Swift_Attachment::fromPath(__DIR__ . "/last_order.pdf"))
-                  ;
+                  // $mailer = new Swift_Mailer($transport);
+                  //
+                  // // Create a message
+                  // $email_message = (new Swift_Message('AmProTelecom INC. - Your Order'))
+                  //         ->setFrom(['info@amprotelecom.com' => 'AmProTelecom INC.'])
+                  //         ->setTo([$to, 'info@amprotelecom.com'])
+                  //         ->setBody($body)
+                  //         ->attach(Swift_Attachment::fromPath(__DIR__ . "/last_order.pdf"))
+                  // ;
 
                   // Send the message
-                  $result = $mailer->send($message);
-
+                  //$result = $mailer->send($email_message);
+                  echo "{\"error\":false,\"message\":\"".$message."\"}";
+                  exit();
               } catch (Exception $e) {
-                $message=false;
+                $message=$e;
+                echo "{\"error\":true,\"message\":\"".$message."\"}";
+                exit();
               }
 
           } else {
-              $message=false;
+            $message="Error in saving the order. Please contact support team to fix this. Sorry for that";
+            echo "{\"error\":true,\"message\":\"".$message."\"}";
+            exit();
           }
       }
-      $message=false;
+      $message="Error: missing data. Please contact support team to fix this. Sorry for that";
+      echo "{\"error\":true,\"message\":\"".$message."\"}";
+      exit();
   }
 
 
-    echo $message;
-    exit();
+  echo "{\"error\":true,\"message\":\"".$message."\"}";
+  exit();
 
 }
 else{
 
   $message=$mGlobalOnePaymentXMLTools->payment($_POST["card_number"], $_POST["card_type"], $_POST["card_expiry"], $_POST["card_holders_name"], $_POST["card_cvv"], "P_" . $_POST["merchant_reference"], $_POST["amount"]);
+
   if($message!=true)
   {
-    echo $message;
+    echo "{\"error\":true,\"message\":\"".$message."\"}";
     exit();
   }
   $message=true;
@@ -974,9 +1135,7 @@ else{
       $product_id = $_POST["product"];
 
       if (isset($_POST["full_name"])) {
-
           if ($customer_id == 0) {
-
 
               $is_credit = "yes";
 
@@ -1061,16 +1220,9 @@ else{
 
               $stmt2->execute();
 
-              $customer_product = $stmt2->get_result();
               $customer_id=-1;
-                  if($customer_product){
-                    $query="SELECT last_insert_id() as 'customer_id'";
-                    $stmt3 = $dbTools->getConnection()->prepare($query);
-                    $stmt3->execute();
-
-                    $last_insert = $stmt3->get_result();
-                    $last_insert_id = $dbTools->fetch_assoc($last_insert);
-                    $customer_id=$last_insert_id["customer_id"];
+                  if($stmt2->insert_id>0){
+                    $customer_id=$stmt2->insert_id;
                   }//New customer's ID
           } else {
               // $customer_id = $_POST["customer_id"];
@@ -1152,22 +1304,17 @@ else{
 
           $order_result = $stmt_order->get_result();
           $order_id=-1;
-              if($order_result){
-                $query="SELECT last_insert_id() AS 'order_id'";
-                $stmt_order_id = $dbTools->getConnection()->prepare($query);
-                $stmt_order_id->execute();
+              if($stmt_order->insert_id>0){
 
-                $last_insert = $stmt_order_id->get_result();
-                $last_insert_id = $dbTools->fetch_assoc($last_insert);
+                $order_id=$stmt_order->insert_id;
 
-                $order_id=$last_insert_id["order_id"];
               }
 
           if (isset($_POST["options"])) {
 
 
-
-              $options = json_decode($_POST['options'], true);
+              //$options = json_decode($_POST['options'], true);
+              $options = $_POST['options'];
               $properties=[
                 "order_id"
                 ,"plan"
@@ -1389,7 +1536,7 @@ else{
 
             $stmt_order_options->execute();
 
-            $result_order_options = $stmt_order_options->get_result();
+            $result_order_options = $stmt_order_options->affected_rows>0?true:false;
 
               //Assgin the modem to the new customer if it is from inventory
               if ($options['modem'] == "inventory") {
@@ -1413,6 +1560,7 @@ else{
 
           //if existed customer, do not add new merchantref
           if ($secure_card_merchantref==false) {
+
               //4- insert Order Merchant Ref
               $param_value1=$_POST["merchantref"];
               $param_value2=$customer_id;
@@ -1433,6 +1581,7 @@ else{
                       . ")";
               $stmt_merchantrefs = $dbTools->getConnection()->prepare($query_merchantrefs);
 
+
               $stmt_merchantrefs->bind_param('ssss',
                                 $param_value1,
                                 $param_value2,
@@ -1443,7 +1592,7 @@ else{
 
               $stmt_merchantrefs->execute();
 
-              $result_merchantrefs = $stmt_merchantrefs->get_result();
+              $result_merchantrefs = $stmt_merchantrefs->affected_rows>0?true:false;
           } else {
               $param_value1=$_POST["merchantref"];
               $param_value2=$customer_id;
@@ -1474,10 +1623,9 @@ else{
 
 
               $stmt_merchantrefs->execute();
+              $result_merchantrefs = $stmt_merchantrefs->affected_rows>0?true:false;
 
-              $result_merchantrefs = $stmt_merchantrefs->get_result();
           }
-
 
           if ($customer_id>0 && $order_id>0 && $result_order_options && $result_merchantrefs)
           {
@@ -1488,7 +1636,7 @@ else{
                   $printOrder = new PrintOrder();
                   file_put_contents('last_order.pdf', $printOrder->output($order_id));
 
-                  $to = mysqli_real_escape_string($dbToolsReseller->getConnection(),$_POST["email"]);
+                  $to = mysqli_real_escape_string($dbTools->getConnection(),$_POST["email"]);
                   $body = "Dear Customer,\nWe would like to thank you for using our services,\nYour order (".$orid.") has been received and your invoice is attached\nTo finalize your order, please read our Terms and Conditions on (https://www.amprotelecom.com/terms-and-conditions/) and agree by replying to this email with 'I agree'\nBest,\nAmProTelecom INC.";
 
                   // Create the Transport
@@ -1498,32 +1646,40 @@ else{
                   ;
 
                   // Create the Mailer using your created Transport
-                  $mailer = new Swift_Mailer($transport);
-
-                  // Create a message
-                  $message = (new Swift_Message('AmProTelecom INC. - Your Order'))
-                          ->setFrom(['info@amprotelecom.com' => 'AmProTelecom INC.'])
-                          ->setTo([$to, 'info@amprotelecom.com'])
-                          ->setBody($body)
-                          ->attach(Swift_Attachment::fromPath(__DIR__ . "/last_order.pdf"))
-                  ;
+                  // $mailer = new Swift_Mailer($transport);
+                  //
+                  // // Create a message
+                  // $email_message = (new Swift_Message('AmProTelecom INC. - Your Order'))
+                  //         ->setFrom(['info@amprotelecom.com' => 'AmProTelecom INC.'])
+                  //         ->setTo([$to, 'info@amprotelecom.com'])
+                  //         ->setBody($body)
+                  //         ->attach(Swift_Attachment::fromPath(__DIR__ . "/last_order.pdf"))
+                  // ;
 
                   // Send the message
-                  $result = $mailer->send($message);
-
+                  //$result = $mailer->send($email_message);
+                  echo "{\"error\":false,\"message\":\"".$message."\"}";
+                  exit();
               } catch (Exception $e) {
-                $message=false;
+                $message=$e;
+                echo "{\"error\":true,\"message\":\"".$message."\"}";
+                exit();
               }
 
           } else {
-              $message=false;
+            $message="Error in saving the order. Please contact support team to fix this. Sorry for that";
+            echo "{\"error\":true,\"message\":\"".$message."\"}";
+            exit();
           }
       }
-      $message=false;
+      $message="Error: missing data. Please contact support team to fix this. Sorry for that";
+      echo "{\"error\":true,\"message\":\"".$message."\"}";
+      exit();
   }
 
-    echo $message;
-    exit();
+
+  echo "{\"error\":true,\"message\":\"".$message."\"}";
+  exit();
 }
 
 ?>
