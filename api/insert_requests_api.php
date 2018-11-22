@@ -6,7 +6,7 @@
 function checkRequest($order_id, $dbTools) {
 
     //$getOrder=$dbTools->query("SELECT actual_installation_date from order_options where order_id=".$order_id);
-    $getOrder = $dbTools->query("SELECT * from orders inner join order_options on orders.order_id= order_options.order_id where  orders.order_id=" . $order_id);
+    $getOrder = $dbTools->query("SELECT * FROM `orders` INNER JOIN `order_options` ON `orders`.`order_id`= `order_options`.`order_id` WHERE  `orders`.`order_id`=" . $order_id);
 
     $start_active_date = null;
     while ($order_row = $dbTools->fetch_assoc($getOrder)) {
@@ -65,13 +65,13 @@ else if (isset($_GET["order_id"]) && isset($_GET['do']) == "product_list") {
 
     $dbTools->query("SET CHARACTER SET utf8");
 
-    $getOrder = $dbTools->query("SELECT `orders`.`product_title`, `request_id`, `requests`.`product_title` as request_product_title, 
+    $getOrder = $dbTools->query("SELECT `orders`.`product_title`, `request_id`, `requests`.`product_title` as request_product_title,
                                 `orders`.`product_subscription_type`, `orders`.`product_category`
-                                from orders 
+                                from orders
                                 inner join order_options on orders.order_id= order_options.order_id
-                                left join requests on orders.order_id= requests.order_id 
+                                left join requests on orders.order_id= requests.order_id
                                 where orders.order_id=" . $_GET["order_id"]. " order by `request_id` desc limit 0,1");
-    
+
     $order_row = $dbTools->fetch_assoc($getOrder);
 
     $current_product_title = ($order_row["request_product_title"] != "")? $order_row["product_title"] : $order_row["request_product_title"];
@@ -182,13 +182,49 @@ else if (isset($_GET["order_id"]) && isset($_GET['do']) == "product_list") {
     }
 
 
-    $product = $dbTools->query("SELECT * FROM `products` where product_id=" . $_POST["product_id"]);
+    if($_POST["action"]==="change_speed")
+    {
+      $product = $dbTools->query("SELECT * FROM `products` WHERE `product_id`=" . $_POST["product_id"]);
 
-    while ($product_row = $dbTools->fetch_assoc($product)) {
-        $InsertFieldValues["product_title"] = $product_row["title"];
-        $InsertFieldValues["product_price"] = $product_row["price"];
-        $InsertFieldValues["product_category"] = $product_row["category"];
-        $InsertFieldValues["product_subscription_type"] = $product_row["subscription_type"];
+      while ($product_row = $dbTools->fetch_assoc($product)) {
+          $InsertFieldValues["product_title"] = $product_row["title"];
+          $InsertFieldValues["product_price"] = $product_row["price"];
+          $InsertFieldValues["product_category"] = $product_row["category"];
+          $InsertFieldValues["product_subscription_type"] = $product_row["subscription_type"];
+      }
+    }
+    else{
+      $product = $dbTools->query("SELECT
+                                    `product_title`,
+                                    `product_category`,
+                                    `product_subscription_type`,
+                                    `product_price`
+                                  FROM `orders`
+                                  INNER JOIN `order_options` ON `orders`.`order_id`=`order_options`.`order_id`
+                                  WHERE `orders`.`order_id`=" . $order_id);
+
+      while ($product_row = $dbTools->fetch_assoc($product)) {
+          $InsertFieldValues["product_title"] = $product_row["product_title"];
+          $InsertFieldValues["product_price"] = $product_row["product_price"];
+          $InsertFieldValues["product_category"] = $product_row["product_category"];
+          $InsertFieldValues["product_subscription_type"] = $product_row["product_subscription_type"];
+      }
+
+      $product = $dbTools->query("SELECT
+                                    `product_title`,
+                                    `product_category`,
+                                    `product_subscription_type`,
+                                    `product_price`
+                                  FROM `requests`
+                                  WHERE `order_id` = " . $order_id." AND `requests`.`verdict`='approve'
+                                  ORDER BY `request_id`  DESC LIMIT 1");
+
+      while ($product_row = $dbTools->fetch_assoc($product)) {
+          $InsertFieldValues["product_title"] = $product_row["product_title"];
+          $InsertFieldValues["product_price"] = $product_row["product_price"];
+          $InsertFieldValues["product_category"] = $product_row["product_category"];
+          $InsertFieldValues["product_subscription_type"] = $product_row["product_subscription_type"];
+      }
     }
 
     $InsertFieldValues["action_value"] = "0";

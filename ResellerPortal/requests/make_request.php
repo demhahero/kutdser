@@ -6,34 +6,34 @@ include_once "../header.php";
 $order_id = intval($_GET["order_id"]);
 
 $creation_date = new DateTime();
-
-if (isset($_POST["action"])) {
-
-    $action_on_date = new DateTime(($_POST["action_on_date"]));
-
-    $product = $dbToolsReseller->objProductTools($_POST["action_value"]);
-
-    $requestTools = $dbToolsReseller->objRequestTools(null);
-    $requestTools->setReseller($dbToolsReseller->objCustomerTools($reseller_id));
-    $requestTools->setAction(($_POST["action"]));
-    $requestTools->setActionValue(($_POST["action_value"]));
-    $requestTools->setNote(($_POST["note"]));
-    $requestTools->setOrder($dbToolsReseller->objOrderTools($order_id));
-    $requestTools->setCreationDate($creation_date);
-    $requestTools->setActionOnDate($action_on_date);
-
-    $requestTools->setProductPrice($product->getPrice());
-    $requestTools->setProductTitle($product->getTitle());
-    $requestTools->setProductCategory($product->getCategory());
-    $requestTools->setProductSubscriptionType($product->getSubscriptionType());
-
-    $request_result = $requestTools->doInsert();
-
-    if ($request_result) {
-        echo "<div class='alert alert-success'>Request sent!</div>";
-        //header('Location: '.$site_url.'/requests/requests.php');
-    }
-}
+//
+// if (isset($_POST["action"])) {
+//
+//     $action_on_date = new DateTime(($_POST["action_on_date"]));
+//
+//     $product = $dbToolsReseller->objProductTools($_POST["action_value"]);
+//
+//     $requestTools = $dbToolsReseller->objRequestTools(null);
+//     $requestTools->setReseller($dbToolsReseller->objCustomerTools($reseller_id));
+//     $requestTools->setAction(($_POST["action"]));
+//     $requestTools->setActionValue(($_POST["action_value"]));
+//     $requestTools->setNote(($_POST["note"]));
+//     $requestTools->setOrder($dbToolsReseller->objOrderTools($order_id));
+//     $requestTools->setCreationDate($creation_date);
+//     $requestTools->setActionOnDate($action_on_date);
+//
+//     $requestTools->setProductPrice($product->getPrice());
+//     $requestTools->setProductTitle($product->getTitle());
+//     $requestTools->setProductCategory($product->getCategory());
+//     $requestTools->setProductSubscriptionType($product->getSubscriptionType());
+//
+//     $request_result = $requestTools->doInsert();
+//
+//     if ($request_result) {
+//         echo "<div class='alert alert-success'>Request sent!</div>";
+//         //header('Location: '.$site_url.'/requests/requests.php');
+//     }
+// }
 ?>
 
 <title>Make a request</title>
@@ -143,6 +143,13 @@ if (isset($_POST["action"])) {
                         + field['product_id'] + "'>" + field['title'] + " (" + field['price'] + ")</option>");
             });
         });
+
+        $('#product_change_speed').on('change', function() {
+          $('#product_swap_and_change').val($(this).val())
+        });
+        $('#product_swap_and_change').on('change', function() {
+          $('#product_change_speed').val($(this).val())
+        });
     });
 </script>
 <form class="register-form" method="post">
@@ -241,12 +248,12 @@ if (isset($_POST["action"])) {
 
     <div class="form-group action-value">
         <label>Speed:</label>
-        <select name="product_id" class="product-list form-control">
+        <select name="product_id" id="product_change_speed" class="product-list form-control">
         </select>
     </div>
     <div class="form-group swap-change">
         <label>Speed:</label>
-        <select name="product_id" class="product-list form-control">
+        <select name="product_id" id="product_swap_and_change" class="product-list form-control">
         </select>
     </div>
     <div class="form-group swap-change">
