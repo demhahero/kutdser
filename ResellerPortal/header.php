@@ -106,6 +106,7 @@ if(!@include_once "../../api/dbconfig.php")
                           ?>
                           <li><a href="<?= $site_url ?>/shop/shop_test.php">test api shop</a></li>
                           <li><a href="<?= $site_url ?>/customers/statistics.php">Statistics</a></li>
+                          <li><a href="<?= $site_url ?>/reseller_requests/reseller_requests.php">My Requests</a></li>
                         <?PHP
                         }
                         ?>

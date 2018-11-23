@@ -77,9 +77,9 @@ if (!@include_once "../../api/dbconfig.php")
             (function worker() {
                 $.get("<?= $api_url ?>orders/new_orders_notification.php", function (data) {
                     // Now that we've completed the request schedule the next one.
-                    
+
                     if(data != "0"){
-                       alert("New Order(s) has(have) been sent"); 
+                       alert("New Order(s) has(have) been sent");
                     }
                     setTimeout(worker, 60000);
                 });
@@ -139,6 +139,7 @@ if (!@include_once "../../api/dbconfig.php")
                                         <ul class="nav child_menu">
                                             <li><a href="<?= $site_url ?>/create_customer.php">Create Reseller</a></li>
                                             <li><a href="<?= $site_url ?>/customers/resellers.php">Resellers</a></li>
+                                            <li><a href="<?= $site_url ?>/reseller_requests/reseller_requests.php">Requests</a></li>
                                             <li><a href="<?= $site_url ?>/custom_invoice.php">Custom Invoice</a></li>
                                             <li><a href="<?= $site_url ?>/custom_statement.php">Custom Statement</a></li>
                                         </ul>
