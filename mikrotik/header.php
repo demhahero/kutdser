@@ -59,6 +59,7 @@ if (!@include_once "../../api/dbconfig.php")
                         }
                     });
                 });
+                function getUpdates(){
                 $.post("<?= $api_url ?>orders/order_sent_count_api.php",
                         {
                             action: "get_total_order_sent"
@@ -66,12 +67,41 @@ if (!@include_once "../../api/dbconfig.php")
                 , function (response, status) {
                     response = $.parseJSON(response);
                     if (!response.error) {
-                        $('#total_order_sent').html(response.total_order_sent);
+                        if(response.total_order_sent>0)
+                        {
+                          $('.total_order_sent').html(response.total_order_sent);
+                        }
+                        else{
+                          $('.total_order_sent').html("");
+                        }
+                        if(response.total_request_sent>0)
+                        {
+                          $('.total_request_sent').html(response.total_request_sent);
+                        }
+                        else{
+                          $('.total_request_sent').html("");
+                        }
+                        if(response.total_reseller_request_sent>0)
+                        {
+                          $('.total_reseller_request_sent').html(response.total_reseller_request_sent);
+                        }
+                        else{
+                          $('.total_reseller_request_sent').html("");
+                        }
                     } else {
-                        $('#total_order_sent').html(0);
+                        $('.total_order_sent').html("");
+                        $('.total_request_sent').html("");
+                        $('.total_reseller_request_sent').html("");
                     }
                 }
                 );
+              }
+              (function worker() {
+
+                      getUpdates();
+                      setTimeout(worker, 60000);
+
+              })();
             });
 
             (function worker() {
@@ -85,6 +115,24 @@ if (!@include_once "../../api/dbconfig.php")
                 });
             })();
         </script>
+        <style>
+            .blink {
+                color:red;
+                vertical-align: super;
+                font-size: 12px;
+                animation: blink-animation 1s steps(5,start) infinite;
+                -webkit-animation: blink-animation 1s steps(5,start) infinite;
+            }
+
+            /* Safari */
+            @-webkit-keyframes spin {
+                to { visibility: hidden; }
+            }
+
+            @keyframes blink-animation {
+                to { visibility: hidden; }
+            }
+        </style>
     </head>
 
     <body class="nav-md">
@@ -118,28 +166,28 @@ if (!@include_once "../../api/dbconfig.php")
                             <div class="menu_section">
                                 <h3>General</h3>
                                 <ul class="nav side-menu">
-                                    <li><a><i class="fa fa-male"></i> Customers <span class="fa fa-chevron-down"></span></a>
+                                    <li><a><i class="fa fa-male"></i> Customers<span class="blink total_request_sent"></span> <span class="fa fa-chevron-down"></span></a>
                                         <ul class="nav child_menu">
                                             <li><a href="<?= $site_url ?>/customers/customers.php">Customers</a></li>
-                                            <li><a href="<?= $site_url ?>/requests/requests.php">Requests</a></li>
+                                            <li><a href="<?= $site_url ?>/requests/requests.php">Requests<span class="blink total_request_sent"></span></a></li>
                                             <li><a href="<?= $site_url ?>/upcoming_customers/upcoming_customers.php">Upcoming Customers</a></li>
                                             <li><a href="<?= $site_url ?>/expire/expire_soon_orders.php">Expire Soon</a></li>
                                         </ul>
                                     </li>
 
-                                    <li><a><i class="fa fa-shopping-cart"></i> Order <span class="fa fa-chevron-down"></span></a>
+                                    <li><a><i class="fa fa-shopping-cart"></i> Order <span class="blink total_order_sent" ></span> <span class="fa fa-chevron-down"></span></a>
                                         <ul class="nav child_menu">
-                                            <li><a href="<?= $site_url ?>/orders/orders.php">Orders</a></li>
+                                            <li><a href="<?= $site_url ?>/orders/orders.php">Orders<span class="blink total_order_sent" ></span></a></li>
                                             <li><a href="<?= $site_url ?>/customers/going_to_merge.php">Merges</a></li>
                                             <li><a href="<?= $site_url ?>/orders/phones.php">Phones</a></li>
                                         </ul>
                                     </li>
 
-                                    <li><a><i class="fa fa-sitemap"></i>Resellers<span class="fa fa-chevron-down"></span></a>
+                                    <li><a><i class="fa fa-sitemap"></i>Resellers <span class="blink total_reseller_request_sent"></span> <span class="fa fa-chevron-down"></span></a>
                                         <ul class="nav child_menu">
                                             <li><a href="<?= $site_url ?>/create_customer.php">Create Reseller</a></li>
                                             <li><a href="<?= $site_url ?>/customers/resellers.php">Resellers</a></li>
-                                            <li><a href="<?= $site_url ?>/reseller_requests/reseller_requests.php">Requests</a></li>
+                                            <li><a href="<?= $site_url ?>/reseller_requests/reseller_requests.php">Requests<span class="blink total_reseller_request_sent"></span></a></li>
                                             <li><a href="<?= $site_url ?>/custom_invoice.php">Custom Invoice</a></li>
                                             <li><a href="<?= $site_url ?>/custom_statement.php">Custom Statement</a></li>
                                         </ul>
@@ -229,7 +277,7 @@ if (!@include_once "../../api/dbconfig.php")
                                 <li role="presentation" class="dropdown">
                                     <a href="javascript:;" class="dropdown-toggle info-number" data-toggle="dropdown" aria-expanded="false">
                                         <i class="fa fa-envelope-o"></i>
-                                        <span class="badge bg-green" id="total_order_sent"></span>
+                                        <span class="badge bg-green total_order_sent"></span>
                                     </a>
                                     <ul id="menu1" class="dropdown-menu list-unstyled msg_list" role="menu">
 
