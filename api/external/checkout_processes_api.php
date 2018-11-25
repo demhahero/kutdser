@@ -502,6 +502,7 @@ $subscription_recurring_amount = number_format((float) $subscription_recurring_a
 //Initial amount is same as total_price
 $subscription_initial_amount = number_format((float) $total_price, 2, '.', '');
 
+
 //Find out 1st recurring date
 $subscription_start_date = "";
 if ($subscription_period_type == "YEARLY") { //If yearly payment
@@ -525,6 +526,20 @@ if ($subscription_period_type == "YEARLY") { //If yearly payment
     }
 }
 
+
+// **** FOR TESTING PURPOSES ONLY - START
+
+$subscription_initial_amount = "0.01";
+$subscription_recurring_amount = "1";
+// **** FOR TESTING PURPOSES ONLY - END
+
+
+
+$_POST["period_type"]=$subscription_period_type;
+$_POST["subscription_start_date"]=$subscription_start_date;
+$_POST["amount"]=$subscription_initial_amount;
+$_POST["recurring_amount"]=$subscription_recurring_amount;
+$_POST["initial_amount"]=$subscription_initial_amount;
 //Get unique random merchant reference
 $merchantref = uniqid();
 
@@ -549,14 +564,30 @@ if ($customer_id > 0) {
     }
 }
 if ($secure_card_merchantref == false) {
-  $message=$mGlobalOnePaymentXMLTools->secureCardRegister("CARD_" . $_POST["merchant_reference"], $_POST["card_number"], $_POST["card_type"], $_POST["card_expiry"], $_POST["card_holders_name"], $_POST["card_cvv"]);
+  $message=false;
+  try {
+    $message=$mGlobalOnePaymentXMLTools->secureCardRegister("CARD_" . $_POST["merchant_reference"], $_POST["card_number"], $_POST["card_type"], $_POST["card_expiry"], $_POST["card_holders_name"], $_POST["card_cvv"]);
+
+  } catch (\Exception $e) {
+    echo "{\"error\":true,\"message\":\"".$e."\"}";
+    exit();
+  }
+
 
   if($message!=true)
   {
     echo "{\"error\":true,\"message\":\"".$message."\"}";
     exit();
   }
-  $message=$mGlobalOnePaymentXMLTools->subscriptionRegister("SS_" . $_POST["merchant_reference"], "CARD_" . $_POST["merchant_reference"], $_POST["subscription_start_date"], $_POST["recurring_amount"], $_POST["initial_amount"], $_POST["period_type"]);
+  $message=false;
+  try {
+    $message=$mGlobalOnePaymentXMLTools->subscriptionRegister("SS_" . $_POST["merchant_reference"], "CARD_" . $_POST["merchant_reference"], $_POST["subscription_start_date"], $_POST["recurring_amount"], $_POST["initial_amount"], $_POST["period_type"]);
+
+  } catch (\Exception $e) {
+    echo "{\"error\":true,\"message\":\"".$e."\"}";
+    exit();
+  }
+
 
   if($message!=true)
   {
@@ -1119,8 +1150,15 @@ if ($secure_card_merchantref == false) {
 
 }
 else{
+  $message=false;
+  try {
+    $message=$mGlobalOnePaymentXMLTools->payment($_POST["card_number"], $_POST["card_type"], $_POST["card_expiry"], $_POST["card_holders_name"], $_POST["card_cvv"], "P_" . $_POST["merchant_reference"], $_POST["amount"]);
 
-  $message=$mGlobalOnePaymentXMLTools->payment($_POST["card_number"], $_POST["card_type"], $_POST["card_expiry"], $_POST["card_holders_name"], $_POST["card_cvv"], "P_" . $_POST["merchant_reference"], $_POST["amount"]);
+  } catch (\Exception $e) {
+    echo "{\"error\":true,\"message\":\"".$e."\"}";
+    exit();
+  }
+
 
   if($message!=true)
   {
