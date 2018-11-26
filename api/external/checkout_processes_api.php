@@ -529,8 +529,8 @@ if ($subscription_period_type == "YEARLY") { //If yearly payment
 
 // **** FOR TESTING PURPOSES ONLY - START
 
-$subscription_initial_amount = "0.01";
-$subscription_recurring_amount = "1";
+// $subscription_initial_amount = "0.01";
+// $subscription_recurring_amount = "1";
 // **** FOR TESTING PURPOSES ONLY - END
 
 
