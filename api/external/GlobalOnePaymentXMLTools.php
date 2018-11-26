@@ -15,7 +15,7 @@ class GlobalOnePaymentXMLTools {
         $this->gateway = 'globalone';   # This is the WorldNet payments gateway that you should use, assigned to the site by WorldNet.
         $this->terminalId = '9530001';  # This is the Terminal ID assigned to the site by WorldNet.
         $this->currency = 'CAD';   # This is the 3 digit ISO currency code for the above Terminal ID.
-        $this->secret = 'Ali@1982';   # This shared secret is used when generating the hash validation strings. 
+        $this->secret = 'Ali@1982';   # This shared secret is used when generating the hash validation strings.
         # It must be set exactly as it is in the WorldNet Self Care system.
         $this->testAccount = false;
 
@@ -27,7 +27,7 @@ class GlobalOnePaymentXMLTools {
 
     function payment($cardNumber, $cardType, $cardExpiry, $cardHolderName, $cvv, $orderId, $amount) {
 
-        require('gateway_tps_xml.php');
+        require_once('gateway_tps_xml.php');
 
         # These values are specific to the cardholder.
         //$cardNumber = '5526123000333124';  # This is the full PAN (card number) of the credit card OR the SecureCard Card Reference if using a SecureCard. It must be digits only (i.e. no spaces or other characters).
@@ -135,7 +135,7 @@ class GlobalOnePaymentXMLTools {
     }
 
     function secureCardRegister($secureCardMerchantRef, $cardNumber, $cardType, $cardExpiry, $cardHolderName, $cvv) {
-        require('gateway_tps_xml.php');
+        require_once('gateway_tps_xml.php');
         # These values are specific to the cardholder.
         $dontCheckSecurity = '';  # (optional) "Y" if you do not want the CVV to be validated online.
         $issueNo = '';   # (optional) Issue number for Switch and Solo cards.
@@ -170,7 +170,7 @@ class GlobalOnePaymentXMLTools {
     }
 
     function subscriptionRegister($subscriptionMerchantRef, $secureCardMerchantRef, $subscriptionStartDate, $recurringAmount, $initialAmount, $periodType) {
-        require('gateway_tps_xml.php');
+        require_once('gateway_tps_xml.php');
 
         # These are all optiona fields
         $endDate = '';    # (optional) set an end date for the subscription.  Format: DD-MM-YYYY.
@@ -211,7 +211,7 @@ class GlobalOnePaymentXMLTools {
     }
 
     function updateSubscription($subscriptionMerchantRef, $storedSubscriptionMerchantRef, $secureCardMerchantRef, $recurringAmount) {
-        require('gateway_tps_xml.php');
+        require_once('gateway_tps_xml.php');
 
         # Set up the stored subscription update object
         $subupd = new XmlSubscriptionUpdRequest($subscriptionMerchantRef, $this->terminalId, $secureCardMerchantRef);

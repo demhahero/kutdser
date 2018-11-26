@@ -1,6 +1,6 @@
 <?php
 require_once './init.php';
-require_once 'GlobalOnePaymentXMLTools.php';
+include 'GlobalOnePaymentXMLTools.php';
 require_once 'print_order_class.php';
 require_once '../../mikrotik/swiftmailer/vendor/autoload.php';
 
@@ -1113,18 +1113,18 @@ if ($secure_card_merchantref == false) {
                   ;
 
                   // Create the Mailer using your created Transport
-                  // $mailer = new Swift_Mailer($transport);
-                  //
-                  // // Create a message
-                  // $email_message = (new Swift_Message('AmProTelecom INC. - Your Order'))
-                  //         ->setFrom(['info@amprotelecom.com' => 'AmProTelecom INC.'])
-                  //         ->setTo([$to, 'info@amprotelecom.com'])
-                  //         ->setBody($body)
-                  //         ->attach(Swift_Attachment::fromPath(__DIR__ . "/last_order.pdf"))
-                  // ;
+                  $mailer = new Swift_Mailer($transport);
+
+                  // Create a message
+                  $email_message = (new Swift_Message('AmProTelecom INC. - Your Order'))
+                          ->setFrom(['info@amprotelecom.com' => 'AmProTelecom INC.'])
+                          ->setTo([$to, 'info@amprotelecom.com'])
+                          ->setBody($body)
+                          ->attach(Swift_Attachment::fromPath(__DIR__ . "/last_order.pdf"))
+                  ;
 
                   // Send the message
-                  //$result = $mailer->send($email_message);
+                  $result = $mailer->send($email_message);
                   echo "{\"error\":false,\"message\":\"".$message."\"}";
                   exit();
               } catch (Exception $e) {
@@ -1684,18 +1684,18 @@ else{
                   ;
 
                   // Create the Mailer using your created Transport
-                  // $mailer = new Swift_Mailer($transport);
-                  //
-                  // // Create a message
-                  // $email_message = (new Swift_Message('AmProTelecom INC. - Your Order'))
-                  //         ->setFrom(['info@amprotelecom.com' => 'AmProTelecom INC.'])
-                  //         ->setTo([$to, 'info@amprotelecom.com'])
-                  //         ->setBody($body)
-                  //         ->attach(Swift_Attachment::fromPath(__DIR__ . "/last_order.pdf"))
-                  // ;
+                  $mailer = new Swift_Mailer($transport);
+
+                  // Create a message
+                  $email_message = (new Swift_Message('AmProTelecom INC. - Your Order'))
+                          ->setFrom(['info@amprotelecom.com' => 'AmProTelecom INC.'])
+                          ->setTo([$to, 'info@amprotelecom.com'])
+                          ->setBody($body)
+                          ->attach(Swift_Attachment::fromPath(__DIR__ . "/last_order.pdf"))
+                  ;
 
                   // Send the message
-                  //$result = $mailer->send($email_message);
+                  $result = $mailer->send($email_message);
                   echo "{\"error\":false,\"message\":\"".$message."\"}";
                   exit();
               } catch (Exception $e) {
