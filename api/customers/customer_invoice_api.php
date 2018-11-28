@@ -155,7 +155,7 @@ $customer_full_name=$row["full_name"];
                 $data[1] = '<a target="_blank" href="'.$api_url.'customers/print_customer_recurring_invoice.php?month='. $dt->format("m") .'&year='. $dt->format("Y") .'&customer_id='.$customer_id .'">
                     Print
                 </a>';
-
+                $all_data[] = $data;
               }
             }
             else {
@@ -169,6 +169,7 @@ $customer_full_name=$row["full_name"];
                   $data[1] = '<a target="_blank" href="'.$api_url.'customers/print_customer_recurring_invoice.php?month='. $dt->format("m") .'&year='. $dt->format("Y") .'&customer_id='.$customer_id .'">
                       Print
                   </a>';
+                  $all_data[] = $data;
                 }
             }
 

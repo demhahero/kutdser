@@ -19,9 +19,9 @@ $month = $_GET["month"];
 $year = intval(filter_input(INPUT_GET, 'year', FILTER_VALIDATE_INT));
 
 
-$ordersMonthly=$dbTools->orders_by_month($customer_id,$year,$month);
+$ordersMonthly=$dbTools->orders_by_month($customer_id,"".$year,"".$month);
 
-$ordersYearly=$dbTools->orders_by_month_yearly($customer_id,$year,$month);
+$ordersYearly=$dbTools->orders_by_month_yearly($customer_id,"".$year,"".$month);
 
 
 
@@ -37,6 +37,49 @@ $qst_tax = 0;
 $gst_tax = 0;
 
 
+$query = "SELECT
+					`customers`.`customer_id`,
+          `customers`.`full_name`,
+          `customers`.`address`,
+          `customers`.`city`,
+          `customers`.`address_line_1`,
+          `customers`.`address_line_2`,
+          `customers`.`postal_code`,
+          resellers.`full_name` as 'reseller_full_name',
+          resellers.`address` as 'reseller_address',
+          resellers.`city` as 'reseller_city',
+          resellers.`address_line_1` as 'reseller_address_line_1',
+          resellers.`address_line_2` as 'reseller_address_line_2',
+          resellers.`postal_code` as 'reseller_postal_code'
+
+          FROM `orders`
+
+          LEFT JOIN `customers` ON `orders`.`customer_id`=`customers`.`customer_id`
+          LEFT JOIN `customers` resellers ON resellers.`customer_id` = `orders`.`reseller_id`
+
+          WHERE `orders`.`order_id`=?";
+
+        $stmt1 = $dbTools->getConnection()->prepare($query);
+
+
+        $stmt1->bind_param('s',
+                          $orders[0]["order_id"]
+                          ); // 's' specifies the variable type => 'string'
+
+
+        $stmt1->execute();
+
+        $result1 = $stmt1->get_result();
+        $result = $dbTools->fetch_assoc($result1);
+
+        $result["full_address"]=$result['address'].$result['city']." " .
+                $result['address_line_1']." ".$result['address_line_2']." " .
+                $result['postal_code'];
+        $result["reseller_full_address"]=$result['reseller_address'].$result['reseller_city']." " .
+                $result['reseller_address_line_1']." ".$result['reseller_address_line_2']." " .
+                $result['reseller_postal_code'];
+
+
 foreach ($orders as $order) {
 
   $rent_router_cost += $order["monthInfo"][0]["router_price"];
@@ -50,11 +93,11 @@ foreach ($orders as $order) {
 }
 
 $html = $terms_header . '
-                    ' . $orders[0]["customer_name"] . '<br/>' . $orders[0]["address"] . '
+                    ' . $orders[0]["customer_name"] . '<br/>' . $result["full_address"] . '
                 </td>
 		<td class="address shipping-address">
                     <h3>Reseller:</h3>
-                    ' . $orders[0]["reseller_name"] . '<br/>' . $orders[0]["reseller_address"] . '
+                    ' . $orders[0]["reseller_name"] . '<br/>' . $result["reseller_full_address"] . '
 		</td>
 		<td class="order-data">
 			<table>
@@ -64,11 +107,11 @@ $html = $terms_header . '
 				</tr>
 				<tr class="order-date">
 					<th>Invoice No.:</th>
-					<td>#' . $year . $month . $orders[0]["customer_id"]. '</td>
+					<td>#' . $year . $month . $result["customer_id"]. '</td>
 				</tr>
                                 <tr class="order-date">
 					<th>Invoice for:</th>
-					<td>'.$year .'/'. $month.'</td> 
+					<td>'.$year .'/'. $month.'</td>
 				</tr>
 							</table>
 		</td>
