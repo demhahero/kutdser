@@ -141,41 +141,67 @@ $result1 = $stmt1->get_result();
 $queryRecords = $result1;
 $all_data=[];
 $customer_full_name="";
-//iterate on results row and create new index array of data
+
+$rows=[];
 while ($row = mysqli_fetch_array($queryRecords)) {
-$customer_full_name=$row["full_name"];
-          if ($row["product_subscription_type"] == "monthly") {
-              $start = getRecurringStartDate($row)->modify('first day of this month');
-              $end = (new DateTime())->modify('first day of this month');
-              $interval = DateInterval::createFromDateString('1 month');
-              $period = new DatePeriod($start, $interval, $end);
-
-              foreach ($period as $dt) {
-                $data[0] = $dt->format("Y-m");
-                $data[1] = '<a target="_blank" href="'.$api_url.'customers/print_customer_recurring_invoice.php?month='. $dt->format("m") .'&year='. $dt->format("Y") .'&customer_id='.$customer_id .'">
-                    Print
-                </a>';
-                $all_data[] = $data;
-              }
-            }
-            else {
-                $start = getRecurringStartDate($row)->modify('first day of this month');
-                $end = (new DateTime())->modify('first day of this month');
-                $interval = DateInterval::createFromDateString('1 month');
-                $period = new DatePeriod($start, $interval, $end);
-
-                foreach ($period as $dt) {
-                  $data[0] = $dt->format("Y-m");
-                  $data[1] = '<a target="_blank" href="'.$api_url.'customers/print_customer_recurring_invoice.php?month='. $dt->format("m") .'&year='. $dt->format("Y") .'&customer_id='.$customer_id .'">
-                      Print
-                  </a>';
-                  $all_data[] = $data;
-                }
-            }
-
-
-    $all_data[] = $data;
+  $rows[] = $row;
 }
+//iterate on results row and create new index array of data
+
+$start_active_date=null;
+if($stmt1->affected_rows>1)
+{
+  $order1_start_active_date= getRecurringStartDate($rows[0]);
+  $order2_start_active_date= getRecurringStartDate($rows[1]);
+  $start_active_date= $order1_start_active_date> $order1_start_active_date? $order1_start_active_date:$order2_start_active_date;
+}
+else if($stmt1->affected_rows==1){
+  $order1_start_active_date= getRecurringStartDate($rows[0]);
+  $start_active_date= $order1_start_active_date;
+}
+else{
+  $json_data = array(
+      "draw" => intval($params['draw']),
+      "recordsTotal" => 0,
+      "recordsFiltered" => 0,
+      "data" => [],   // total data array
+      "customer_full_name"=>""
+  );
+
+  echo $json = json_encode($json_data);
+  exit();
+}
+$row=$rows[0];
+$customer_full_name=$row["full_name"];
+if ($row["product_subscription_type"] == "monthly") {
+  $start = $start_active_date->modify('first day of this month');
+  $end = (new DateTime())->modify('first day of this month');
+  $interval = DateInterval::createFromDateString('1 month');
+  $period = new DatePeriod($start, $interval, $end);
+
+  foreach ($period as $dt) {
+    $data[0] = $dt->format("Y-m");
+    $data[1] = '<a target="_blank" href="'.$api_url.'customers/print_customer_recurring_invoice.php?month='. $dt->format("m") .'&year='. $dt->format("Y") .'&customer_id='.$customer_id .'">
+        Print
+    </a>';
+    $all_data[] = $data;
+  }
+}
+else {
+    $start = getRecurringStartDate($row)->modify('first day of this month');
+    $end = (new DateTime())->modify('first day of this month');
+    $interval = DateInterval::createFromDateString('1 month');
+    $period = new DatePeriod($start, $interval, $end);
+
+    foreach ($period as $dt) {
+      $data[0] = $dt->format("Y-m");
+      $data[1] = '<a target="_blank" href="'.$api_url.'customers/print_customer_recurring_invoice.php?month='. $dt->format("m") .'&year='. $dt->format("Y") .'&customer_id='.$customer_id .'">
+          Print
+      </a>';
+      $all_data[] = $data;
+    }
+}
+
 
 $json_data = array(
     "draw" => intval($params['draw']),
