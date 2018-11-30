@@ -135,8 +135,8 @@ foreach ($orders as $order):
   if (isset($order["monthInfo"][0]["product_price_2"]) && $order["monthInfo"][0]["product_price_2"] !=="null")
 
   {
-    $product_title=$order["monthInfo"][0]["product_title"]+" ("+$order["monthInfo"][0]["days"]+" days), "+$order["monthInfo"][0]["product_title_2"]+" ("+$order["monthInfo"][0]["days_2"]+" days)";
-    $product_price=$order["monthInfo"][0]["product_price"]+"$  ("+$order["monthInfo"][0]["product_price_previous"]+"$), "+$order["monthInfo"][0]["product_price_2"]+"$ ("+$order["monthInfo"][0]["product_price_current"]+"$)";
+    $product_title=$order["monthInfo"][0]["product_title"]." (".$order["monthInfo"][0]["days"]." days), ".$order["monthInfo"][0]["product_title_2"]." (".$order["monthInfo"][0]["days_2"]." days)";
+    $product_price=$order["monthInfo"][0]["product_price"]."$  (".$order["monthInfo"][0]["product_price_previous"]."$), ".$order["monthInfo"][0]["product_price_2"]."$ (".$order["monthInfo"][0]["product_price_current"]."$)";
   }
     $html .= '<tr class="415">
 		<td class="product">
@@ -144,7 +144,7 @@ foreach ($orders as $order):
                     <dl class="meta">																</dl>
 		</td>
 		<td class="quantity">1</td>
-		<td class="price"><span class="woocommerce-Price-amount amount"><span class="woocommerce-Price-currencySymbol">&#36;</span>' . $product_price . '</span></td>
+		<td class="price"><span class="woocommerce-Price-amount amount">' . $product_price . '</span></td>
             </tr>';
 endforeach;
 $html .= '
@@ -207,7 +207,6 @@ $html .= '
 </table>
 
 ' . $terms_footer;
-
 
 
 // instantiate and use the dompdf class

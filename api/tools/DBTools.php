@@ -2132,8 +2132,8 @@ class DBTools {
     				$monthInfo["product_price_previous"]=$monthInfo["product_price"];
             $monthInfo["product_price_current"]=0;
             //$totalPriceWoT=(float)$monthInfo["product_price"]+$priceDifference;
-    				$monthInfo["product_price"]=0;
-    				//$monthInfo["product_price_2"]=0;
+    				$monthInfo["product_price"]=round($previous_product_price,2, PHP_ROUND_HALF_UP);;
+    				$monthInfo["product_price_2"]=0;
     				$monthInfo["days"]=$previous_days;
     				$monthInfo["days_2"]=$this_request_days;
             //echo $monthInfo["product_price"]."-".$priceDifference;
@@ -2177,7 +2177,7 @@ class DBTools {
     				$monthInfo["total_price_with_out_tax"]=round($subtotal,2, PHP_ROUND_HALF_UP);
     				$monthInfo["total_price_with_tax"]=round($totalPriceWT,2, PHP_ROUND_HALF_UP);
     				$monthInfo["total_price_with_tax_p7"]=round($totalPriceWT7,2, PHP_ROUND_HALF_UP);
-    				$monthInfo["product_title_2"]="";
+    				$monthInfo["product_title_2"]=$monthInfo["product_title"];
     				//$monthInfo["additional_service_price"]=0;
     				$monthInfo["setup_price"]=0;
     				if($monthInfo["modem"]!=="rent" )
