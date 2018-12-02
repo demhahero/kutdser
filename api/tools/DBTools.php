@@ -576,7 +576,7 @@ class DBTools {
             else {
               $request_row["action"]=$request_row["action"].", Router Rent";
             }
-            if($monthInfo["static"]!=="yes" )
+            if($monthInfo["static_ip"]!=="yes" )
             {
     					$monthInfo["static_ip_price"]=0;
             }
@@ -828,7 +828,7 @@ class DBTools {
       array_push($order_rows,$order_row);
     }
     $customers=array();
-    for($i=0;$i<sizeof($order_rows);$i=$i+2){
+    for($i=0;$i<sizeof($order_rows)-1;$i=$i+2){
     $customer=array();
     $orderOne=$this->fillOrderInfo($order_rows[$i],$year,$month);
     $orderTwo=$this->fillOrderInfo($order_rows[$i+1],$year,$month);
@@ -1028,6 +1028,10 @@ class DBTools {
       $orderChild["free_adapter"]=$order_row["free_adapter"];
       $orderChild["free_installation"]=$order_row["free_installation"];
       $orderChild["free_transfer"]=$order_row["free_transfer"];
+      ///////////
+      ///////////
+      ////reseller commission percentage
+      $orderChild["reseller_commission_percentage"]=(int)$order_row["reseller_commission_percentage"];
       ///////////
       $orderChild["join_type"]=$order_row["join_type"];
       $orderChild["reseller_name"]=$order_row["reseller_name"];
@@ -1670,6 +1674,9 @@ class DBTools {
       $orderChild["free_adapter"]=$order_row["free_adapter"];
       $orderChild["free_installation"]=$order_row["free_installation"];
       $orderChild["free_transfer"]=$order_row["free_transfer"];
+      ///////////
+      ////reseller commission percentage
+      $orderChild["reseller_commission_percentage"]=(int)$order_row["reseller_commission_percentage"];
       ///////////
       $orderChild["join_type"]=$order_row["join_type"];
       $orderChild["reseller_name"]=$order_row["reseller_name"];
