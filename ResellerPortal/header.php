@@ -40,6 +40,25 @@ if(!@include_once "../../api/dbconfig.php")
             });
           });
           </script>
+
+          <style>
+              .blink {
+                  color:red;
+                  vertical-align: super;
+                  font-size: 12px;
+                  animation: blink-animation 1s steps(5,start) infinite;
+                  -webkit-animation: blink-animation 1s steps(5,start) infinite;
+              }
+
+              /* Safari */
+              @-webkit-keyframes spin {
+                  to { visibility: hidden; }
+              }
+
+              @keyframes blink-animation {
+                  to { visibility: hidden; }
+              }
+          </style>
     </head>
 
     <body>
@@ -104,9 +123,8 @@ if(!@include_once "../../api/dbconfig.php")
                         <?PHP if ($reseller_id==="190")
                         {
                           ?>
-                          <li><a href="<?= $site_url ?>/shop/shop_test.php">test api shop</a></li>
                           <li><a href="<?= $site_url ?>/customers/statistics.php">Statistics</a></li>
-                          <li><a href="<?= $site_url ?>/reseller_requests/reseller_requests.php">My Requests</a></li>
+                          <li><a href="<?= $site_url ?>/reseller_requests/reseller_requests.php">My Requests<span class="blink">new</span></a></li>
                         <?PHP
                         }
                         ?>
