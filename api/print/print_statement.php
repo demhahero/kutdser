@@ -58,7 +58,7 @@ $reseller["full_address"]=$reseller['address'].$reseller['city']." " .
 $statement_no=$reseller_id."0".$year."0".$month;
 
 $displayed_statement_no=(((0x0000FFFF & (int) $statement_no) << 16) + ((0xFFFF0000 & (int) $statement_no) >> 16));
-$html = $terms_header . '
+$html = $terms_header_statement . '
                     ' . $reseller["full_name"] . '<br/>' . $reseller["full_address"] . '
                 </td>
     <td></td>
