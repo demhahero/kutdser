@@ -1,5 +1,4 @@
 <?php
-
 //include connection file
 include_once "../dbconfig.php";
 
@@ -12,15 +11,10 @@ $params = $_REQUEST;
 $columns = array(
     0 => 'reseller_request_id',
     1 => 'full_name',
-    2 => 'modem_type',
-    3 => 'modem_mac_address',
-    4 => 'modem_serial_number',
-    5 => 'action',
-    6 => 'creation_date',
-    7 => 'action_on_date',
-    8 => 'verdict',
-    9 => 'verdict_date',
-    10 => 'note',
+    2 => 'action',
+    3 => 'action_on_date',
+    4 => 'creation_date',
+    5 => 'number_of_items',
 
 );
 
@@ -29,19 +23,25 @@ $where = $sqlTot = $sqlRec = "";
 
 
 $sqlTot = "SELECT
-            `reseller_request_id`,
-            `verdict`,
-            `verdict_date`,
-            `reseller_requests`.`note`,
+           `reseller_requests`.`reseller_request_id`,
+           `customers`.`full_name`,
             `action`,
-            `full_name`,
             `action_on_date`,
             `creation_date`,
-            `modem_mac_address`,
-            `modem_serial_number`,
-            `modem_type`
+            IFNULL(`number_of_items`,0) AS `number_of_items`,
+            IFNULL(`approved`,0) AS `approved`,
+            IFNULL(`disapproved`,0) AS `disapproved`
           FROM `reseller_requests`
-          INNER JOIN `customers` ON `reseller_requests`.`reseller_id`=`customers`.`customer_id`";
+          LEFT JOIN
+          (
+            SELECT count(*) AS `number_of_items`,`reseller_request_items`.`reseller_request_id`,
+              IFNULL(sum(IF(`reseller_request_items`.`verdict` = 'approve', 1, 0)), 0) as `approved`,
+            IFNULL(sum(IF(`reseller_request_items`.`verdict` = 'disapprove', 1, 0)), 0) as `disapproved`
+
+            FROM `reseller_request_items` GROUP BY `reseller_request_items`.`reseller_request_id`)
+          AS `reseller_requests_items` ON `reseller_requests_items`.`reseller_request_id`= `reseller_requests`.`reseller_request_id`
+          INNER JOIN `customers` ON `customers`.`customer_id`=`reseller_requests`.`reseller_id`
+          ";
 
 $sqlRec = $sqlTot;
 
@@ -51,13 +51,8 @@ $sqlRec = $sqlTot;
 // check search value exist
 if (!empty($params['search']['value'])) {
     $where .= " AND ";
-    $where .= " ( modem_mac_address LIKE ? ";
-    $where .= " OR modem_serial_number LIKE ? ";
-    $where .= " OR full_name LIKE ? ";
-    $where .= " OR modem_type LIKE ? ";
-    $where .= " OR reseller_request_id LIKE ? ";
-    $where .= " OR verdict LIKE ? ";
-    $where .= " OR note LIKE ? ) ";
+    $where .= " ( customer_full_name LIKE ? ";
+    $where .= " OR `reseller_requests`.`reseller_request_id` LIKE ? ) ";
 }
 
 //concatenate search sql if value exist
@@ -81,12 +76,7 @@ $stmt = $dbTools->getConnection()->prepare($sqlTot);
 
 if (isset($where) && $where != '') {
   $search_value="%".$params['search']['value']."%";
-$stmt->bind_param('sssssss',
-                  $search_value,
-                  $search_value,
-                  $search_value,
-                  $search_value,
-                  $search_value,
+$stmt->bind_param('ss',
                   $search_value,
                   $search_value );
 
@@ -106,12 +96,7 @@ $stmt1 = $dbTools->getConnection()->prepare($sqlRec);
 
 if (isset($where) && $where != '') {
   $search_value="%".$params['search']['value']."%";
-  $stmt1->bind_param('sssssss',
-                  $search_value,
-                  $search_value,
-                  $search_value,
-                  $search_value,
-                  $search_value,
+  $stmt1->bind_param('ss',
                   $search_value,
                   $search_value
                   ); // 's' specifies the variable type => 'string'
@@ -127,18 +112,20 @@ $all_data=[];
 //iterate on results row and create new index array of data
 while ($row = mysqli_fetch_array($queryRecords)) {
 
+    if($row['action']=="add_modem")
+    $row['action']="Add Modem(s)";
 
-    $data[0] = '<a href="request_details.php?request_id='.$row['reseller_request_id'].'" >'.$row['reseller_request_id'].'</a>';
+    $data[0] = $row['reseller_request_id'];
     $data[1] = $row['full_name'];
     $data[2] = $row['action'];
-    $data[3] = $row['modem_mac_address'];
-    $data[4] = $row['modem_serial_number'];
-    $data[5] = $row['modem_type'];
-    $data[6] = $row['creation_date'];
-    $data[7] = $row['action_on_date'];
-    $data[8] = $row['verdict'];
-    $data[9] = $row['verdict_date'];
-    $data[10] = $row['note'];
+    $data[3] = $row['creation_date'];
+    $data[4] = $row['action_on_date'];
+    $data[5] = $row['number_of_items'];
+    $data[6] = $row['approved'];
+    $data[7] = $row['disapproved'];
+    $data[8] = '<button class="btn btn-primary view" data-id='.$row['reseller_request_id'].'><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></button>';
+
+
     $all_data[] = $data;
 }
 

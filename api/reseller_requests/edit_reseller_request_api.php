@@ -8,28 +8,39 @@ if(isset($_POST["post_action"]))
 
     $query="SELECT
           	 *
-          	FROM `reseller_requests`
-            WHERE `reseller_request_id`= ? AND `reseller_id`=?";
+          	FROM `reseller_request_items`
+            WHERE `reseller_request_id`= ?";
 
 
     $stmt1 = $dbTools->getConnection()->prepare($query);
 
     $param_value=$_POST["edit_id"];
-    $param_value1=$reseller_id;
-    $stmt1->bind_param('ss',
-                      $param_value,
-                      $param_value1
+    $stmt1->bind_param('s',
+                      $param_value
                       ); // 's' specifies the variable type => 'string'
 
 
     $stmt1->execute();
 
     $result1 = $stmt1->get_result();
-    $result = $dbTools->fetch_assoc($result1);
-    if($result)
+    $request_items=[];
+    while($request_item = $dbTools->fetch_assoc($result1))
     {
-      $json = json_encode($result);
-        echo "{\"reseller_request\" :", $json
+      if (is_null($request_item["note"]))
+      {
+        $request_item["note"]="";
+      }
+      if (is_null($request_item["verdict_reason"]))
+      {
+        $request_item["verdict_reason"]="";
+      }
+      $request_items[]=$request_item;
+    }
+    if(sizeof($request_items)>0)
+    {
+
+      $json = json_encode($request_items);
+        echo "{\"reseller_request_items\" :", $json
           , ",\"error\":false}";
     }
     else {
@@ -37,7 +48,7 @@ if(isset($_POST["post_action"]))
         , ",\"error\":true}";
     }
   }
-  else if($_POST["post_action"]==="edit_reseller_request" && isset($_POST["edit_id"]))
+  else if($_POST["post_action"]==="edit_reseller_request_item" && isset($_POST["edit_id"]))
     {
 
       include_once "../dbconfig.php";
@@ -45,32 +56,24 @@ if(isset($_POST["post_action"]))
       $mac_address=$_POST["modem_mac_address"];
       $serial_number=$_POST["modem_serial_number"];
       $type=$_POST["modem_type"];
-      $action=$_POST["action"];
       $note=$_POST["note"];
-      $action_on_date=new DateTime($_POST["action_on_date"]);
-      $action_on_date_string=$action_on_date->format("Y-m-d");
 
-      $query = "UPDATE `reseller_requests` SET
-                `modem_mac_address`=?,
-                `modem_serial_number`=?,
-                `modem_type`=?,
-                `action`=?,
-                `action_on_date`=?,
-                `note`=?
-                WHERE `reseller_request_id`=? AND `reseller_id`=?";
+      $query = "UPDATE `reseller_request_items`
+                  SET `note`=?,
+                      `modem_mac_address`=?,
+                      `modem_serial_number`=?,
+                      `modem_type`=?
+                WHERE `reseller_request_item_id`=?";
 
 
       $stmt1 = $dbTools->getConnection()->prepare($query);
 
-      $stmt1->bind_param('ssssssss',
+      $stmt1->bind_param('sssss',
+                        $note,
                         $mac_address,
                         $serial_number,
                         $type,
-                        $action,
-                        $action_on_date_string,
-                        $note,
-                        $edit_id,
-                        $reseller_id);
+                        $edit_id);
 
 
       $stmt1->execute();

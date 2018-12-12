@@ -26,7 +26,8 @@
     <script src="<?= $site_url ?>/gentelella/vendors/jszip/dist/jszip.min.js"></script>
     <script src="<?= $site_url ?>/gentelella/vendors/pdfmake/build/pdfmake.min.js"></script>
     <script src="<?= $site_url ?>/gentelella/vendors/pdfmake/build/vfs_fonts.js"></script>
-
+    <!-- Switchery -->
+    <script src="<?= $site_url ?>/gentelella/vendors/switchery/dist/switchery.min.js"></script>
     <!-- Custom Theme Scripts -->
     <script src="<?= $site_url ?>/gentelella/build/js/custom.min.js"></script>
 

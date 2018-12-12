@@ -1,206 +1,196 @@
 <?php
-
 include_once "../header.php";
+?>
+<?php
+$edit_id=intval($_GET["reseller_request_id"]);
 
-$request_id = intval($_GET["request_id"]);
 ?>
 
 <script>
     $(document).ready(function () {
-
       function isNumber(n) {
        return !isNaN(parseFloat(n)) && isFinite(n);
       }
 
-      $("#no_verdict").hide();
-      $("#moving_approved").hide();
-      $("#moving_approved").hide();
+      $(document).on('click', '.update', function(){
+        var id=$(this).attr("data-reseller-request-item-id");
+        var verdict=$("input[name=\"reseller_request_items["+id+"][verdict]\"]").prop('checked');
 
+        var verdict_reason=$("textarea[name=\"reseller_request_items["+id+"][verdict_reason]\"]").val();
 
-      function refresh_page_data(){
-        $.post("<?= $api_url ?>reseller_requests/request_details_api.php"
-          ,{
-                "request_id":<?=$request_id?>,
-                "post_action": "get_request_details"
-            }, function (data) {
-
-            data = $.parseJSON(data);
-            if (data.error != true) {
-
-              if (data.request_row !== null) {
-
-                  $("#action").html(data.request_row.action);
-                  $("#action_on_date").html(data.request_row.action_on_date);
-                  $("#verdict_date").html(data.request_row.verdict_date);
-                  $("#verdict").html(data.request_row.verdict);
-                  $("#username").html(data.request_row.username);
-                  $("#reseller_full_name").html(data.request_row.reseller_full_name);
-                  $("#modem_mac_address").html(data.request_row.modem_mac_address);
-                  $("#modem_type").html(data.request_row.modem_type);
-                  $("#modem_serial_number").html(data.request_row.modem_serial_number);
-                  $("#note").html(data.request_row.note);
-                  if(!data.request_row.verdict || data.request_row.verdict.length<=0)
-                  {
-                    $("#no_verdict").show();
-                  }else{
-                    $("#no_verdict").hide();
-                  }
-
-
-                  $(".no_request_row").hide();
-                  $(".request_row_tr").show();
-                }
-                else{
-                  $(".no_request_row").show();
-                  $(".request_row_tr").hide();
-                }
+        $.post("<?= $api_url ?>reseller_requests/request_details_api.php",
+              {
+                "post_action":"edit_reseller_request_item",
+                "edit_id":id,
+                "verdict":verdict,
+                "verdict_reason":verdict_reason
               }
+             , function (data, status) {
+            data = $.parseJSON(data);
+            if(data.edited===true)
+            {
+              $("#"+id+"").hide();
+            }
+            else {
+              $('#message').html('<div class="alert alert-danger"><strong>Failed</strong> info didn\'t save</div>');
+              window.scrollTo(0, 0);
+            }
+
+          }
+        );
+
+      });
+
+    function refreshData()
+    {
+      if ( $.fn.dataTable.isDataTable( '#myTable2' ) ) {
+          var tableDetails = $('#myTable2').DataTable();
+          tableDetails.destroy();
+      }
+      var tableDetailsTag=$('#myTable2');
+      var tableDetails=tableDetailsTag.DataTable({
+        columnDefs: [
+                      {
+                          targets: 4,
+                          className: 'text-center'
+                      }
+                    ],
+        "createdRow": function( row, data, dataIndex){
+            if( data[6].indexOf('Save') >= 0){
+
+              $(row).css({"background-color": "#ffffff"});
+
+            }
+            else if (data[6].indexOf('Update') >= 0) {
+              $(row).css({"background-color": "#f2dede"});
+
+            }
+            else {
+
+              $(row).css({"background-color": "#dff0d8"});
+            }
+        },
+        "paging":   false,
+        "ordering": false,
+        "info":     false,
+        "searching":false
+      });
+      tableDetails.clear().draw();
+      $.post("<?= $api_url ?>reseller_requests/edit_reseller_request_api.php"
+      ,{
+            "edit_id":<?=$edit_id?>,
+            "post_action": "get_reseller_request_by_id"
+        }, function (data) {
+        data = $.parseJSON(data);
+        if (data.error != true) {
+          $.each(data['reseller_request_items'], function (i, reseller_request_item) {
+
+            var col1=reseller_request_item.modem_type;
+            var col2=reseller_request_item.modem_mac_address;
+            var col3=reseller_request_item.modem_serial_number;
+            var col4=reseller_request_item.note;
+            var checked_verdict="";
+            var button_text="Save";
+            if(reseller_request_item.verdict=="approve")
+            {
+              checked_verdict="checked";
+            }
+            else if (reseller_request_item.verdict=="disapprove") {
+              button_text="Update";
+            }
+            var col5='<input type="checkbox" class="js-switch" '+checked_verdict+' name="reseller_request_items['+reseller_request_item.reseller_request_item_id+'][verdict]" /></br> Disapprove/Approve';
+            var col6='<textarea name="reseller_request_items['+reseller_request_item.reseller_request_item_id+'][verdict_reason]">'+reseller_request_item.verdict_reason+'</textarea>';
+
+            var col7='<span id="'+reseller_request_item.reseller_request_item_id+'" data-reseller-request-item-id="'+reseller_request_item.reseller_request_item_id+'" class="btn btn-primary update">'+button_text+'</span>';
+
+            if(reseller_request_item.verdict=="approve" )
+            {
+
+              col5=reseller_request_item.verdict;
+              col6=reseller_request_item.verdict_reason;
+              col7="";
+
+            }
+
+
+            tableDetails.row.add([
+              col1,
+              col2,
+              col3,
+              col4,
+              col5,
+              col6,
+              col7
+            ]).draw( false );
           });
-      }
 
-      refresh_page_data();
-///////// form submit ajax call
-$("#no_verdict").submit(function(e){
-  e.preventDefault();
-  var verdict=$("select[name=\"verdict\"]").val();
 
-  $.post("<?= $api_url ?>reseller_requests/request_details_api.php"
-    ,{
-          "reseller_request_id":<?=$request_id?>,
-          "post_action": "edit_request",
-          "verdict":verdict,
+          }
+          else{
+            alert("error loading data, please contact admin");
+          }
+          if ($(".js-switch")[0]) {
+              var elems = Array.prototype.slice.call(document.querySelectorAll('.js-switch'));
+              elems.forEach(function (html) {
+                  var switchery = new Switchery(html, {
+                      color: '#26B99A'
+                  });
+              });
+          }
+      });
+    }
+    $("#reseller_request_items").submit(function(e){
+        e.preventDefault();
+        var post_data=$("form").serialize();
+        debugger;
+        $.post("<?= $api_url ?>reseller_requests/request_details_api.php",
+              post_data
+             , function (data, status) {
+            data = $.parseJSON(data);
+            if(data.edited===true)
+            {
+              $('#message').html('<div class="alert alert-success"><strong>Success</strong>info saved</div>');
+              refreshData();
+            }
+            else {
+              $('#message').html('<div class="alert alert-danger"><strong>Failed</strong> info didn\'t save</div>');
+            }
+            window.scrollTo(0, 0);
+          }
+        );
 
-      }, function (data) {
-
-      data = $.parseJSON(data);
-      if (data.edited == true) {
-        alert("Success: data updated");
-        refresh_page_data();
-      }
-      else{
-        alert("Error: update failed");
-      }
-    });
+      });
+      refreshData();
 });
-
-///////// end form submit
-
-    });
 </script>
-<title>Request Details</title>
+<title>Edit reseller_request</title>
 <div class="page-header">
-    <h4>Request Details</h4>
+    <h4>Edit reseller_request</h4>
+</div>
+<div id="message">
+
 </div>
 
-<br>
+<div class="row">
+  <form id="reseller_request_items">
+    <table id="myTable2"  class="display table table-striped table-bordered">
+        <thead>
+          <th>Modem Type</th>
+          <th>Mac address</th>
+          <th>Serial Number</th>
+          <th>Note</th>
+          <th>Verdict</th>
+          <th>Verdict Reason</th>
+          <th>Options</th>
+      </thead>
+      <tbody>
 
-
-    <form id="no_verdict" class="confirm-form" >
-
-        <div class="form-group">
-          <div class="form-group">
-            <label for="email">Verdict:</label>
-            <select  name="verdict" class="form-control">
-                <option  value="approve">approve</option>
-                <option  value="disapprove">disapprove</option>
-            </select>
-          </div>
-        </div>
-        <input type="submit" class="btn btn-primary" value="Submit">
-    </form>
-
-          <div id="moving_approved">
-          </div>
-
-    <div id="verdict_found">
-        <table class="display table table-striped table-bordered">
-            <tr>
-                <td id="username_verdict_date">
-
-                </td>
-            </tr>
-        </table>
-    </div>
-
-<div class="row" style="width:100% !important;">
-    <div class="col-lg-12 col-md-12 col-sm-12" >
-        <p class="rounded form-row form-row-wide">
-        <div class="panel panel-success">
-            <div class="panel-heading">Request Info</div>
-            <div class="panel-body">
-                <table class="display table table-striped table-bordered">
-
-                        <tr class="request_row_tr">
-                          <td class=" bg-success" style="width: 20%;">Reseller Name:</td>
-                          <td id="reseller_full_name">
-
-                          </td>
-                          <td class=" bg-success" style="width: 20%;" rowspan="2">Admin:</td>
-                          <td id="username" rowspan="2">
-
-                          </td>
-                        </tr>
-                        <tr class="request_row_tr">
-
-                          <td class=" bg-success" style="width: 20%;">Action:</td>
-                          <td id="action">
-
-                          </td>
-
-                        </tr>
-                        <tr class="request_row_tr">
-                          <td class=" bg-success" style="width: 20%;">Action On Date:</td>
-                          <td id="action_on_date" >
-
-                          </td>
-                          <td class=" bg-success" style="width: 20%;" rowspan="2">Verdict:</td>
-                          <td id="verdict" rowspan="2">
-
-                          </td>
-
-                        </tr>
-                        <tr class="request_row_tr">
-                          <td class=" bg-success" style="width: 20%;">Modem Type:</td>
-                          <td id="modem_type">
-
-                          </td>
-
-                        </tr>
-                        <tr class="request_row_tr">
-                          <td class=" bg-success" style="width: 20%;">Modem Mac Address:</td>
-                          <td id="modem_mac_address">
-
-                          </td>
-                          <td class=" bg-success" style="width: 20%;" rowspan="3">Verdict Date:</td>
-                          <td id="verdict_date" rowspan="3">
-
-                          </td>
-                        </tr>
-                        <tr class="request_row_tr">
-                          <td class=" bg-success" style="width: 20%;">Modem Serial Number:</td>
-                          <td id="modem_serial_number">
-
-                          </td>
-
-                        </tr>
-                        <tr class="request_row_tr">
-                          <td class=" bg-success" style="width: 20%;">Note:</td>
-                          <td id="note">
-
-                          </td>
-
-                        </tr>
-
-
-                </table>
-            </div>
-        </div>
-        </p>
-    </div>
+      </tbody>
+    </table>
+    <input type="hidden" name="post_action" value="edit_all_request_items"/>
+    <button class="btn btn-primary">Save all</button>
+  </form>
 </div>
-
-
-
 <?php
 include_once "../footer.php";
 ?>

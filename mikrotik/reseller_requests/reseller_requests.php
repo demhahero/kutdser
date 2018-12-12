@@ -7,6 +7,19 @@ include_once "../header.php";
       $('.dataTables_empty').html('<div class="loader"></div>');
 
       var table2=$('#myTable2').DataTable({
+          "createdRow": function( row, data, dataIndex){
+              if( data[5]==data[6]){
+
+                $(row).css({"background-color": "#dff0d8"});
+
+              }
+              else if (data[7]>0 ) {
+                $(row).css({"background-color": "#f2dede"});
+              }
+              else {
+                $(row).css({"background-color": "#ffffff"});
+              }
+          },
           "bProcessing": true,
           "serverSide": true,
           "ajax": {
@@ -16,6 +29,10 @@ include_once "../header.php";
                   $("#myTable2").css("display", "none");
               }
           }
+      });
+      $( "#myTable2 tbody" ).on( "click", ".view", function() {
+        var edit_id = $(this).attr('data-id');
+        window.location.href = "request_details.php?reseller_request_id="+edit_id;
       });
     });
 </script>
@@ -52,14 +69,12 @@ include_once "../header.php";
       <th>ID</th>
       <th>Reseller Name</th>
       <th>Action</th>
-      <th>Modem Mac Address</th>
-      <th>Modem Serial Number</th>
-      <th>Modem Type</th>
       <th>Creation Date</th>
-      <th>Action Date</th>
-      <th>Verdict</th>
-      <th>Verdict Date</th>
-      <th>Note</th>
+      <th>Action on Date</th>
+      <th>Patch number</th>
+      <th>Approved</th>
+      <th>Disapproved</th>
+      <th>View</th>
 </thead>
 <tbody>
 

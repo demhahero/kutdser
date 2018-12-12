@@ -8,60 +8,139 @@ $edit_id=intval($_GET["reseller_request_id"]);
 
 <script>
     $(document).ready(function () {
-      $('#datepicker').datepicker({
-          format: 'mm/dd/yyyy',
-          startDate: '+0d'
+      function isNumber(n) {
+       return !isNaN(parseFloat(n)) && isFinite(n);
+      }
+
+      $(document).on('click', '.update', function(){
+        var id=$(this).attr("data-reseller-request-item-id");
+        var modem_type=$("input[name=\"reseller_request_items["+id+"][modem_type]\"]").val();
+        var modem_mac_address=$("input[name=\"reseller_request_items["+id+"][modem_mac_address]\"]").val();
+        var modem_serial_number=$("input[name=\"reseller_request_items["+id+"][modem_serial_number]\"]").val();
+
+        var note=$("textarea[name=\"reseller_request_items["+id+"][note]\"]").val();
+
+        $.post("<?= $api_url ?>reseller_requests/edit_reseller_request_api.php",
+              {
+                "post_action":"edit_reseller_request_item",
+                "edit_id":id,
+                "modem_type":modem_type,
+                "modem_mac_address":modem_mac_address,
+                "modem_serial_number":modem_serial_number,
+                "note":note
+              }
+             , function (data, status) {
+            data = $.parseJSON(data);
+            if(data.edited===true)
+            {
+              $('#message').html('<div class="alert alert-success"><strong>Success</strong> info saved</div>');
+            }
+            else {
+              $('#message').html('<div class="alert alert-danger"><strong>Failed</strong> info didn\'t save</div>');
+            }
+            window.scrollTo(0, 0);
+          }
+        );
+
       });
-              $.post("<?= $api_url ?>reseller_requests/edit_reseller_request_api.php"
-              ,{
-                    "edit_id":<?=$edit_id?>,
-                    "post_action": "get_reseller_request_by_id"
-                }, function (data) {
-                data = $.parseJSON(data);
-                if (data.error != true) {
-                  $("input[name=\"modem_mac_address\"]").val(data.reseller_request.mac_address);
-                  $("input[name=\"modem_serial_number\"]").val(data.reseller_request.serial_number);
-                  $("input[name=\"modem_type\"]").val(data.reseller_request.type);
-                  $("select[name=\"action\"]").val(data.reseller_request.action);
-                  $("input[name=\"action_on_date\"]").val(data.reseller_request.action_on_date);
-                  $("textarea[name=\"note\"]").val(data.reseller_request.note);
+      $(document).on('click', '.delete', function(){
+        var id=$(this).attr("data-reseller-request-item-id");
+        $.post("<?= $api_url ?>reseller_requests/delete_reseller_request_api.php",
+              {
+                "post_action":"delete_reseller_request_item",
+                "delete_id":id
+              }
+             , function (data, status) {
+            data = $.parseJSON(data);
+            if(data.deleted===true)
+            {
+              $('#message').html('<div class="alert alert-success"><strong>Success</strong> item deleted</div>');
+              refreshData();
+            }
+            else {
+              $('#message').html('<div class="alert alert-danger"><strong>Error:</strong> operation failed</div>');
+            }
+            window.scrollTo(0, 0);
+          }
+        );
+      });
+  function refreshData()
+  {
+    if ( $.fn.dataTable.isDataTable( '#myTable2' ) ) {
+        var tableDetails = $('#myTable2').DataTable();
+        tableDetails.destroy();
+    }
+    var tableDetailsTag=$('#myTable2');
+    var tableDetails=tableDetailsTag.DataTable({
+      "createdRow": function( row, data, dataIndex){
+          if( data[4] ==  `approve`){
+
+            $(row).css({"background-color": "#dff0d8"});
+
+          }
+          else if (data[4] ==  `disapprove`) {
+            $(row).css({"background-color": "#f2dede"});
+          }
+          else {
+            $(row).css({"background-color": "#ffffff"});
+          }
+      },
+      "paging":   false,
+      "ordering": false,
+      "info":     false,
+      "searching":false
+    });
+    tableDetails.clear().draw();
+    $.post("<?= $api_url ?>reseller_requests/edit_reseller_request_api.php"
+    ,{
+          "edit_id":<?=$edit_id?>,
+          "post_action": "get_reseller_request_by_id"
+      }, function (data) {
+      data = $.parseJSON(data);
+      if (data.error != true) {
+        $.each(data['reseller_request_items'], function (i, reseller_request_item) {
+
+          var col1='<input type="text" name="reseller_request_items['+reseller_request_item.reseller_request_item_id+'][modem_type]" value="'+reseller_request_item.modem_type+'"/>';
+          var col2='<input type="text" name="reseller_request_items['+reseller_request_item.reseller_request_item_id+'][modem_mac_address]" value="'+reseller_request_item.modem_mac_address+'"/>';
+          var col3='<input type="text" name="reseller_request_items['+reseller_request_item.reseller_request_item_id+'][modem_serial_number]" value="'+reseller_request_item.modem_serial_number+'"/>';
+          var col4='<textarea name="reseller_request_items['+reseller_request_item.reseller_request_item_id+'][note]">'+reseller_request_item.note+'</textarea>';
+          var col5=reseller_request_item.verdict;
+          var col6=reseller_request_item.verdict_date;
+          var col7=reseller_request_item.verdict_reason;
+          var col8='<span data-reseller-request-item-id="'+reseller_request_item.reseller_request_item_id+'" class="btn btn-primary update">Update</span>';
+          var col9='<span data-reseller-request-item-id="'+reseller_request_item.reseller_request_item_id+'" class="btn btn-danger delete">Delete</span>';
+          if(reseller_request_item.verdict=="approve")
+          {
+            col1=reseller_request_item.modem_type;
+            col2=reseller_request_item.modem_mac_address;
+            col3=reseller_request_item.modem_serial_number;
+            col4=reseller_request_item.note;
+            col8="";
+            col9="";
+          }
 
 
-                  }
-                  else{
-                    alert("error loading data, please contact admin");
-                  }
-              });
-
-      $( ".update-form" ).submit(function( event ) {
-          event.preventDefault();
-          var action_on_date = $("input[name=\"action_on_date\"]").val();
-          var note = $("textarea[name=\"note\"]").val();
-          var action = $("select[name=\"action\"]").val();
-          var modem_mac_address = $("input[name=\"modem_mac_address\"]").val();
-          var modem_serial_number = $("input[name=\"modem_serial_number\"]").val();
-          var modem_type = $("input[name=\"modem_type\"]").val();
-
-          $.post("<?= $api_url ?>reseller_requests/edit_reseller_request_api.php",
-                  {
-                    "post_action":"edit_reseller_request",
-                    "edit_id":<?=$edit_id?>,
-                    "action": action,
-                    "action_on_date": action_on_date,
-                    "modem_mac_address": modem_mac_address,
-                    "modem_serial_number": modem_serial_number,
-                    "modem_type": modem_type,
-                    "note": note,
-                  }
-          , function (data, status) {
-              data = $.parseJSON(data);
-              if (data.edited == true) {
-                  alert("value updated");
-
-              } else
-                  alert("Error: "+data.error);
-          });
+          tableDetails.row.add([
+            col1,
+            col2,
+            col3,
+            col4,
+            col5,
+            col6,
+            col7,
+            col8+
+            col9
+          ]).draw( false );
         });
+
+
+        }
+        else{
+          alert("error loading data, please contact admin");
+        }
+    });
+}
+refreshData();
 
     });
 </script>
@@ -69,44 +148,29 @@ $edit_id=intval($_GET["reseller_request_id"]);
 <div class="page-header">
     <h4>Edit reseller_request</h4>
 </div>
+<div id="message">
 
-<form class="update-form" method="post">
-      <div class="form-group">
-          <label>Make a request:</label>
+</div>
 
-      </div>
+<div class="row">
+  <form id="reseller_request_items">
+    <table id="myTable2"  class="display table table-striped table-bordered">
+        <thead>
+          <th>Modem Type</th>
+          <th>Mac address</th>
+          <th>Serial Number</th>
+          <th>Note</th>
+          <th>Verdict</th>
+          <th>Verdict Date</th>
+          <th>Verdict Reason</th>
+          <th>Options</th>
+      </thead>
+      <tbody>
 
-      <div class="form-group">
-          <label>Action:</label>
-          <select name="action" class="form-control">
-              <option data-value="add_modem" value="add_modem">Add Modem</option>
-          </select>
-      </div>
-      <div class="form-group">
-          <label>Action on date:</label>
-          <input readonly="" name="action_on_date" type="text" id="datepicker" class="form-control" />
-      </div>
-      <div class="form-group">
-          <label>Modem Type:</label>
-          <input type="text" name="modem_type" class="form-control"/>
-      </div>
-      <div class="form-group">
-          <label>Modem Mac Address:</label>
-          <input type="text" name="modem_mac_address" class="form-control"/>
-
-      </div>
-      <div class="form-group">
-          <label>Modem Serial Number:</label>
-          <input type="text" name="modem_serial_number" class="form-control"/>
-      </div>
-      <div class="form-group">
-          <label>Note:</label>
-          <textarea name="note" class="form-control"></textarea>
-      </div>
-      <input type="submit" class="btn btn-primary submit"  value="Send">
+      </tbody>
+    </table>
   </form>
-
-
+</div>
 <?php
 include_once "../footer.php";
 ?>

@@ -22,6 +22,9 @@ if (!@include_once "../../api/dbconfig.php")
         <!-- NProgress -->
         <link href="<?= $site_url ?>/gentelella/vendors/nprogress/nprogress.css" rel="stylesheet">
 
+        <!-- Switchery -->
+        <link href="<?= $site_url ?>/gentelella/vendors/switchery/dist/switchery.min.css" rel="stylesheet">
+
         <!-- Custom Theme Style -->
         <link href="<?= $site_url ?>/gentelella/build/css/custom.min.css" rel="stylesheet">
 

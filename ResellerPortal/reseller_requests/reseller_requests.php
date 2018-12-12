@@ -10,6 +10,19 @@ $(document).ready(function () {
       "data_id":<?=$reseller_id?>
     };
     var table2=$('#myTable2').DataTable({
+            "createdRow": function( row, data, dataIndex){
+                if( data[4]==data[5]){
+
+                  $(row).css({"background-color": "#dff0d8"});
+
+                }
+                else if (data[6]>0 ) {
+                  $(row).css({"background-color": "#f2dede"});
+                }
+                else {
+                  $(row).css({"background-color": "#ffffff"});
+                }
+            },
             "bProcessing": true,
             "serverSide": true,
             "ajax": {
@@ -23,26 +36,33 @@ $(document).ready(function () {
             }
         });
 
-    $( "#myTable2 tbody" ).on( "click", ".edit", function() {
+    $( "#myTable2 tbody" ).on( "click", ".view", function() {
       var edit_id = $(this).attr('data-id');
       window.location.href = "edit_reseller_request.php?reseller_request_id="+edit_id;
     });
-    $( "#myTable2 tbody" ).on( "click", ".remove", function() {
 
-        var delete_id = $(this).attr('data-id');
-        $.post("<?= $api_url ?>reseller_requests/delete_reseller_request_api.php",
-                {
-                  delete_id: delete_id
-                }
-        , function (data, status) {
-            data = $.parseJSON(data);
-            if (data.deleted == true) {
-                alert("Record deleted");
-                table2.ajax.reload();
-            } else
-                alert("Error: delete record failed, try again later");
-        });
-      });
+    $(document).on('click', '.delete', function(){
+      var id = $(this).attr('data-id');
+      $.post("<?= $api_url ?>reseller_requests/delete_reseller_request_api.php",
+            {
+              "post_action":"delete_reseller_request",
+              "delete_id":id
+            }
+           , function (data, status) {
+          data = $.parseJSON(data);
+          if(data.deleted===true)
+          {
+            $('#message').html('<div class="alert alert-success"><strong>Success</strong> item deleted</div>');
+
+            table2.ajax.reload();
+          }
+          else {
+            $('#message').html('<div class="alert alert-danger"><strong>Error:</strong> operation failed</div>');
+          }
+          window.scrollTo(0, 0);
+        }
+      );
+    });
 
 });
 </script>
@@ -77,20 +97,20 @@ $(document).ready(function () {
 <a class="btn btn-primary" href="make_request.php">Make a request</a>
 </br></br>
 </div>
+<div id="message">
+
+</div>
 <div class="row">
 <table id="myTable2"  class="display table table-striped table-bordered">
     <thead>
     <th>ID</th>
     <th>Action</th>
-    <th>Modem Mac Address</th>
-    <th>Modem Serial Number</th>
-    <th>Modem Type</th>
     <th>Creation Date</th>
     <th>Action Date</th>
-    <th>Verdict</th>
-    <th>Verdict Date</th>
-    <th>Note</th>
-    <th>Options</th>
+    <th>Patch Size</th>
+    <th>Approved</th>
+    <th>Disapproved</th>
+    <th>View</th>
 </thead>
 <tbody>
 

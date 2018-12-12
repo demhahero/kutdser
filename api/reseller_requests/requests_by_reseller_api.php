@@ -14,15 +14,10 @@ $params = $_REQUEST;
 //define index of column
 $columns = array(
     0 => 'reseller_request_id',
-    1 => 'modem_type',
-    2 => 'modem_mac_address',
-    3 => 'modem_serial_number',
-    4 => 'action',
-    5 => 'creation_date',
-    6 => 'action_on_date',
-    7 => 'verdict',
-    8 => 'verdict_date',
-    9 => 'note',
+    1 => 'action',
+    2 => 'action_on_date',
+    3 => 'creation_date',
+    4 => 'number_of_items',
 
 );
 
@@ -31,17 +26,22 @@ $where = $sqlTot = $sqlRec = "";
 
 
 $sqlTot = "SELECT
-            `reseller_request_id`,
-            `verdict`,
-            `verdict_date`,
-            `note`,
+           `reseller_requests`.`reseller_request_id`,
             `action`,
             `action_on_date`,
             `creation_date`,
-            `modem_mac_address`,
-            `modem_serial_number`,
-            `modem_type`
+            `number_of_items`,
+            `approved`,
+            `disapproved`
           FROM `reseller_requests`
+          LEFT JOIN
+          (
+            SELECT count(*) AS `number_of_items`,`reseller_request_items`.`reseller_request_id`,
+              IFNULL(sum(IF(`reseller_request_items`.`verdict` = 'approve', 1, 0)), 0) as `approved`,
+            IFNULL(sum(IF(`reseller_request_items`.`verdict` = 'disapprove', 1, 0)), 0) as `disapproved`
+
+            FROM `reseller_request_items` GROUP BY `reseller_request_items`.`reseller_request_id`)
+          AS `reseller_requests_items` ON `reseller_requests_items`.`reseller_request_id`= `reseller_requests`.`reseller_request_id`
           WHERE `reseller_requests`.`reseller_id`=?";
 
 $sqlRec = $sqlTot;
@@ -51,13 +51,13 @@ $sqlRec = $sqlTot;
 
 // check search value exist
 if (!empty($params['search']['value'])) {
-    $where .= " AND ";
-    $where .= " ( modem_mac_address LIKE ? ";
-    $where .= " OR modem_serial_number LIKE ? ";
-    $where .= " OR modem_type LIKE ? ";
-    $where .= " OR reseller_request_id LIKE ? ";
-    $where .= " OR verdict LIKE ? ";
-    $where .= " OR note LIKE ? ) ";
+    // $where .= " AND ";
+    // $where .= " ( modem_mac_address LIKE ? ";
+    // $where .= " OR modem_serial_number LIKE ? ";
+    // $where .= " OR modem_type LIKE ? ";
+    // $where .= " OR reseller_request_id LIKE ? ";
+    // $where .= " OR verdict LIKE ? ";
+    // $where .= " OR note LIKE ? ) ";
 }
 
 //concatenate search sql if value exist
@@ -133,25 +133,26 @@ $all_data=[];
 //iterate on results row and create new index array of data
 while ($row = mysqli_fetch_array($queryRecords)) {
 
+    if($row['action']=="add_modem")
+    $row['action']="Add Modem(s)";
 
     $data[0] = $row['reseller_request_id'];
     $data[1] = $row['action'];
-    $data[2] = $row['modem_mac_address'];
-    $data[3] = $row['modem_serial_number'];
-    $data[4] = $row['modem_type'];
-    $data[5] = $row['creation_date'];
-    $data[6] = $row['action_on_date'];
-    $data[7] = $row['verdict'];
-    $data[8] = $row['verdict_date'];
-    $data[9] = $row['note'];
-    if(strlen($row['verdict'])<=0)
+    $data[2] = $row['creation_date'];
+    $data[3] = $row['action_on_date'];
+    $data[4] = $row['number_of_items'];
+    $data[5] = $row['approved'];
+    $data[6] = $row['disapproved'];
+
+    if((int)$row['approved']==0 && (int)$row['disapproved']==0)
     {
-      $data[10] = '<button class="btn btn-primary edit" data-id='.$row['reseller_request_id'].'>Edit</button>
-      <button class="btn btn-danger remove" data-id='.$row['reseller_request_id'].'>Delete</button>';
+      $data[7] = '<button class="btn btn-primary view" data-id='.$row['reseller_request_id'].'><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></button>
+      <button class="btn btn-danger delete" data-id='.$row['reseller_request_id'].'><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>';
     }
     else {
-      $data[10] = "";
+      $data[7] = '<button class="btn btn-primary view" data-id='.$row['reseller_request_id'].'><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></button>';
     }
+
 
     $all_data[] = $data;
 }
