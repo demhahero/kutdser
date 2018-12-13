@@ -15,6 +15,7 @@ $query = "SELECT
           `requests`.`action` ,
           `requests`.`modem_id`,
           `requests`.`fees_charged`,
+          `requests`.`verdict_date`,
 
           `customers`.`full_name` as 'customer_full_name',
           `customers`.`address` as 'customer_address',
@@ -74,6 +75,7 @@ $title_array= array(
 );
 
 $request_fees=$result['fees_charged'];
+$request_verdict_date=new DateTime($result['verdict_date']);
 $title=$title_array[$result["action"]];
 $qst_tax=$request_fees*0.09975;
 $gst_tax=$request_fees*0.05;
@@ -97,14 +99,14 @@ $html = $terms_header . '
 			<table>
 				<tr class="invoice-date">
 					<th>Invoice Date:</th>
-					<td>' . date("Y/m/d") . '</td>
+					<td>' . $request_verdict_date->format("Y/m/d") . '</td>
 				</tr>
 				<tr class="order-date">
 					<th>Order:</th>
 					<td>#' . $result["displayed_order_id"] . '</td>
 				</tr>
 
-							</table>
+			</table>
 		</td>
 	</tr>
 </table>
