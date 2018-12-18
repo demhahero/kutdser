@@ -706,5 +706,36 @@ AM Pro Telecom will make every effort to provide hight quality service. however,
 	<p>Website: www.amprotelecom.com | Phone: +1-514-548-2555 | Email: Info@amprotelecom.com</p>
 </div><!-- #letter-footer -->
 
+
+<center><h1>AM PRO TELECOM Termes et conditions :</h1></center>
+
+Les termes et conditions suivante vont être appliques pour tous les services fournis par AM PRO TELECOM.
+<br/><br/><br/>
+<div class="terms">
+
+<h2>Charge pour le service:</h2><br/>
+Les services qu’on offre sont des services prépayée. Votre premier paiement incluras  des charges uniques, par la suite il seras question de paiement mensuelle équivalent au plan que vous avez choisis.
+Vous serez responsable de payée votre service a temps avant la date d’échéance. Une balance qui reste impayée après la date d‘échéance seras soumis a un taux d’intérêt de 2% par mois. Dans le cas ou le paiement ne seras pas fait, AM PRO Telecom a le droit de suspendre et/ou terminer votre service a n’importe quel moment et sans aucun préavis. Pour réactiver ou réinstaller votre service de nouveau vous pouvez être charger des frais de réactivation ou d’installation de service.
+<br/><br/><br/>
+
+<h2>Installation de Service :</h2><br/>
+Vous pouvez demander au technicien d’installer votre service n’importe ou dans votre maison si il existe une prise fonctionnelle, dans le cas ou la prise est inexistante ou non fonctionnelle, le technicien installeras le service sur une des prise fonctionnelle, le technicien se réserve le droit de ne pas installer vos équipements, dans ce cas vous serais responsable de le faire.
+<br/><br/><br/>
+
+<h2>Résiliation:</h2><br/>
+-si vous vous abonnez pour un contrat d’un ans ou un ans de service internet prépayer, et vous résilier avant de complété la durée les frais d’installations qui non pas été payée au début seront charger ou une frais de résiliation de service qui s’élève a 83$+ taxes.
+-AM PRO Telecom se réserve tout les droits de se procurer votre dépôt sans préavis, dans le cas de n’importe quelle balance impayée,et la balance restante vous seras envoyer dans un délais de 10 jours ouvrables après la réception de tous les équipement louer dans un état fonctionnelle avec tous les accessoires, si les accessoire ne sont pas rendu après 10 jours ouvrables de la date de résiliation, vous serais charger le montant complet de n’importe quel équipement qui n’est pas rendu a AM PRO Telecom.
+<br/><br/><br/>
+
+<h2>Responsabilité limite:</h2><br/>
+AM PRO Telecom vas fournir tous les effort de donnée un service de Haut qualité. Cependant si les services sont interrompus ou ont une performance inférieure à celle attendue pour plus de 72 heurs consécutif, AM PRO Telecom responsabilité seras limite de vous créditer juste la période en question.
+<br/><br/>
+
+
+</div>
+<div id="footer">
+	<p>Site web: www.amprotelecom.com | Téléphone: +1-514-548-2555 | Email: Info@amprotelecom.com</p>
+</div><!-- #letter-footer -->
+
 </body>
 </html>';
