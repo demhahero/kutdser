@@ -281,6 +281,7 @@ font.tax-number{
     bottom: -1cm;
 }
 
+
 /* Footer Imprint */
 #footer {
 	position: absolute;
@@ -608,6 +609,12 @@ font.tax-number{
     position: absolute;
     bottom: -1cm;
 }
+font.initial{
+    font-size: 10pt;
+    position: absolute;
+    bottom: 0cm;
+    right: 0cm;
+}
 
 /* Footer Imprint */
 #footer {
@@ -656,6 +663,7 @@ Invoice</h1>
                     <!-- <h3>Billing Address:</h3> -->';
 
 $terms_footer = '
+<font class="initial">initial:___ ___</font>
 <font class="tax-number">GST: 745440297 | QST:  1224265740 | partner with: <img src="'.__DIR__ .'/bidsettle.png" width="120" height="20" /></font>
 <div id="footer">
 	<p>Website: www.amprotelecom.com | Phone: +1-514-548-2555 | Email: Info@amprotelecom.com</p>
@@ -700,11 +708,16 @@ There is a fee of $90 will be applied to all our services.
 AM Pro Telecom will make every effort to provide hight quality service. however, if the services are interrupted or have lower performed than what expected for more than 72 consecutive hours, AM Pro Telecom&rsquo;s liability will be limited to crediting you the service fee only for the period in question.
 <br/><br/>
 
-
+<font class="initial">initial:___ ___</font>
 </div>
+
 <div id="footer">
 	<p>Website: www.amprotelecom.com | Phone: +1-514-548-2555 | Email: Info@amprotelecom.com</p>
 </div><!-- #letter-footer -->
+
+
+<div class="break"></div>
+
 
 
 <center><h1>AM PRO TELECOM Termes et conditions :</h1></center>
@@ -731,7 +744,7 @@ Vous pouvez demander au technicien d’installer votre service n’importe ou da
 AM PRO Telecom vas fournir tous les effort de donnée un service de Haut qualité. Cependant si les services sont interrompus ou ont une performance inférieure à celle attendue pour plus de 72 heurs consécutif, AM PRO Telecom responsabilité seras limite de vous créditer juste la période en question.
 <br/><br/>
 
-
+<font class="initial">signature:________________________________</font>
 </div>
 <div id="footer">
 	<p>Site web: www.amprotelecom.com | Téléphone: +1-514-548-2555 | Email: Info@amprotelecom.com</p>
