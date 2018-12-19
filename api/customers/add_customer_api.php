@@ -4,7 +4,7 @@ if (isset($_GET["action"])) {
   if($_GET["action"]==="get_all_customers"){
     include_once "../dbconfig.php";
 
-    $customer_query = $dbTools->query("SELECT `customer_id`,`full_name` FROM `customers` WHERE `is_reseller` = '0'");
+    $customer_query = $dbTools->query("SELECT `customer_id`,`full_name` FROM `customers` WHERE `is_reseller` = '0' order by full_name asc");
 
 
       $customers=array();
