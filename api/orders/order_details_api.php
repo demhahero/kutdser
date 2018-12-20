@@ -13,6 +13,7 @@ if(isset($_POST["action"]))
       `orders`.`vl_number`,
       `order_options`.`modem`,
       `order_options`.`modem_mac_address`,
+      `order_options`.`modem_serial_number`,
       `order_options`.`modem_modem_type`,
       `order_options`.`cable_subscriber`,
       `order_options`.`completion`,
