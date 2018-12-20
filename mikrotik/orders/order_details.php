@@ -61,9 +61,9 @@ if(isset($_GET["order_id"]))
                   $('#modem_inventory').show();
                   $('.own_modem').hide();
                 } else if (response.order_details.modem == "own_modem") {
-                  $('#serial_number').html(response.order_details.serial_number);
+                  $('#serial_number').html(response.order_details.modem_serial_number);
                   $('#modem_mac_address').html(response.order_details.modem_mac_address);
-                  $('#modem_type').html(response.order_details.modem_type);
+                  $('#modem_type').html(response.order_details.modem_modem_type);
                   $('#modem_inventory').hide();
                   $('.own_modem').show();
 
@@ -320,7 +320,7 @@ if(isset($_GET["order_id"]))
             </tr>
             <tr class="own_modem">
                 <td>modem mac address</td>
-                <td id="mac_address">
+                <td id="modem_mac_address">
 
                 </td>
             </tr>
