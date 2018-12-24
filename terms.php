@@ -788,6 +788,6 @@ AM PRO Telecom va fournir tous les efforts de donnée un service de Haut qualit�
 <div id="footer">
 	<p>Site web: www.amprotelecom.com | Téléphone: +1-514-548-2555 | Email: Info@amprotelecom.com</p>
 </div><!-- #letter-footer -->
-
 </body>
+
 </html>';
