@@ -1542,7 +1542,7 @@ class DBTools {
     		$monthInfo["total_price_with_out_tax"]=round($totalPriceWoT,2, PHP_ROUND_HALF_UP);
     		$monthInfo["total_price_with_tax"]=round($totalPriceWT,2, PHP_ROUND_HALF_UP);
     		$monthInfo["total_price_with_tax_p7"]=round($totalPriceWT7,2, PHP_ROUND_HALF_UP);
-    		$monthInfo["product_price"]=round($totalPriceWoT,2, PHP_ROUND_HALF_UP);
+    		$monthInfo["product_price"]=round($productPrices[sizeof($productPrices)-2]["pricePreviousActual"],2, PHP_ROUND_HALF_UP);
     		$monthInfo["additional_service_price"]=0;
     		$monthInfo["setup_price"]=0;
     		$monthInfo["modem_price"]=0;
@@ -1813,25 +1813,28 @@ class DBTools {
           if($orderChild["router"]==='rent' || $orderChild["router"]==='rent_hap_lite')
           {
             $action=$action.", Router Rent";
-             $monthInfo["router_price"]=$router_price;
-           }
-          else {
+            $monthInfo["router_price"]=$router_price;
+          }
+          else
+          {
             $monthInfo["router_price"]=0;
           }
           if($orderChild["static_ip"]==='yes')
           {
             $action=$action.", Static IP";
-             $monthInfo["static_ip_price"]=$static_ip_price;
-           }
-          else {
+            $monthInfo["static_ip_price"]=$static_ip_price;
+          }
+          else
+          {
             $monthInfo["static_ip_price"]=0;
           }
           if($orderChild["additional_service"]==='yes')
           {
             $action=$action.", Additional Service";
-             $monthInfo["additional_service_price"]=$orderChild["additional_service_price"];
-           }
-          else {
+            $monthInfo["additional_service_price"]=$orderChild["additional_service_price"];
+          }
+          else
+          {
             $monthInfo["additional_service_price"]=0;
           }
           $totalPriceWoR=$product_price;
