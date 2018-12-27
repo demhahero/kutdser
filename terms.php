@@ -616,6 +616,13 @@ font.initial{
     right: 0cm;
 }
 
+font.signature{
+    font-size: 10pt;
+    position: absolute;
+    top: -4cm;
+    right: 0cm;
+}
+
 /* Footer Imprint */
 #footer {
 	position: absolute;
@@ -686,29 +693,41 @@ The next following Terms and Conditions will be apply to all AM PRO TELECOM Serv
 <div class="terms">
 
 <h2>Service Charge:</h2><br/>
-The services that we provide are prepaid services. your first payment includes one-time fee, and after that it will be monthly payment depending on the plan that you registered in. you will be responsible to make all the payment in time before the due date. Balance that remain unpaid after the due date will be charged interest  rate of 2% pre month.
-In case of a failure to make payment, AM Pro Telecom have the right to suspend and or terminate your service at any time with or without further notice. To reactivate or re-installation the service you may be charged a reactivation or re-installation fee.
+The services that we provide are prepaid services. Your first payment includes a modem deposit fee of 60$+ tax that will be refunded at the end of your subscription, and after that it will be monthly payment depending on the plan that you register in. You will be responsible to make all the payments on time before the due date. Balance that remain unpaid after the due date will be charged an interest rate of 2% per month. In case of a failure to make payment, AM Pro Telecom have the right to suspend and or terminate your service at any time with or without further notice. To reactivate or re-install the service you may be charged a reactivation or re-installation fee.
 <br/><br/><br/>
 
 <h2>Services Installation:</h2><br/>
-you may ask the technician to install the service at your place if the functional jack is available there. In case of there is no or broken functional jake, the technician will instal the service to where a functional jack is available.The technician may or may not connect your modem.you will be responsible to connect devices.
+You may ask the technician to install the service at your place if the functional jack is available there. In case there is no or broken functional jack, the technician will install the service where a functional jack is available. The technician may or may not connect your modem, you will be responsible to connect devices.
 <br/><br/><br/>
 
 <h2>Cancellation:</h2><br/>
--If you subscribe to one year contract or one year prepaid Internet Service, in case of early cancellation the installation fee that was concede at the registration will be charged back, or a fee of $83+tax  will be charged.
-<br/><br/>
--AM Pro Telecom have all the right to apply your deposit without  notice,in case of any unpaid balances ,and the remaining balance will be sent to you within ten days after return of all the leased equipment in good working condition with complete parts, failure to do so within ten business days after the service stop, you will be charged for the full cost of any equipment that not returned toAM Pro Telecom.
+-If you pay for a one-year subscription, or one-year prepaid Internet Service and need to cancel before completing the year, and because the installation fee was conceded at the registration, you will have to be charged a fee of $82+tax for cancellation.
+
+-AM PRO Telecom have all the right to apply your deposit without notice in case of any unpaid balances, as well as the remaining balance will be sent to you within ten days after returning all the leased equipment in good working condition with complete parts. Failure to do that within ten business days after the service stop, you will be charged the full cost of any equipment that is not returned to AM Pro Telecom.
+
 <br/><br/><br/>
 
-<h2>Moving your Service to another place:</h2><br/>
-There is a fee of $90 will be applied to all our services.
+<h2>Additional Fees:</h2><br/>
+
+-A fee of $68+ tax will be required in order to move your service from your place to another one.
+
+-A fee of 45$+ tax will be required in order to suspend your service for a vacation or until you want to reactivate the service in your place.
+
 <br/><br/><br/>
+
 
 <h2>Limited  Liability:</h2><br/>
-AM Pro Telecom will make every effort to provide hight quality service. however, if the services are interrupted or have lower performed than what expected for more than 72 consecutive hours, AM Pro Telecom&rsquo;s liability will be limited to crediting you the service fee only for the period in question.
+AM Pro Telecom will make all the effort to provide high quality service. However, if the services are interrupted or have Lower performed than what expected for more than 72 consecutive hours, AM Pro Telecoms liability will be limited to Crediting you the service fee only for the period in question.
 <br/><br/>
 
-<font class="initial">initial:___ ___</font>
+<h2>Am PRO Telecom reserves the right:</h2><br/>
+-To change these Terms and Conditions in the future.
+
+-All new Terms and Conditions will be applied to all customers, a copy will be send by email to all clients and the response should be done within 15 business days. In case the client did not respond in the allocated time, we will consider that it is accepted automatically.
+
+<br/><br/>
+
+<font class="signature">initial:___ ___</font>
 </div>
 
 <div id="footer">
@@ -720,35 +739,55 @@ AM Pro Telecom will make every effort to provide hight quality service. however,
 
 
 
-<center><h1>AM PRO TELECOM Termes et conditions :</h1></center>
+<center><h1>Les Termes et Conditions de AM PRO TELECOM :</h1></center>
 
-Les termes et conditions suivante vont être appliques pour tous les services fournis par AM PRO TELECOM.
+Les termes et conditions suivante vont être appliques pour tous les services fournis par AMPRO TELECOM.
 <br/><br/><br/>
 <div class="terms">
 
-<h2>Charge pour le service:</h2><br/>
-Les services qu’on offre sont des services prépayée. Votre premier paiement incluras  des charges uniques, par la suite il seras question de paiement mensuelle équivalent au plan que vous avez choisis.
-Vous serez responsable de payée votre service a temps avant la date d’échéance. Une balance qui reste impayée après la date d‘échéance seras soumis a un taux d’intérêt de 2% par mois. Dans le cas ou le paiement ne seras pas fait, AM PRO Telecom a le droit de suspendre et/ou terminer votre service a n’importe quel moment et sans aucun préavis. Pour réactiver ou réinstaller votre service de nouveau vous pouvez être charger des frais de réactivation ou d’installation de service.
+<h2>Charge pour le service :</h2><br/>
+Les services qu’on offre sont des services prépayés. Votre premier paiement inclura un dépôt de modem qui s’élève a 60$+taxes qui sera rembourser à la fin de votre abonnement, par la suite il sera question de paiement mensuelle équivalent Au plan que Vous avez choisi. Vous serez responsable de payée votre service a temps avant la date d’échéance. Une
+
+Balance qui reste impayée après la date d‘échéance seras soumis à un taux d’intérêt de 2% Par mois. Dans le cas où le Paiement ne seras pas fait, AM PRO Telecom a le droit de Suspendre et/ou terminer votre service à n’importe quel moment Et sans aucun préavis. Pour Réactiver ou réinstaller votre service de nouveau vous pouvez être charger des frais de
+
+Réactivation ou d’installation de service.
 <br/><br/><br/>
 
-<h2>Installation de Service :</h2><br/>
-Vous pouvez demander au technicien d’installer votre service n’importe ou dans votre maison si il existe une prise fonctionnelle, dans le cas ou la prise est inexistante ou non fonctionnelle, le technicien installeras le service sur une des prise fonctionnelle, le technicien se réserve le droit de ne pas installer vos équipements, dans ce cas vous serais responsable de le faire.
+<h2>Installation de Service :</h2><br/>
+Vous pouvez demander au technicien d’installer votre service n’importe où dans votre local s’il existe une prise Fonctionnelle, dans le cas où la prise est inexistante ou non fonctionnelle, le technicien installera le service sur une des Prise fonctionnelle, le technicien se réserve le droit de ne pas installer vos équipements, dans ce cas vous serais Responsable de le faire.
 <br/><br/><br/>
 
 <h2>Résiliation:</h2><br/>
--si vous vous abonnez pour un contrat d’un ans ou un ans de service internet prépayer, et vous résilier avant de complété la durée les frais d’installations qui non pas été payée au début seront charger ou une frais de résiliation de service qui s’élève a 83$+ taxes.
--AM PRO Telecom se réserve tout les droits de se procurer votre dépôt sans préavis, dans le cas de n’importe quelle balance impayée,et la balance restante vous seras envoyer dans un délais de 10 jours ouvrables après la réception de tous les équipement louer dans un état fonctionnelle avec tous les accessoires, si les accessoire ne sont pas rendu après 10 jours ouvrables de la date de résiliation, vous serais charger le montant complet de n’importe quel équipement qui n’est pas rendu a AM PRO Telecom.
+-Si vous payer un abonnement d’un an ou un an de service internet prépayer, et Vous résilier avant de compléter la durée, Et parce que les frais d’installations qui non pas été payée au début vous allez être charger un frais de résiliation de service Qui s’élève a 83$+ taxes.
+
+-AM PRO Telecom se réserve tous les droits de se procurer votre dépôt sans préavis, dans le cas de n’importe quelle Balance impayée, et la balance restante vous seras envoyer dans un délais de 10 jours ouvrables après la réception de tous Les équipements louer dans un état fonctionnelle avec tous les accessoires, si les accessoires ne sont pas rendus après 10 Jours ouvrables de la date de résiliation, vous serais chargés le montant complet de n’importe quel équipement qui n’est Pas rendu à AM PRO Telecom.
 <br/><br/><br/>
 
-<h2>Responsabilité limite:</h2><br/>
-AM PRO Telecom vas fournir tous les effort de donnée un service de Haut qualité. Cependant si les services sont interrompus ou ont une performance inférieure à celle attendue pour plus de 72 heurs consécutif, AM PRO Telecom responsabilité seras limite de vous créditer juste la période en question.
+<h2>Charges Supplémentaires :</h2><br/>
+
+-Des charges qui s’élèvent à $68+ taxes sont requise pour transférer votre service dans un autre local.
+
+-Des charges qui s’élèvent a 45$+ taxes sont requise pour suspendre votre service lors d’une vacance ou jusqu’à ce que Vous vouliez réactiver le service dans votre local.
+
+<br/><br/><br/>
+
+<h2>Responsabilité limite :</h2><br/>
+AM PRO Telecom va fournir tous les efforts de donnée un service de Haut qualité. Cependant si les services sont Interrompus ou ont une performance inférieure à celle Attendue pour plus de 72 heurs consécutif, AM PRO Telecom Responsabilité seras limite de vous créditer juste la période en question.
+
 <br/><br/>
 
-<font class="initial">signature:________________________________</font>
+<h2>Am Pro Telecom se réserve le droit :</h2><br/>
+-De changer ces termes and conditions dans la future.
+
+-Tous les nouvelle termes et condition vont être applicable sur tous les clients, une copy vas être envoyer à tous les clients Par email et les clients doivent répondre dans les 15 jours ouvrables suivant la réception de cet email. Dans le cas où le Client ne répond pas dans le temps allouer AM PRO Telecom considère que le client accepter ces termes et condition.
+
+<br/><br/>
+
+<font class="signature">signature:________________________________</font>
 </div>
 <div id="footer">
 	<p>Site web: www.amprotelecom.com | Téléphone: +1-514-548-2555 | Email: Info@amprotelecom.com</p>
 </div><!-- #letter-footer -->
-
 </body>
+
 </html>';
