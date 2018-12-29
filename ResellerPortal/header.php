@@ -124,10 +124,11 @@ if(!@include_once "../../api/dbconfig.php")
                         {
                           ?>
                           <li><a href="<?= $site_url ?>/customers/statistics.php">Statistics</a></li>
-                          <li><a href="<?= $site_url ?>/reseller_requests/reseller_requests.php">My Requests<span class="blink">new</span></a></li>
+
                         <?PHP
                         }
                         ?>
+                        <li><a href="<?= $site_url ?>/reseller_requests/reseller_requests.php">My Requests<span class="blink">new</span></a></li>
                     </ul>
                     <ul class="nav navbar-nav navbar-right">
                         <li><a  style="color:red" href="#">Hello "<?= $username; ?>"</a></li>
