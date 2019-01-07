@@ -2199,9 +2199,10 @@ class DBTools {
             $monthInfo["gst_tax_2"]=round($total_gst_tax,2, PHP_ROUND_HALF_UP);
     				$monthInfo["adapter_price"]=0;
           }
-          else if($request_row["action"]==="moving"){
+          else if($request_row["action"]==="moving" || $request_row["action"]==="swap_modem"){
             $actionTax=$fees_charged;
-            $this_product_price=(float)$request_row["product_price"];
+
+
             if($monthInfo["router"]!=="rent" && $monthInfo["router"]!=="rent_hap_lite" )
     					$monthInfo["router_price"]=0;
             if($monthInfo["static_ip"]!=="yes")
@@ -2227,6 +2228,18 @@ class DBTools {
              }
             else {
               $monthInfo["static_ip_price"]=0;
+            }
+            $d = new DateTime($recurring_date->format("Y-m-d"));
+            $d->modify('first day of previous month');
+
+            if((int)$this_action_on_date->format('d')>1
+            &&((int)$d->format('m')==(int)$month)
+      			)//if before first recurring by one month
+            {
+              $this_product_price=0;
+            }
+            else{
+              $this_product_price=(float)$request_row["product_price"];
             }
     				$totalPriceWoT=$this_product_price;
             $subtotal=$totalPriceWoT+$actionTax+(float)$monthInfo["router_price"]+(float)$monthInfo["additional_service_price"]+(float)$monthInfo["static_ip_price"];
