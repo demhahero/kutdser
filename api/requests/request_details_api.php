@@ -122,11 +122,13 @@ if(isset($_POST["post_action"]))
         $product_category = $last_request_row['product_category'];
         $product_subscription_type = $last_request_row['product_subscription_type'];
     }
-$request_row["product_price"]=$product_price;
-$request_row["product_title"]=$product_title;
-$request_row["product_category"]=$product_category;
-$request_row["product_subscription_type"]=$product_subscription_type;
-
+if($request_row["action"]!="change_speed")// if not change speed request take these value from the last updated request or order
+{
+  $request_row["product_price"]=$product_price;
+  $request_row["product_title"]=$product_title;
+  $request_row["product_category"]=$product_category;
+  $request_row["product_subscription_type"]=$product_subscription_type;
+}
 
     if($stmt1->errno==0 && $stmt2->errno==0 && $stmt3->errno==0)
     {
