@@ -12,7 +12,7 @@ if (!@include_once "../../api/dbconfig.php")
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
 
-        <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs-3.3.7/jq-3.2.1/jq-3.2.1/dt-1.10.16/r-2.2.0/datatables.min.css"/>
+        <link rel="stylesheet" type="text/css" href="<?= $site_url ?>/css/datatable.min.css"/>
         <link rel="stylesheet" href="<?= $site_url ?>/css/bootstrap-datetimepicker.min.css">
 
         <!-- Bootstrap -->
@@ -39,11 +39,11 @@ if (!@include_once "../../api/dbconfig.php")
         <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 
         <!-- Print Excel and PDF for datatables -->
-        <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs/jszip-2.5.0/dt-1.10.18/b-1.5.2/b-html5-1.5.2/datatables.min.css"/>
+        <link rel="stylesheet" type="text/css" href="<?= $site_url ?>/css/datatable2.min.css"/>
 
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
-        <script type="text/javascript" src="https://cdn.datatables.net/v/bs/jszip-2.5.0/dt-1.10.18/b-1.5.2/b-html5-1.5.2/datatables.min.js"></script>
+        <script type="text/javascript" src="<?= $site_url ?>/js/datatable.min.js"></script>
         <script>
             $(document).ready(function () {
                 $(".logout").click(function () {
