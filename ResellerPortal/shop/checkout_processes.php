@@ -5,6 +5,7 @@ include 'GlobalOnePaymentXMLTools.php';
 require_once '../../mikrotik/swiftmailer/vendor/autoload.php';
 include 'print_order_class.php';
 
+
 $mGlobalOnePaymentXMLTools = new GlobalOnePaymentXMLTools();
 
 
@@ -355,40 +356,69 @@ if ($_GET["do"] == "register") {
 
         if ($customer_id>0 && $order_id>0 && $result_order_options && $result_merchantrefs)
         {
-            $orid = (((0x0000FFFF & (int) $order_id) << 16) + ((0xFFFF0000 & (int) $order_id) >> 16));
-            echo $order_id . "_" . (((0x0000FFFF & (int) $order_id) << 16) + ((0xFFFF0000 & (int) $order_id) >> 16));
 
-            try {
-                $printOrder = new PrintOrder();
-                file_put_contents('last_order.pdf', $printOrder->output($order_id));
-
-                $to = mysqli_real_escape_string($dbToolsReseller->getConnection(),$_POST["email"]);
-                $body = "Dear Customer,\nWe would like to thank you for using our services,\nYour order (".$orid.") has been received and your invoice is attached\nTo finalize your order, please read our Terms and Conditions on (https://www.amprotelecom.com/terms-and-conditions/) and agree by replying to this email with 'I agree'\nBest,\nAmProTelecom INC.";
-
-                // Create the Transport
-                $transport = (new Swift_SmtpTransport('mail.amprotelecom.com', 25))
-                        ->setUsername('alialsaffar')
-                        ->setPassword('zOIq6dX$@Pq44M')
-                ;
-
-                // Create the Mailer using your created Transport
-                $mailer = new Swift_Mailer($transport);
-
-                // Create a message
-                $message = (new Swift_Message('AmProTelecom INC. - Your Order'))
-                        ->setFrom(['info@amprotelecom.com' => 'AmProTelecom INC.'])
-                        ->setTo([$to, 'info@amprotelecom.com'])
-                        ->setBody($body)
-                        ->attach(Swift_Attachment::fromPath(__DIR__ . "/last_order.pdf"))
-                ;
-
-                // Send the message
-                $result = $mailer->send($message);
-
-            } catch (Exception $e) {
-
-            }
+          $recurring_date = DateTime::createFromFormat('d-m-Y', $_POST["recurring_date"]);
+          $recurring_date->sub(new DateInterval('P1D'));
+          $invoice_query="INSERT INTO `invoices`(`customer_id`,`valid_date_from`,`valid_date_to`,`order_id`,`product_price`,`reseller_id`) VALUES (N'".$customer_id."',N'".$_POST["start_active_date"]."',N'".$recurring_date->format('Y-m-d')."',N'".$order_id."',N'".$options["product_price"]."',N'".$reseller_id."')";
+          $invoice_id=-1;
+          if($dbToolsReseller->query($invoice_query)===TRUE)
+          {
+            $last_insert_id=mysqli_fetch_assoc( $dbToolsReseller->query("SELECT last_insert_id() as 'invoice_id'"));
+            $invoice_id=$last_insert_id["invoice_id"];
+          }
+          else {
+            echo "0";
             die();
+          }
+          $invoice_item_query="INSERT INTO `invoice_items`( `invoice_id`, `item_name`, `item_price`, `item_duration_price`,`item_type`) VALUES ";
+          $_POST["invoice_items"]=json_decode($_POST["invoice_items"], true);
+          foreach ($_POST["invoice_items"] as $key => $value)
+          {
+            $invoice_item_query.="(N'".$invoice_id."',N'".$value["item_name"]."',N'".$value["item_price"]."',N'".$value["item_duration_price"]."',N'".$value["item_type"]."'),";
+          }
+          $invoice_item_query=rtrim($invoice_item_query, ",");
+          if($dbToolsReseller->query($invoice_item_query)===TRUE){
+              $orid = (((0x0000FFFF & (int) $order_id) << 16) + ((0xFFFF0000 & (int) $order_id) >> 16));
+              echo $order_id . "_" . (((0x0000FFFF & (int) $order_id) << 16) + ((0xFFFF0000 & (int) $order_id) >> 16));
+
+              try {
+                  $printOrder = new PrintOrder();
+                  file_put_contents('last_order.pdf', $printOrder->output($order_id));
+
+                  $to = mysqli_real_escape_string($dbToolsReseller->getConnection(),$_POST["email"]);
+                  $body = "Dear Customer,\nWe would like to thank you for using our services,\nYour order (".$orid.") has been received and your invoice is attached\nTo finalize your order, please read our Terms and Conditions on (https://www.amprotelecom.com/terms-and-conditions/) and agree by replying to this email with 'I agree'\nBest,\nAmProTelecom INC.";
+
+                  // Create the Transport
+                  $transport = (new Swift_SmtpTransport('mail.amprotelecom.com', 25))
+                          ->setUsername('alialsaffar')
+                          ->setPassword('zOIq6dX$@Pq44M')
+                  ;
+
+                  // Create the Mailer using your created Transport
+                  $mailer = new Swift_Mailer($transport);
+
+                  // Create a message
+                  $message = (new Swift_Message('AmProTelecom INC. - Your Order'))
+                          ->setFrom(['info@amprotelecom.com' => 'AmProTelecom INC.'])
+                          ->setTo([$to, 'info@amprotelecom.com'])
+                          ->setBody($body)
+                          ->attach(Swift_Attachment::fromPath(__DIR__ . "/last_order.pdf"))
+                  ;
+
+                  // Send the message
+                  $result = $mailer->send($message);
+
+              } catch (Exception $e) {
+
+              }
+
+              die();
+            }
+            else
+            {
+              echo "0";
+              die();
+            }
         } else {
             echo "0";
             die();

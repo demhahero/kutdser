@@ -1,4 +1,5 @@
 <?php
+include_once "./insert_invoice_function.php";
 if(isset($_POST["post_action"]))
 {
   if($_POST["post_action"]==="get_request_details" && isset($_POST["request_id"]))
@@ -315,11 +316,13 @@ if($request_row["action"]!="change_speed")// if not change speed request take th
                   $stmt2->execute();
 
                   if ($stmt2->errno==0) {
+                    insertInvoice($dbTools,$_POST);
                       echo "{\"edited\" :true,\"error\" :\"null\"}";
                     } else {
                       echo "{\"edited\" :\"false\",\"error\" :\"failed to insert value\"}";
                     }
                 } else {
+                  insertInvoice($dbTools,$_POST);
                   echo "{\"edited\" :true,\"error\" :\"null\"}";
                 }
             } else {

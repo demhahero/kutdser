@@ -57,6 +57,7 @@ $(document).ready(function () {
     <th>Customers</th>
     <th>Resellers Statistics</th>
     <th>Statistics</th>
+    <th>New Statistics</th>
     <th>Edit discount</th>
 </thead>
 <tbody>

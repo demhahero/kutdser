@@ -54,7 +54,7 @@ if ($product_type == "internet") {
         $installation_date_1 = $_POST["options"]["installation_date_1"];
         $start_date = new DateTime($installation_date_1);
     }
-
+    $start_active_date_string=$start_date->format('Y-m-d');
     //Get product info
     $subscription_period_type = "MONTHLY";
     $sql="SELECT * FROM `products` INNER JOIN `reseller_discounts`
@@ -66,7 +66,7 @@ if ($product_type == "internet") {
     if($result_product->num_rows ==0)
     $result_product = $dbToolsReseller->query("SELECT * FROM `products` where `products`.`product_id`='".$product_id."'");
 
-
+    $row_product="";
     if ($result_product->num_rows > 0) {
         $row_product = $result_product->fetch_assoc();
         if (strpos($row_product["subscription_type"], 'yearly') !== false) { // Check they type of payment (yearly or monthly)
@@ -96,6 +96,15 @@ if ($product_type == "internet") {
     $additional_service = 0;
     $static_ip = 0;
 
+    /////////////// invoice related variables
+
+    $router_item_type="once";
+    $router_duration_price=0;
+    $modem_duration_price=0;
+    $additional_service_duration_price=0;
+    $static_ip_duration_price=0;
+    $product_duration_price=0;
+
 
 
     //If rent modem
@@ -106,6 +115,7 @@ if ($product_type == "internet") {
         //Deposit has no tax
         //$value_has_no_tax = $modem_cost;
     }
+
     if ($_POST["options"]["modem"] == "rent") {
         $modem_cost = 59.90;
 
@@ -121,11 +131,12 @@ if ($product_type == "internet") {
     if ($_POST["options"]["router"] == "rent") { //If rent router
         $router_cost = 2.90;
         if($has_discount && $free_router)
-        $router_cost=0;
-
+          $router_cost=0;
+        $router_item_type="duration";
     }
     else if($_POST["options"]["router"] == "rent_hap_lite") { //If rent hap lite router
       $router_cost = 4.90;
+      $router_item_type="duration";
     } else if ($_POST["options"]["router"] == "buy_hap_ac_lite") { //if buy hap ac lite
         $router_cost = 74.00;
     } else if ($_POST["options"]["router"] == "buy_hap_mini") { //if buy hap mini
@@ -177,17 +188,32 @@ if ($product_type == "internet") {
     } else {
         if ($subscription_period_type == "YEARLY") { //if yearly payment, divide price by 12 months
             $price_of_remaining_days = (($product_price / 12) / $days_in_month) * $remainingDays;
+
             $price_of_remaining_days += $additional_service / $days_in_month * $remainingDays; // add additional service fees
+
             $price_of_remaining_days += $static_ip / $days_in_month * $remainingDays; // add static ip fees
+
+            //// invoice related remaining_days_price
+            $product_duration_price=((($product_price / 12) / $days_in_month) * $remainingDays);
+            $additional_service_duration_price=($additional_service / $days_in_month * $remainingDays);
+            $static_ip_duration_price= ($static_ip / $days_in_month * $remainingDays);
         } else { // if monthly payment
             $price_of_remaining_days = ($product_price / $days_in_month) * $remainingDays;
             $price_of_remaining_days += $additional_service / $days_in_month * $remainingDays; // add additional service fees
             $price_of_remaining_days += $static_ip / $days_in_month * $remainingDays; // add static_ip fees
+            //// invoice related remaining_days_price
+            $product_duration_price=(($product_price / $days_in_month) * $remainingDays);
+            $additional_service_duration_price=($additional_service / $days_in_month * $remainingDays);
+            $static_ip_duration_price= ($static_ip / $days_in_month * $remainingDays);
+
             if ($_POST["options"]["router"] == "rent") { //if rent router, add rent cost of the remaining day
                 $price_of_remaining_days += ($router_cost / $days_in_month) * $remainingDays;
+                $router_duration_price=(($router_cost / $days_in_month) * $remainingDays);// invoice
             }
             else if ($_POST["options"]["router"] == "rent_hap_lite") { //if rent hap lite router, add rent cost of the remaining day
                 $price_of_remaining_days += ($router_cost / $days_in_month) * $remainingDays;
+                $router_duration_price=(($router_cost / $days_in_month) * $remainingDays);// invoice
+
             }
         }
     }
@@ -214,6 +240,17 @@ if ($product_type == "internet") {
     $_POST["options"]["qst_tax"] = $qst_tax;
     $_POST["options"]["gst_tax"] = $gst_tax;
 
+//////////////////////////////// invoice_items values
+
+$_POST["invoice_items"][]=["item_name"=>"Product ".$row_product["title"]." With remaining ".$remainingDays." days","item_price"=> $product_price,"item_duration_price"=>($product_price+$product_duration_price),"item_type"=>"duration"];
+$_POST["invoice_items"][]=["item_name"=>"Setup price","item_price"=> $installation_transfer_cost,"item_duration_price"=>$installation_transfer_cost,"item_type"=>"once"];
+$_POST["invoice_items"][]=["item_name"=>"Modem price","item_price"=> $modem_cost,"item_duration_price"=>$modem_cost,"item_type"=>"once"];
+$_POST["invoice_items"][]=["item_name"=>"Router price","item_price"=> $router_cost,"item_duration_price"=>($router_cost+$router_duration_price),"item_type"=>$router_item_type];
+$_POST["invoice_items"][]=["item_name"=>"Additional service price","item_price"=> $additional_service,"item_duration_price"=>($additional_service+$additional_service_duration_price),"item_type"=>"duration"];
+$_POST["invoice_items"][]=["item_name"=>"Static IP price","item_price"=> $static_ip,"item_duration_price"=>($static_ip+$static_ip_duration_price),"item_type"=>"duration"];
+$_POST["invoice_items"][]=["item_name"=>"QST tax","item_price"=> $qst_tax,"item_duration_price"=>$qst_tax,"item_type"=>"once"];
+$_POST["invoice_items"][]=["item_name"=>"GST tax","item_price"=> $gst_tax,"item_duration_price"=>$gst_tax,"item_type"=>"once"];
+
     //Calculate recurring amount
     $subscription_recurring_amount = $product_price + $additional_service + $static_ip;
     if ($_POST["options"]["router"] == "rent") { //If rent router, add $2.90 on the recurring amount
@@ -227,7 +264,7 @@ if ($product_type == "internet") {
 } else if ($product_type == "phone") {
     //Get start date
     $start_date = new DateTime();
-
+    $start_active_date_string=$start_date->format('Y-m-d');
     //Get product info
 
     $subscription_period_type = "MONTHLY";
@@ -236,7 +273,7 @@ if ($product_type == "internet") {
       WHERE `reseller_discounts`.`reseller_id`='" . $reseller_id . "'
       and `products`.`product_id`='".$product_id."'";
     $result_product = $dbToolsReseller->query($sql);
-
+    $row_product="";
     if($result_product->num_rows ==0)
     $result_product = $dbToolsReseller->query("SELECT * FROM `products` where `products`.`product_id`='".$product_id."'");
 
@@ -264,6 +301,8 @@ if ($product_type == "internet") {
     $value_has_no_tax = 0; // Exclude items that have no tax such as deposits
     $gst_tax = 0;
     $qst_tax = 0;
+    //////////// invoice related variables
+    $product_duration_price=0;
 
     //If rent modem
     if ($_POST["options"]["adapter"] == "buy_Cisco_SPA112") {
@@ -291,8 +330,10 @@ if ($product_type == "internet") {
     } else {
         if ($subscription_period_type == "YEARLY") { //if yearly payment, divide price by 12 months
             $price_of_remaining_days = (($product_price / 12) / $days_in_month) * $remainingDays;
+            $product_duration_price=((($product_price / 12) / $days_in_month) * $remainingDays);
         } else { // if monthly payment
             $price_of_remaining_days = ($product_price / $days_in_month) * $remainingDays;
+            $product_duration_price=(($product_price / $days_in_month) * $remainingDays);
         }
     }
 
@@ -315,6 +356,14 @@ if ($product_type == "internet") {
     $_POST["options"]["qst_tax"] = $qst_tax;
     $_POST["options"]["gst_tax"] = $gst_tax;
 
+    //////////////////////////////// invoice_items values
+
+
+    $_POST["invoice_items"][]=["item_name"=>"Product ".$row_product["title"]." With remaining ".$remainingDays." days","item_price"=>$product_price,"item_duration_price"=>($product_price+$product_duration_price),"item_type"=>"duration"];
+    $_POST["invoice_items"][]=["item_name"=>"Setup price","item_price"=> $transfer_cost,"item_duration_price"=> $transfer_cost,"item_type"=>"once"];
+    $_POST["invoice_items"][]=["item_name"=>"adapter_price","item_price"=> $adapter_cost,"item_duration_price"=> $adapter_cost,"item_type"=>"once"];
+    $_POST["invoice_items"][]=["item_name"=>"QST tax","item_price"=> $qst_tax,"item_duration_price"=> $qst_tax,"item_type"=>"once"];
+    $_POST["invoice_items"][]=["item_name"=>"GST tax","item_price"=> $gst_tax,"item_duration_price"=> $gst_tax,"item_type"=>"once"];
 
     $subscription_recurring_amount = $product_price;
 }
@@ -425,6 +474,10 @@ if ($_POST["card_type"] != "cache_on_delivery") {
                                                     note: `<?= $_POST["note"] ?>`,
                                                     customer_id: '<?= $_POST["customer_id"] ?>',
                                                     options: JSON.stringify(<?= json_encode($_POST["options"]) ?>),
+                                                    invoice_items: JSON.stringify(<?= json_encode($_POST["invoice_items"]) ?>),
+                                                    start_active_date: '<?=$start_active_date_string?>',
+                                                    recurring_date: '<?= $subscription_start_date ?>',
+                                                    recurring_amount: '<?= $subscription_recurring_amount ?>',
                                                     merchantref: '<?= $merchantref ?>'})
                                                         .done(function (data) {
                                                             if (data != 0) {
@@ -504,6 +557,10 @@ if ($_POST["card_type"] != "cache_on_delivery") {
                                     note: `<?= $_POST["note"] ?>`,
                                     customer_id: '<?= $_POST["customer_id"] ?>',
                                     options: JSON.stringify(<?= json_encode($_POST["options"]) ?>),
+                                    invoice_items: JSON.stringify(<?= json_encode($_POST["invoice_items"]) ?>),
+                                    start_active_date: '<?=$start_active_date_string?>',
+                                    recurring_date: '<?= $subscription_start_date ?>',
+                                    recurring_amount: '<?= $subscription_recurring_amount ?>',
                                     existed_merchant_reference: '<?= $secure_card_merchantref ?>',
                                     merchantref: '<?= $merchantref ?>'})
                                         .done(function (data) {
@@ -565,6 +622,10 @@ if ($_POST["card_type"] != "cache_on_delivery") {
                     note: `<?= $_POST["note"] ?>`,
                     customer_id: '<?= $_POST["customer_id"] ?>',
                     options: JSON.stringify(<?= json_encode($_POST["options"]) ?>),
+                    invoice_items: JSON.stringify(<?= json_encode($_POST["invoice_items"]) ?>),
+                    start_active_date: '<?=$start_active_date_string?>',
+                    recurring_date: '<?= $subscription_start_date ?>',
+                    recurring_amount: '<?= $subscription_recurring_amount ?>',
                     merchantref: 'cache_on_delivery_<?= $merchantref ?>'})
                         .done(function (data) {
                             if (data != 0) {
@@ -618,6 +679,10 @@ if ($_POST["card_type"] != "cache_on_delivery") {
                     note: `<?= $_POST["note"] ?>`,
                     customer_id: '<?= $_POST["customer_id"] ?>',
                     options: JSON.stringify(<?= json_encode($_POST["options"]) ?>),
+                    invoice_items: JSON.stringify(<?= json_encode($_POST["invoice_items"]) ?>),
+                    start_active_date: '<?=$start_active_date_string?>',
+                    recurring_date: '<?= $subscription_start_date ?>',
+                    recurring_amount: '<?= $subscription_recurring_amount ?>',
                     existed_merchant_reference: 'cache_on_delivery_<?= $merchantref ?>',
                     merchantref: 'cache_on_delivery_<?= $merchantref ?>'})
                         .done(function (data) {
