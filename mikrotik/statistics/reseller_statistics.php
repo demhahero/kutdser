@@ -79,6 +79,7 @@ $(document).ready(function () {
     <thead>
     <th>Order ID</th>
     <th>Customer ID</th>
+    <th>Customer Name</th>
     <th>Commission Base Amount</th>
     <th>Subtotal</th>
     <th>Total With Tax</th>

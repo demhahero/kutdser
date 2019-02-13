@@ -27,7 +27,7 @@ $year=(isset($_POST["year"])?$_POST["year"]:1990);
 $month=(isset($_POST["month"])?$_POST["month"]:1);
 
 
-$sqlTot = "SELECT `subtotal`.*,`twt`.`total_with_tax`,`cba`.`commission_base_amount`
+$sqlTot = "SELECT `subtotal`.*,`twt`.`total_with_tax`,`cba`.`commission_base_amount`,`customers`.`full_name`
 FROM (SELECT `order_id`,`customer_id`, sum(IF(`invoices`.`invoice_type_id`=0,`invoice_items`.`item_duration_price`*-1,`invoice_items`.`item_duration_price`)) AS 'subtotal'
   FROM `invoices` INNER JOIN `invoice_items` ON `invoice_items`.`invoice_id`=`invoices`.`invoice_id` WHERE `invoice_items`.`item_name` NOT LIKE '%Tax%' AND `reseller_id` = ?  AND Year(`valid_date_from`)=? and Month(`valid_date_from`)=? GROUP BY `order_id`,`customer_id`
 ) AS `subtotal`
@@ -37,7 +37,8 @@ INNER JOIN (SELECT `order_id`, `customer_id`,sum(IF(`invoices`.`invoice_type_id`
 
 INNER JOIN (SELECT sum(IF(`invoices`.`invoice_type_id`=0,`invoice_items`.`item_duration_price`*-1,`invoice_items`.`item_duration_price`)) AS 'commission_base_amount', `order_id`,`customer_id`
   FROM `invoices` INNER JOIN `invoice_items` ON `invoice_items`.`invoice_id`=`invoices`.`invoice_id` WHERE `invoice_items`.`item_type` = 'duration' AND `reseller_id` = ?  AND Year(`valid_date_from`)=? and Month(`valid_date_from`)=? GROUP BY `order_id`, `customer_id`
-) AS `cba` ON `cba`.`order_id` = `subtotal`.`order_id`";
+) AS `cba` ON `cba`.`order_id` = `subtotal`.`order_id`
+INNER JOIN `customers` ON `customers`.`customer_id` = `subtotal`.`customer_id`";
 
 $sqlRec = $sqlTot;
 
@@ -46,10 +47,11 @@ $sqlRec = $sqlTot;
 
 // check search value exist
 if (!empty($params['search']['value'])) {
-    $where .= " AND ";
-    $where .= " ( order_id LIKE ? ";
-    $where .= " OR customer_id LIKE ? ";
-    $where .= " OR total_with_tax LIKE ? ) ";
+    $where .= " WHERE ";
+    $where .= " ( `subtotal`.`order_id` LIKE ? ";
+    $where .= " OR `subtotal`.`customer_id` LIKE ? ";
+    $where .= " OR `full_name` LIKE ? ";
+    $where .= " OR `total_with_tax` LIKE ? ) ";
 }
 
 //concatenate search sql if value exist
@@ -73,7 +75,7 @@ $stmt = $dbTools->getConnection()->prepare($sqlTot);
 
 if (isset($where) && $where != '') {
   $search_value="%".$params['search']['value']."%";
-$stmt->bind_param('ssssssssssss',
+$stmt->bind_param('sssssssssssss',
                   $reseller_id,
                   $year,
                   $month,
@@ -83,6 +85,7 @@ $stmt->bind_param('ssssssssssss',
                   $reseller_id,
                   $year,
                   $month,
+                  $search_value,
                   $search_value,
                   $search_value,
                   $search_value );
@@ -114,7 +117,7 @@ $stmt1 = $dbTools->getConnection()->prepare($sqlRec);
 
 if (isset($where) && $where != '') {
   $search_value="%".$params['search']['value']."%";
-$stmt1->bind_param('ssssssssssss',
+$stmt1->bind_param('sssssssssssss',
                   $reseller_id,
                   $year,
                   $month,
@@ -124,6 +127,7 @@ $stmt1->bind_param('ssssssssssss',
                   $reseller_id,
                   $year,
                   $month,
+                  $search_value,
                   $search_value,
                   $search_value,
                   $search_value );
@@ -154,9 +158,10 @@ while ($row = mysqli_fetch_array($queryRecords)) {
 
     $data[0] = '<a href="customer_invoices.php?order_id='.$row['order_id'].'&year='.$year.'&month='.$month.'" >'.$row['order_id'].'</a>';
     $data[1] = $row['customer_id'];
-    $data[2] = round((double)$row['commission_base_amount'], 2);
-    $data[3] = round((double)$row['subtotal'], 2);
-    $data[4] = round((double)$row['total_with_tax'], 2);
+    $data[2] = $row['full_name'];
+    $data[3] = round((double)$row['commission_base_amount'], 2);
+    $data[4] = round((double)$row['subtotal'], 2);
+    $data[5] = round((double)$row['total_with_tax'], 2);
     $all_data[] = $data;
 }
 
