@@ -26,8 +26,19 @@ $year=(isset($_POST["year"])?$_POST["year"]:1990);
 
 $month=(isset($_POST["month"])?$_POST["month"]:1);
 
+$sqlTot="SELECT `subtotal`.*,
+`twt`.`total_with_tax`,
+`cba`.`commission_base_amount`,
+(`cba`.`commission_base_amount`*(IF(`order_options`.`reseller_commission_percentage`=-1,`resellers`.`reseller_commission_percentage`,`order_options`.`reseller_commission_percentage`)/100)) AS `monthly_commission`,
+`customers`.`full_name`,
+`order_options`.`reseller_commission_percentage` AS `customer_commission_percentage`,
+IF(`order_options`.`reseller_commission_percentage`=-1,`resellers`.`reseller_commission_percentage`,`order_options`.`reseller_commission_percentage`) AS `reseller_commission_percentage`,
+`products_details`.`item_name`,
+`products_details`.`item_price`,
+`products_details`.`valid_date_from`,
+`products_details`.`type_name`
 
-$sqlTot = "SELECT `subtotal`.*,`twt`.`total_with_tax`,`cba`.`commission_base_amount`,`customers`.`full_name`
+
 FROM (SELECT `order_id`,`customer_id`, sum(IF(`invoices`.`invoice_type_id`=0,`invoice_items`.`item_duration_price`*-1,`invoice_items`.`item_duration_price`)) AS 'subtotal'
   FROM `invoices` INNER JOIN `invoice_items` ON `invoice_items`.`invoice_id`=`invoices`.`invoice_id` WHERE `invoice_items`.`item_name` NOT LIKE '%Tax%' AND `reseller_id` = ?  AND Year(`valid_date_from`)=? and Month(`valid_date_from`)=? GROUP BY `order_id`,`customer_id`
 ) AS `subtotal`
@@ -38,7 +49,35 @@ INNER JOIN (SELECT `order_id`, `customer_id`,sum(IF(`invoices`.`invoice_type_id`
 INNER JOIN (SELECT sum(IF(`invoices`.`invoice_type_id`=0,`invoice_items`.`item_duration_price`*-1,`invoice_items`.`item_duration_price`)) AS 'commission_base_amount', `order_id`,`customer_id`
   FROM `invoices` INNER JOIN `invoice_items` ON `invoice_items`.`invoice_id`=`invoices`.`invoice_id` WHERE `invoice_items`.`item_type` = 'duration' AND `reseller_id` = ?  AND Year(`valid_date_from`)=? and Month(`valid_date_from`)=? GROUP BY `order_id`, `customer_id`
 ) AS `cba` ON `cba`.`order_id` = `subtotal`.`order_id`
-INNER JOIN `customers` ON `customers`.`customer_id` = `subtotal`.`customer_id`";
+INNER JOIN `customers` ON `customers`.`customer_id` = `subtotal`.`customer_id`
+INNER JOIN `order_options` ON `order_options`.`order_id` = `subtotal`.`order_id`
+INNER JOIN `customers` AS `resellers` ON `resellers`.`customer_id` = ?
+INNER JOIN (
+SELECT `order_id`,`customer_id`,
+GROUP_CONCAT(`invoice_items`.`item_name`) AS `item_name`,
+GROUP_CONCAT(`invoice_items`.`item_price`) AS `item_price`,
+GROUP_CONCAT(date(`invoices`.`valid_date_from`)) AS `valid_date_from`,
+GROUP_CONCAT(`invoice_types`.`type_name`) AS `type_name`
+
+  FROM `invoices`
+  INNER JOIN `invoice_items` ON `invoice_items`.`invoice_id`=`invoices`.`invoice_id`
+  INNER JOIN `invoice_types` ON `invoice_types`.`invoic_type_id` = `invoices`.`invoice_type_id`
+  WHERE `invoice_items`.`item_name` LIKE '%Product%' AND `reseller_id` = 4  AND Year(`valid_date_from`)=2019 and Month(`valid_date_from`)=2 GROUP BY `order_id`,`customer_id`
+) AS `products_details` ON  `products_details`.`order_id` = `subtotal`.`order_id`";
+
+
+// $sqlTot = "SELECT `subtotal`.*,`twt`.`total_with_tax`,`cba`.`commission_base_amount`,`customers`.`full_name`
+// FROM (SELECT `order_id`,`customer_id`, sum(IF(`invoices`.`invoice_type_id`=0,`invoice_items`.`item_duration_price`*-1,`invoice_items`.`item_duration_price`)) AS 'subtotal'
+//   FROM `invoices` INNER JOIN `invoice_items` ON `invoice_items`.`invoice_id`=`invoices`.`invoice_id` WHERE `invoice_items`.`item_name` NOT LIKE '%Tax%' AND `reseller_id` = ?  AND Year(`valid_date_from`)=? and Month(`valid_date_from`)=? GROUP BY `order_id`,`customer_id`
+// ) AS `subtotal`
+// INNER JOIN (SELECT `order_id`, `customer_id`,sum(IF(`invoices`.`invoice_type_id`=0,`invoice_items`.`item_duration_price`*-1,`invoice_items`.`item_duration_price`)) AS 'total_with_tax'
+//   FROM `invoices` INNER JOIN `invoice_items` ON `invoice_items`.`invoice_id`=`invoices`.`invoice_id` WHERE `reseller_id` = ?  AND Year(`valid_date_from`)=? and Month(`valid_date_from`)=? GROUP BY `order_id`,`customer_id`
+// ) AS `twt` ON `twt`.`order_id` = `subtotal`.`order_id`
+//
+// INNER JOIN (SELECT sum(IF(`invoices`.`invoice_type_id`=0,`invoice_items`.`item_duration_price`*-1,`invoice_items`.`item_duration_price`)) AS 'commission_base_amount', `order_id`,`customer_id`
+//   FROM `invoices` INNER JOIN `invoice_items` ON `invoice_items`.`invoice_id`=`invoices`.`invoice_id` WHERE `invoice_items`.`item_type` = 'duration' AND `reseller_id` = ?  AND Year(`valid_date_from`)=? and Month(`valid_date_from`)=? GROUP BY `order_id`, `customer_id`
+// ) AS `cba` ON `cba`.`order_id` = `subtotal`.`order_id`
+// INNER JOIN `customers` ON `customers`.`customer_id` = `subtotal`.`customer_id`";
 
 $sqlRec = $sqlTot;
 
@@ -75,7 +114,7 @@ $stmt = $dbTools->getConnection()->prepare($sqlTot);
 
 if (isset($where) && $where != '') {
   $search_value="%".$params['search']['value']."%";
-$stmt->bind_param('sssssssssssss',
+$stmt->bind_param('ssssssssssssss',
                   $reseller_id,
                   $year,
                   $month,
@@ -85,6 +124,7 @@ $stmt->bind_param('sssssssssssss',
                   $reseller_id,
                   $year,
                   $month,
+                  $reseller_id,
                   $search_value,
                   $search_value,
                   $search_value,
@@ -92,7 +132,7 @@ $stmt->bind_param('sssssssssssss',
 
 }
 else{
-  $stmt->bind_param('sssssssss',
+  $stmt->bind_param('ssssssssss',
                     $reseller_id,
                     $year,
                     $month,
@@ -101,7 +141,8 @@ else{
                     $month,
                     $reseller_id,
                     $year,
-                    $month);
+                    $month,
+                  $reseller_id);
 }
 
 $stmt->execute();
@@ -117,7 +158,7 @@ $stmt1 = $dbTools->getConnection()->prepare($sqlRec);
 
 if (isset($where) && $where != '') {
   $search_value="%".$params['search']['value']."%";
-$stmt1->bind_param('sssssssssssss',
+$stmt1->bind_param('ssssssssssssss',
                   $reseller_id,
                   $year,
                   $month,
@@ -127,6 +168,7 @@ $stmt1->bind_param('sssssssssssss',
                   $reseller_id,
                   $year,
                   $month,
+                  $reseller_id,
                   $search_value,
                   $search_value,
                   $search_value,
@@ -134,7 +176,7 @@ $stmt1->bind_param('sssssssssssss',
 
 }
 else{
-  $stmt1->bind_param('sssssssss',
+  $stmt1->bind_param('ssssssssss',
   $reseller_id,
   $year,
   $month,
@@ -143,7 +185,8 @@ else{
   $month,
   $reseller_id,
   $year,
-  $month);
+  $month,
+$reseller_id);
 }
 
 
@@ -156,12 +199,18 @@ $all_data=[];
 //iterate on results row and create new index array of data
 while ($row = mysqli_fetch_array($queryRecords)) {
 
-    $data[0] = '<a href="customer_invoices.php?order_id='.$row['order_id'].'&year='.$year.'&month='.$month.'" >'.$row['order_id'].'</a>';
-    $data[1] = $row['customer_id'];
-    $data[2] = $row['full_name'];
-    $data[3] = round((double)$row['commission_base_amount'], 2);
-    $data[4] = round((double)$row['subtotal'], 2);
-    $data[5] = round((double)$row['total_with_tax'], 2);
+    $data[0] = '<a href="customer_invoices.php?order_id='.$row['order_id'].'&year='.$year.'&month='.$month.'" >'.$row['customer_id'].'</a>';
+    $data[1] = $row['full_name'];
+    $data[2] = $row['item_name'];
+    $data[3] = $row['item_price'];
+    $data[4] = $row['valid_date_from'];
+    $data[5] = round((double)$row['commission_base_amount'], 2);
+    $data[6] = round((double)$row['monthly_commission'], 2);
+    $data[7] = $row['type_name'];
+    $data[8] = round((double)$row['subtotal'], 2);
+    $data[9] = round((double)$row['total_with_tax'], 2);
+    $data[10] = "%".$row['reseller_commission_percentage']
+    .'<a data-id="'.$row['order_id'].'" data-id-2="'.$row['customer_commission_percentage'].'" type="button" class="btn btn-danger change_commission" >Change</a>';
     $all_data[] = $data;
 }
 

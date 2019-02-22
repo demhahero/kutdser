@@ -3,7 +3,7 @@ function changeSpeedMonthly($dbTools,$postData)
 {
   $next_days=0;
   $new_product_price=0;
-  $product_subscription_type_days=30;
+
   $customer_id=$postData["customer_id"];
   $order_id=$postData["order_id"];
   $request="SELECT `action_on_date` FROM `requests` WHERE `request_id`=?";
@@ -152,7 +152,7 @@ function terminateMonthly($dbTools,$postData)
 {
   $next_days=0;
   $new_product_price=0;
-  $product_subscription_type_days=30;
+
   $customer_id=$postData["customer_id"];
   $order_id=$postData["order_id"];
   $request="SELECT `action_on_date` FROM `requests` WHERE `request_id`=?";
@@ -470,9 +470,20 @@ function recurring($dbTools,$postData,$start,$end)
    VALUES (?,2,?,?,?,?,?)";
    $stmt_invoice = $dbTools->getConnection()->prepare($invoice_query);
    $param1=$postData["customer_id"];
+
    $start_recurring_date=new DateTime($end);
    $start_recurring_date->add(new DateInterval('P1D'));
    $end_recurring_date=new DateTime($start_recurring_date->format("Y-m-t"));
+   if ($postData["product_subscription_type"]=="YEARLY" || $postData["product_subscription_type"]=="yearly")
+   {
+     
+     $start_recurring_date=new DateTime($end);
+     $start_recurring_date->add(new DateInterval('P1D'));
+     $end_recurring_date=new DateTime($start_recurring_date->format("Y-m-d"));
+     $end_recurring_date->add(new DateInterval('P1Y'));
+     $end_recurring_date->sub(new DateInterval('P1D'));
+   }
+
 
    $param2=$start_recurring_date->format("Y-m-d");
    $param3=$end_recurring_date->format("Y-m-d");
@@ -580,7 +591,7 @@ function changeSpeedYearly($dbTools,$postData)
 {
   $next_days=0;
   $new_product_price=0;
-  $product_subscription_type_days=30;
+
   $customer_id=$postData["customer_id"];
   $order_id=$postData["order_id"];
   $request="SELECT `action_on_date` FROM `requests` WHERE `request_id`=?";
@@ -627,7 +638,7 @@ function changeSpeedYearly($dbTools,$postData)
       $new_valid_date_to=new DateTime($valid_date_to->format('Y-m-d'));
     }
     $previous_duration = $valid_date_from->diff($valid_date_to);
-    $previous_days=(int)$previous_duration->days;
+    $previous_days=(int)$previous_duration->days+1;
     $pricePerDay=$previous_product_price/$previous_days;
 
 
@@ -635,13 +646,17 @@ function changeSpeedYearly($dbTools,$postData)
     $used_days=(int)$used_duration->days;
     $refund_price=$previous_product_price-($pricePerDay*$used_days);
 
+
+
     //calculate new invoice price by divide new price over the year to get price of the day then multiply by the new used days
     $date_first_day=new DateTime($new_valid_date_from->format('Y-01-01'));
     $date_last_day=new DateTime($new_valid_date_from->format('Y-12-31'));
     $full_year = (int)$date_first_day->diff($date_last_day)->days+1;
     $new_price_per_day=(double)$postData["product_price"]/$full_year;
-    $next_days=$new_valid_date_from->diff($new_valid_date_to)->days;
+    $next_days=$new_valid_date_from->diff($new_valid_date_to)->days + 2;
     $new_product_price=$new_price_per_day*($next_days);
+
+
 
 
     $invoice_query="INSERT INTO `invoices`(`customer_id`,`valid_date_from`,`valid_date_to`,`invoice_type_id`,`order_id`,`product_price`,`reseller_id`) VALUES (?,?,?,N'0',?,?,?)";
@@ -728,7 +743,7 @@ function terminateYearly($dbTools,$postData)
 {
   $next_days=0;
   $new_product_price=0;
-  $product_subscription_type_days=30;
+
   $customer_id=$postData["customer_id"];
   $order_id=$postData["order_id"];
   $request="SELECT `action_on_date` FROM `requests` WHERE `request_id`=?";
@@ -775,7 +790,7 @@ function terminateYearly($dbTools,$postData)
       $new_valid_date_to=new DateTime($valid_date_to->format('Y-m-d'));
     }
     $previous_duration = $valid_date_from->diff($valid_date_to);
-    $previous_days=(int)$previous_duration->days;
+    $previous_days=(int)$previous_duration->days+1;
     $pricePerDay=$previous_product_price/$previous_days;
 
 
@@ -783,13 +798,17 @@ function terminateYearly($dbTools,$postData)
     $used_days=(int)$used_duration->days;
     $refund_price=$previous_product_price-($pricePerDay*$used_days);
 
+
+
     //calculate new invoice price by divide new price over the year to get price of the day then multiply by the new used days
     $date_first_day=new DateTime($new_valid_date_from->format('Y-01-01'));
     $date_last_day=new DateTime($new_valid_date_from->format('Y-12-31'));
     $full_year = (int)$date_first_day->diff($date_last_day)->days+1;
     $new_price_per_day=(double)$postData["product_price"]/$full_year;
-    $next_days=$new_valid_date_from->diff($new_valid_date_to)->days;
+    $next_days=$new_valid_date_from->diff($new_valid_date_to)->days + 2;
     $new_product_price=$new_price_per_day*($next_days);
+
+
 
 
     $invoice_query="INSERT INTO `invoices`(`customer_id`,`valid_date_from`,`valid_date_to`,`invoice_type_id`,`order_id`,`product_price`,`reseller_id`) VALUES (?,?,?,N'0',?,?,?)";

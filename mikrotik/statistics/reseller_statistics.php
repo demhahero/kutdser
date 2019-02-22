@@ -21,6 +21,15 @@ $(document).ready(function () {
     var table2=$('#myTable2').DataTable({
         "bProcessing": true,
         "serverSide": true,
+        "scrollX": true,   // enables horizontal scrolling
+        "createdRow": function ( row, data, index ) {
+          //console.log(row);
+          //console.log(data);
+          //console.log(index);
+          $('td', row).eq(6).addClass('bg-success');
+          $('td', row).eq(8).addClass('bg-warning');
+          $('td', row).eq(9).addClass('bg-danger');
+        },
         "ajax": {
             url: "<?= $api_url ?>statistics/reseller_statistics_api.php", // json datasource
             type: "post", // type of method  , by default would be get
@@ -34,11 +43,47 @@ $(document).ready(function () {
             }
         }
     });
+    $( "#myTable2 tbody" ).on( "click", ".change_commission", function() {
+        $('#change_commission').modal({show:true});
+        var order_id = $(this).attr('data-id');
+        var reseller_commission_percentage = $(this).attr('data-id-2');
+        $("input[name=\"order_id\"]").val(order_id);
+        $("input[name=\"reseller_commission_percentage\"]").val(reseller_commission_percentage);
 
+      });
+
+      //////////////// form post for reseller commission percentage
+      $( ".update-form" ).submit(function( event ) {
+          event.preventDefault();
+
+          var order_id=$("input[name=\"order_id\"]").val();
+          var reseller_commission_percentage=$("input[name=\"reseller_commission_percentage\"]").val();
+          $.post("<?= $api_url ?>statistics/update_order_reseller_commission_percentage_api.php",
+                  {
+                    "action":"update_order_reseller_commission_percentage",
+                    "edit_id":order_id,
+                    "reseller_commission_percentage": reseller_commission_percentage
+                  }
+          , function (data, status) {
+              data = $.parseJSON(data);
+              if (data && data.updated == true) {
+                  alert("Record updated");
+                  $('#change_commission').modal("hide");
+
+                  table2.ajax.reload();
+              } else
+              {
+                alert("Error: udpate record failed, try again later");
+                $('#change_commission').modal("hide");
+              }
+
+          });
+        });
+      ///////////////// end form post
 });
 </script>
 
-<title>'s invoices</title>
+<title>Reseller Statistics</title>
 <div class="page-header">
     <a href="customers.php">Customers</a>
     <span class="glyphicon glyphicon-play"></span>
@@ -77,17 +122,51 @@ $(document).ready(function () {
 
 <table id="myTable2" class="display table table-striped table-bordered">
     <thead>
-    <th>Order ID</th>
-    <th>Customer ID</th>
-    <th>Customer Name</th>
-    <th>Commission Base Amount</th>
-    <th>Subtotal</th>
-    <th>Total With Tax</th>
+      <th style="width:50px">ID</th>
+      <th style="width:100px">Full Name</th>
+      <th style="width:100px">Product</th>
+      <th style="width:50px">Product Price</th>
+      <th style="width:100px">Valid From</th>
+      <th style="width:100px">Commission base amount</th>
+      <th style="width:100px">Monthly commission</th>
+      <th style="width:50px">Type</th>
+      <th style="width:50px">Subtotal</th>
+      <th style="width:50px">total with Tax </th>
+      <th style="width:50px">Reseller Commission percentage</th>
 </thead>
 <tbody>
 
 </tbody>
 </table>
+
+<div id="change_commission" class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-hidden="true" style="display: none;">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
+        </button>
+        <h4 class="modal-title" id="myModalLabel">Change Reseller Commission</h4>
+      </div>
+      <div class="modal-body">
+
+        <form class="update-form">
+            <div class="form-group">
+                <label>Reseller commission percentage for this order only:</label>
+                <input type="number" min="-1" max="100" name="reseller_commission_percentage" value="-1" class="form-control" placeholder="Reseller commission percentage"/>
+            </div>
+                <input type="hidden" name="order_id" value="-1"/>
+            <input type="submit" class="btn btn-primary" value="Change">
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+
+      </div>
+
+    </div>
+  </div>
+</div>
 
 <?php
 include_once "../footer.php";
