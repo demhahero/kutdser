@@ -9,6 +9,7 @@ if(!@include_once "../../api/dbconfig.php")
 
       <link rel="stylesheet" type="text/css" href="<?=$site_url?>/css/datatables.min.css"/>
       <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css" rel="stylesheet">
+      <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
 
       <script type="text/javascript" src="<?=$site_url?>/js/datatables.min.js"></script>
 
@@ -18,6 +19,7 @@ if(!@include_once "../../api/dbconfig.php")
       <script src=https://www.amprotelecom.com/wp-content/plugins/woocommerce-custom-options-lite/assets/js/options.js></script>
 
       <script src=https://www.amprotelecom.com/wp-content/plugins/woocommerce-custom-options-lite/assets/js/bootstrap-datepicker.min.js></script>
+              <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
       <link rel="stylesheet" href="<?=$site_url?>/css/bootstrap-datepicker3.css">
 
         <script>
@@ -124,6 +126,7 @@ if(!@include_once "../../api/dbconfig.php")
                         {
                           ?>
                           <li><a href="<?= $site_url ?>/customers/statistics.php">Statistics</a></li>
+                          <li><a href="<?= $site_url ?>/shop/shop_test1.php">Shop tv</a></li>
 
                         <?PHP
                         }

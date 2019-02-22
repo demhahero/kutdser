@@ -8,7 +8,7 @@ $reseller_id=isset($_GET["reseller_id"])?$_GET["reseller_id"]:0;
       $('#discount_form').hide();
       var tableDetailsTag=$('.products_table');
 
-      var tableDetails=tableDetailsTag.DataTable({"pageLength": 20,"ordering": false});
+      var tableDetails=tableDetailsTag.DataTable({"pageLength": 50,"ordering": false});
 
       $(document).on('change', '#discount_toggle', function(){
         $('#discount_form').toggle("slow");
