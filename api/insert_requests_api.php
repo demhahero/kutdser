@@ -122,6 +122,7 @@ else if (isset($_GET["order_id"]) && isset($_GET['do']) == "product_list") {
         "phone" => "",
         "email" => "",
         "note" => "",
+        "end_of_suspension" => "",
             //"product_title"=>"",
             //"product_category"=>"",
             //"product_subscription_type"=>"",
@@ -151,6 +152,7 @@ else if (isset($_GET["order_id"]) && isset($_GET['do']) == "product_list") {
         "full_name" => "",
         "phone" => "",
         "email" => "",
+        "end_of_suspension" => "",
     );
 
     if (!isset($_POST["product_id"])) {
@@ -174,6 +176,7 @@ else if (isset($_GET["order_id"]) && isset($_GET['do']) == "product_list") {
 
 
     $action_on_date = new DateTime($InsertFieldValues["action_on_date"]);
+    $end_of_suspension = new DateTime($InsertFieldValues["end_of_suspension"]);
     $start_active_date = new DateTime($start_active_date);
 
     if ($action_on_date < $start_active_date) {
@@ -233,9 +236,11 @@ else if (isset($_GET["order_id"]) && isset($_GET['do']) == "product_list") {
 
     $creation_date = new DateTime();
     $InsertFieldValues["action_on_date"] = $action_on_date->format('Y-m-d H:i:s');
-
+    
     $InsertFieldValues["creation_date"] = $creation_date->format('Y-m-d H:i:s');
 
+    $InsertFieldValues["end_of_suspension"] = $end_of_suspension->format('Y-m-d H:i:s');
+    
     $columns = "";
     $values = "";
     foreach ($InsertFieldValues as $column => $value) {

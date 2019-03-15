@@ -45,10 +45,15 @@ $creation_date = new DateTime();
             format: 'mm/dd/yyyy',
             startDate: '+' + fistDayInstallation + 'd'
         });
+        
+        $('#datepicker2').datepicker({
+            format: 'mm/dd/yyyy',
+            startDate: '+' + fistDayInstallation + 'd'
+        });
 
         $(".moving-field").hide();
         $(".cusotmer-info-field").hide();
-
+        $(".suspension").hide();
         $(".swap-change").hide();
         $("select[name=\"action\"]").change(function () {
 
@@ -70,6 +75,29 @@ $creation_date = new DateTime();
             } else {
                 $(".cusotmer-info-field").hide();
             }
+            if (data_value == "swap_modem") {
+                $(".swap-modem").show();
+            } else {
+                $(".swap-modem").hide();
+            }
+            if (data_value == "swap_change_speed") {
+                $(".swap-change").show();
+            } else {
+                $(".swap-change").hide();
+            }
+            
+            if (data_value == "suspension") {
+                $(".swap-modem").hide();
+                $(".swap-change").hide();
+                $(".cusotmer-info-field").hide();
+                $(".action-value").hide();
+                $(".suspension").show();
+            } else{
+                $(".suspension").hide();
+                
+            }
+            
+            
             if (data_value == "swap_modem") {
                 $(".swap-modem").show();
             } else {
@@ -105,6 +133,7 @@ $creation_date = new DateTime();
             var modem_id = $("select[name=\"modem_id\"]").val();
 
             var product_id = $("select[name=\"product_id\"]").val();
+            var end_of_suspension = $("input[name=\"end_of_suspension\"]").val();
             $.post("<?= $api_url ?>insert_requests_api.php",
                     {
                         order_id: order_id,
@@ -121,6 +150,7 @@ $creation_date = new DateTime();
                         email: email,
                         phone: phone,
                         note: note,
+                        end_of_suspension: end_of_suspension,
                         reseller_id: reseller_id}, function (data, status) {
                 data = $.parseJSON(data);
                 if (data.inserted == true) {
@@ -208,11 +238,16 @@ $creation_date = new DateTime();
             <option data-value="moving" value="moving">Moving</option>
             <option data-value="terminate" value="terminate">Terminate</option>
             <option data-value="customer_information_modification" value="customer_information_modification">Customer Information Modification</option>
+            <option data-value="suspension" value="suspension">Suspension</option>
         </select>
     </div>
     <div class="form-group">
         <label>Action on date:</label>
         <input readonly="" name="action_on_date" type="text" id="datepicker" class="form-control" />
+    </div>
+    <div class="form-group suspension">
+        <label>End of Suspension:</label>
+        <input readonly="" name="end_of_suspension" type="text" id="datepicker2" class="form-control" />
     </div>
     <div class="form-group moving-field">
         <label>City:</label>
