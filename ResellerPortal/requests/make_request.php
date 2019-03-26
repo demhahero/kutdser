@@ -6,34 +6,7 @@ include_once "../header.php";
 $order_id = intval($_GET["order_id"]);
 
 $creation_date = new DateTime();
-//
-// if (isset($_POST["action"])) {
-//
-//     $action_on_date = new DateTime(($_POST["action_on_date"]));
-//
-//     $product = $dbToolsReseller->objProductTools($_POST["action_value"]);
-//
-//     $requestTools = $dbToolsReseller->objRequestTools(null);
-//     $requestTools->setReseller($dbToolsReseller->objCustomerTools($reseller_id));
-//     $requestTools->setAction(($_POST["action"]));
-//     $requestTools->setActionValue(($_POST["action_value"]));
-//     $requestTools->setNote(($_POST["note"]));
-//     $requestTools->setOrder($dbToolsReseller->objOrderTools($order_id));
-//     $requestTools->setCreationDate($creation_date);
-//     $requestTools->setActionOnDate($action_on_date);
-//
-//     $requestTools->setProductPrice($product->getPrice());
-//     $requestTools->setProductTitle($product->getTitle());
-//     $requestTools->setProductCategory($product->getCategory());
-//     $requestTools->setProductSubscriptionType($product->getSubscriptionType());
-//
-//     $request_result = $requestTools->doInsert();
-//
-//     if ($request_result) {
-//         echo "<div class='alert alert-success'>Request sent!</div>";
-//         //header('Location: '.$site_url.'/requests/requests.php');
-//     }
-// }
+
 ?>
 
 <title>Make a request</title>
@@ -45,7 +18,7 @@ $creation_date = new DateTime();
             format: 'mm/dd/yyyy',
             startDate: '+' + fistDayInstallation + 'd'
         });
-        
+
         $('#datepicker2').datepicker({
             format: 'mm/dd/yyyy',
             startDate: '+' + fistDayInstallation + 'd'
@@ -85,19 +58,41 @@ $creation_date = new DateTime();
             } else {
                 $(".swap-change").hide();
             }
-            
+
             if (data_value == "suspension") {
                 $(".swap-modem").hide();
                 $(".swap-change").hide();
                 $(".cusotmer-info-field").hide();
                 $(".action-value").hide();
                 $(".suspension").show();
+                $("#action_on_date").val("");
+                $("#datepicker").datepicker('remove'); //detach
+                $('#datepicker').datepicker({
+                    format: 'mm/01/yyyy',
+                    startDate: '+' + fistDayInstallation + 'd',
+
+                });
+                $("#datepicker2").datepicker('remove'); //detach
+                $('#datepicker2').datepicker({
+                    format: 'mm/01/yyyy',
+                    startDate: '+' + fistDayInstallation + 'd'
+                });
             } else{
                 $(".suspension").hide();
-                
+                $("#datepicker").datepicker('remove'); //detach
+                $('#datepicker').datepicker({
+                    format: 'mm/dd/yyyy',
+                    startDate: '+' + fistDayInstallation + 'd'
+                });
+                $("#datepicker2").datepicker('remove'); //detach
+                $('#datepicker2').datepicker({
+                    format: 'mm/dd/yyyy',
+                    startDate: '+' + fistDayInstallation + 'd'
+                });
+
             }
-            
-            
+
+
             if (data_value == "swap_modem") {
                 $(".swap-modem").show();
             } else {

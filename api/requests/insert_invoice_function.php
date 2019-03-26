@@ -360,6 +360,31 @@ function moving($dbTools, $postData) {
 
 function recurring($dbTools, $postData, $start, $end) {
 
+  /// check if recuring already exist
+  $suppose_start_recurring_date = new DateTime($end);
+  $suppose_start_recurring_date->add(new DateInterval('P1D'));
+  $sql = "SELECT `invoice_type_id` FROM `invoices`
+        WHERE  `valid_date_from`=?
+        AND `invoices`.`invoice_type_id` = 2
+        AND `invoices`.`customer_id`=?
+        AND `invoices`.`order_id`=?
+        ORDER BY `invoice_id` DESC
+        LIMIT 1";
+
+  $stmt_product = $dbTools->getConnection()->prepare($sql);
+  $param1 = $suppose_start_recurring_date->format("Y-m-d");
+  $param2 = $postData["customer_id"];
+  $param3 = $postData["order_id"];
+  $stmt_product->bind_param('sss', $param1, $param2, $param3);
+  $stmt_product->execute();
+
+  $result_product = $stmt_product->get_result();
+  $hasValue = FALSE;
+  while ($product = $dbTools->fetch_assoc($result_product)) {
+      //already has recuring in this month
+      return FALSE; //FALSE;
+  }
+
     /// get last product price
     $sql = "SELECT `invoice_type_id`,`product_price` FROM `invoices`
           WHERE  (`valid_date_from`>=? AND `valid_date_from`<=?)
@@ -368,6 +393,7 @@ function recurring($dbTools, $postData, $start, $end) {
           AND `invoices`.`order_id`=?
           ORDER BY `invoice_id` DESC
           LIMIT 1";
+
     $stmt_product = $dbTools->getConnection()->prepare($sql);
     $param1 = $start;
     $param2 = $end;
@@ -485,35 +511,250 @@ function recurring($dbTools, $postData, $start, $end) {
 }
 
 function suspension($dbTools, $postData) {
-    $next_days = 0;
-    $new_product_price = 0;
+      $request = "SELECT `action_on_date`,`end_of_suspension` FROM `requests` WHERE `request_id`=?";
+      $stmt_request = $dbTools->getConnection()->prepare($request);
+      $param1 = $postData["request_id"];
+      $stmt_request->bind_param('s', $param1);
+      $stmt_request->execute();
 
-    $customer_id = $postData["customer_id"];
-    $order_id = $postData["order_id"];
-    $request = "SELECT `action_on_date` FROM `requests` WHERE `request_id`=?";
-    $stmt_request = $dbTools->getConnection()->prepare($request);
-    $param1 = $postData["request_id"];
-    $stmt_request->bind_param('s', $param1);
-    $stmt_request->execute();
+      $result_request = $stmt_request->get_result();
+      $request = $dbTools->fetch_assoc($result_request);
 
-    $result_request = $stmt_request->get_result();
-    $request = $dbTools->fetch_assoc($result_request);
-    $postData["action_on_date"] = $request["action_on_date"];
-    
-    $new_valid_date_from = new DateTime($postData["action_on_date"]);
-    
-    $new_valid_date_to = new DateTime($postData["end_of_suspension"]);
-    
-    $invoice_query = "INSERT INTO `invoices`(`customer_id`,`valid_date_from`,`valid_date_to`,`invoice_type_id`,`order_id`,`product_price`,`reseller_id`) VALUES (?,?,?,N'0',?,?,?)";
-    $param1 = $customer_id;
-    $param2 = $new_valid_date_from->format('Y-m-d');
-    $param3 = $new_valid_date_to->format('Y-m-d');
-    $param4 = $order_id;
-    $param5 = "0";
-    $param6 = $postData["reseller_id"];
-    $stmt3 = $dbTools->getConnection()->prepare($invoice_query);
-    $stmt3->bind_param('ssssss', $param1, $param2, $param3, $param4, $param5, $param6);
-    $stmt3->execute();
+      $action_on_date = new DateTime($request["action_on_date"]);
+      $end_of_suspension = new DateTime($request["end_of_suspension"]);
+
+      $startDate=new DateTime($action_on_date->format("Y-m-1"));
+      $startDate->sub(new DateInterval('P1D'));
+
+      $endDate=new DateTime($end_of_suspension->format("Y-m-1"));
+      $endDate->sub(new DateInterval('P1D'));
+
+
+      /// get last product price
+      $sql = "SELECT `invoice_type_id`,`product_price` FROM `invoices`
+            WHERE  (`valid_date_from`>=? AND `valid_date_from`<=?)
+            AND `invoices`.`invoice_type_id` IN (1,2,3,6)
+            AND `invoices`.`customer_id`=?
+            AND `invoices`.`order_id`=?
+            ORDER BY `invoice_id` DESC
+            LIMIT 1";
+      $stmt_product = $dbTools->getConnection()->prepare($sql);
+      $param1 = $startDate->format("Y-m-1");
+      $param2 = $startDate->format("Y-m-t");
+      $param3 = $postData["customer_id"];
+      $param4 = $postData["order_id"];
+      $stmt_product->bind_param('ssss', $param1, $param2, $param3, $param4);
+      $stmt_product->execute();
+
+      $result_product = $stmt_product->get_result();
+      $hasValue = FALSE;
+      $product_price = -1;
+      while ($product = $dbTools->fetch_assoc($result_product)) {
+          $hasValue = TRUE;
+          if ($product["invoice_type_id"] == 6) {//then this is terminated
+              return "terminate"; //FALSE;
+          }
+
+          $product_price = $product["product_price"];
+      }
+      if ($product_price < 0) {
+
+          return FALSE; // already terminated because doesn't have any invoice int this month
+      }
+      // get product title
+      $sql = "(SELECT `requests`.`product_title`,`requests`.`action_on_date` AS `date_active` FROM `requests` INNER JOIN `orders` ON `orders`.`order_id`=`requests`.`order_id` WHERE `customer_id`=? AND `requests`.`verdict`='approve' AND `requests`.`action`='change_speed' AND `action_on_date`<?)
+    UNION
+    (SELECT `product_title`,`creation_date` AS `date_active` FROM `orders` WHERE `customer_id`=? )
+    ORDER BY `date_active` DESC LIMIT 1";
+      $stmt_product_title = $dbTools->getConnection()->prepare($sql);
+      $param1 = $postData["customer_id"];
+      $param2 = $startDate->format("Y-m-d");
+      $stmt_product_title->bind_param('sss', $param1, $param2, $param1);
+      $stmt_product_title->execute();
+
+      $result_product_title = $stmt_product_title->get_result();
+      $product_title = $dbTools->fetch_assoc($result_product_title);
+      // get all duration items from previous except product
+      $sql = "SELECT `invoice_items`.`item_name`,`invoice_items`.`item_price`, `invoice_type_id`,`item_type`,DATE_FORMAT(`valid_date_from`, '%Y-%m') AS `month` FROM `invoices`
+          INNER JOIN `invoice_items` ON `invoices`.`invoice_id`=`invoice_items`.`invoice_id`
+          WHERE  (`valid_date_from`>=? AND `valid_date_from`<=?)
+          AND `invoices`.`invoice_type_id` IN (1,2,3,6)
+          AND `invoice_items`.`item_name` NOT LIKE '%product%'
+          AND `invoice_items`.`item_type`='duration'
+          AND `invoices`.`customer_id`=?
+          AND `invoices`.`order_id`=?";
+      $stmt_items = $dbTools->getConnection()->prepare($sql);
+      $param1 = $startDate->format("Y-m-1");
+      $param2 = $startDate->format("Y-m-t");
+      $param3 = $postData["customer_id"];
+      $param4 = $postData["order_id"];
+      $stmt_items->bind_param('ssss', $param1, $param2, $param3, $param4);
+      $stmt_items->execute();
+
+      $result_items = $stmt_items->get_result();
+      $items = [];
+      $items_zero = [];
+      $item_product = ["item_name" => "product " . $product_title["product_title"], "item_price" => $product_price, "item_type" => "duration"];
+      array_push($items, $item_product);
+      $item_product_zero = ["item_name" => "product " . $product_title["product_title"], "item_price" => "0", "item_type" => "duration"];
+      array_push($items_zero, $item_product_zero);
+      while ($item = $dbTools->fetch_assoc($result_items)) {
+          array_push($items, $item);
+      }
+
+
+
+      /// start add start suspension recurring invoice
+      $invoice_query = "INSERT INTO `invoices`
+    (`customer_id`,`invoice_type_id`,`valid_date_from`,`valid_date_to`,`order_id`,`product_price`,`reseller_id`)
+     VALUES (?,2,?,?,?,?,?)";
+      $stmt_invoice = $dbTools->getConnection()->prepare($invoice_query);
+      $param1 = $postData["customer_id"];
+
+      $start_recurring_date = new DateTime($startDate->format("Y-m-t"));
+      $start_recurring_date->add(new DateInterval('P1D'));
+      $end_recurring_date = new DateTime($start_recurring_date->format("Y-m-t"));
+      if ($postData["product_subscription_type"] == "YEARLY" || $postData["product_subscription_type"] == "yearly") {
+
+          $start_recurring_date = new DateTime($startDate->format("Y-m-t"));
+          $start_recurring_date->add(new DateInterval('P1D'));
+          $end_recurring_date = new DateTime($start_recurring_date->format("Y-m-d"));
+          $end_recurring_date->add(new DateInterval('P1Y'));
+          $end_recurring_date->sub(new DateInterval('P1D'));
+      }
+
+
+      $param2 = $start_recurring_date->format("Y-m-d");
+      $param3 = $end_recurring_date->format("Y-m-d");
+      $param4 = $postData["order_id"];
+      $param5 = $product_price;
+      $param6 = $postData["reseller_id"];
+      $stmt_invoice->bind_param('ssssss', $param1, $param2, $param3, $param4, $param5, $param6);
+      $stmt_invoice->execute();
+      $invoice_id = -1;
+      if ($stmt_invoice->insert_id > 0) {
+
+          $invoice_id = $stmt_invoice->insert_id;
+      } else {
+
+          return FALSE;
+      }
+      $invoice_item_query = "INSERT INTO `invoice_items`( `invoice_id`, `item_name`, `item_price`, `item_duration_price`,`item_type`) VALUES ";
+
+      $total = 0;
+      foreach ($items as $key => $value) {
+          $total += (double) $value["item_price"];
+      }
+      $qst_tax = 0;
+      $gst_tax = 0;
+      $qst_tax_product = ["item_name" => "QST Tax", "item_price" => $qst_tax, "item_type" => "once"];
+      array_push($items_zero, $qst_tax_product);
+      $gst_tax_product = ["item_name" => "GST Tax", "item_price" => $gst_tax, "item_type" => "once"];
+      array_push($items_zero, $gst_tax_product);
+      foreach ($items_zero as $key => $value) {
+
+          $invoice_item_query .= "(N'" . $invoice_id . "',N'" . $value["item_name"] . "',N'" . $value["item_price"] . "',N'" . $value["item_price"] . "',N'" . $value["item_type"] . "'),";
+      }
+      $invoice_item_query = rtrim($invoice_item_query, ",");
+      if ($dbTools->query($invoice_item_query) !== TRUE) {
+          return FALSE;
+      }
+
+      /// end add start suspension recurring invoice
+
+      /// insert suspension invoice
+
+      $order_id = $postData["order_id"];
+      $fees_charged = (double) $postData["fees_charged"];
+      $invoice_query = "INSERT INTO `invoices`(`customer_id`,`valid_date_from`,`valid_date_to`,`invoice_type_id`,`order_id`,`product_price`,`reseller_id`) VALUES (?,?,?,N'8',?,?,?)";
+      $stmt3 = $dbTools->getConnection()->prepare($invoice_query);
+      $param1 = $postData["customer_id"];
+      $param2 = $request["action_on_date"];
+      $param3 = $request["action_on_date"];
+      $param4 = $order_id;
+      $param5 = $postData["product_price"];
+      $param6 = $postData["reseller_id"];
+      $stmt3->bind_param('ssssss', $param1, $param2, $param3, $param4, $param5, $param6);
+      $stmt3->execute();
+      $invoice_id = -1;
+      if ($stmt3->insert_id > 0) {
+          $invoice_id = $stmt3->insert_id;
+      } else {
+          return false;
+      }
+      $total = (double) $fees_charged;
+      $qst_tax = $total * 0.09975;
+      $gst_tax = $total * 0.05;
+      $invoice_item_query = "INSERT INTO `invoice_items`( `invoice_id`, `item_name`, `item_price`, `item_duration_price`,`item_type`)
+    VALUES (?,?,N'0',?,'once'),(?,?,?,?,'once'),(?,?,?,?,'once')";
+      $param1 = $invoice_id;
+      $param2 = "Suspension fees";
+      $param3 = $fees_charged;
+      $param4 = "QST Tax";
+      $param5 = $qst_tax;
+      $param6 = "GST Tax";
+      $param7 = $gst_tax;
+      $stmt4 = $dbTools->getConnection()->prepare($invoice_item_query);
+      $stmt4->bind_param('sssssssssss', $param1, $param2, $param3, $param1, $param4, $param5, $param5, $param1, $param6, $param7, $param7);
+      $stmt4->execute();
+      /// end insert suspension invoice
+
+      /// insert end_of_suspension recurring invoice
+        $invoice_query = "INSERT INTO `invoices`
+      (`customer_id`,`invoice_type_id`,`valid_date_from`,`valid_date_to`,`order_id`,`product_price`,`reseller_id`)
+       VALUES (?,2,?,?,?,?,?)";
+        $stmt_invoice = $dbTools->getConnection()->prepare($invoice_query);
+        $param1 = $postData["customer_id"];
+
+        $start_recurring_date = new DateTime($endDate->format("Y-m-t"));
+        $start_recurring_date->add(new DateInterval('P1D'));
+        $end_recurring_date = new DateTime($start_recurring_date->format("Y-m-t"));
+        if ($postData["product_subscription_type"] == "YEARLY" || $postData["product_subscription_type"] == "yearly") {
+
+            $start_recurring_date = new DateTime($endDate->format("Y-m-t"));
+            $start_recurring_date->add(new DateInterval('P1D'));
+            $end_recurring_date = new DateTime($start_recurring_date->format("Y-m-d"));
+            $end_recurring_date->add(new DateInterval('P1Y'));
+            $end_recurring_date->sub(new DateInterval('P1D'));
+        }
+
+
+        $param2 = $start_recurring_date->format("Y-m-d");
+        $param3 = $end_recurring_date->format("Y-m-d");
+        $param4 = $postData["order_id"];
+        $param5 = $product_price;
+        $param6 = $postData["reseller_id"];
+        $stmt_invoice->bind_param('ssssss', $param1, $param2, $param3, $param4, $param5, $param6);
+        $stmt_invoice->execute();
+        $invoice_id = -1;
+        if ($stmt_invoice->insert_id > 0) {
+
+            $invoice_id = $stmt_invoice->insert_id;
+        } else {
+
+            return FALSE;
+        }
+        $invoice_item_query = "INSERT INTO `invoice_items`( `invoice_id`, `item_name`, `item_price`, `item_duration_price`,`item_type`) VALUES ";
+
+        $total = 0;
+        foreach ($items as $key => $value) {
+            $total += (double) $value["item_price"];
+        }
+        $qst_tax = $total * 0.09975;
+        $gst_tax = $total * 0.05;
+        $qst_tax_product = ["item_name" => "QST Tax", "item_price" => $qst_tax, "item_type" => "once"];
+        array_push($items, $qst_tax_product);
+        $gst_tax_product = ["item_name" => "GST Tax", "item_price" => $gst_tax, "item_type" => "once"];
+        array_push($items, $gst_tax_product);
+        foreach ($items as $key => $value) {
+
+            $invoice_item_query .= "(N'" . $invoice_id . "',N'" . $value["item_name"] . "',N'" . $value["item_price"] . "',N'" . $value["item_price"] . "',N'" . $value["item_type"] . "'),";
+        }
+        $invoice_item_query = rtrim($invoice_item_query, ",");
+        if ($dbTools->query($invoice_item_query) !== TRUE) {
+            return FALSE;
+        }
+        /// end add end_of_suspension recurring invoice
 }
 
 function insertInvoice($dbTools, $postData) {

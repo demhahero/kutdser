@@ -62,7 +62,7 @@ GROUP_CONCAT(`invoice_types`.`type_name`) AS `type_name`
   FROM `invoices`
   INNER JOIN `invoice_items` ON `invoice_items`.`invoice_id`=`invoices`.`invoice_id`
   INNER JOIN `invoice_types` ON `invoice_types`.`invoic_type_id` = `invoices`.`invoice_type_id`
-  WHERE `invoice_items`.`item_name` LIKE '%Product%' AND `reseller_id` = 4  AND Year(`valid_date_from`)=2019 and Month(`valid_date_from`)=2 GROUP BY `order_id`,`customer_id`
+  WHERE `invoice_items`.`item_name` LIKE '%Product%' AND `reseller_id` = ?  AND Year(`valid_date_from`)=? and Month(`valid_date_from`)=? GROUP BY `order_id`,`customer_id`
 ) AS `products_details` ON  `products_details`.`order_id` = `subtotal`.`order_id`";
 
 
@@ -114,7 +114,7 @@ $stmt = $dbTools->getConnection()->prepare($sqlTot);
 
 if (isset($where) && $where != '') {
   $search_value="%".$params['search']['value']."%";
-$stmt->bind_param('ssssssssssssss',
+$stmt->bind_param('sssssssssssssssss',
                   $reseller_id,
                   $year,
                   $month,
@@ -125,6 +125,9 @@ $stmt->bind_param('ssssssssssssss',
                   $year,
                   $month,
                   $reseller_id,
+                  $reseller_id,
+                  $year,
+                  $month,
                   $search_value,
                   $search_value,
                   $search_value,
@@ -132,7 +135,7 @@ $stmt->bind_param('ssssssssssssss',
 
 }
 else{
-  $stmt->bind_param('ssssssssss',
+  $stmt->bind_param('sssssssssssss',
                     $reseller_id,
                     $year,
                     $month,
@@ -142,7 +145,10 @@ else{
                     $reseller_id,
                     $year,
                     $month,
-                  $reseller_id);
+                  $reseller_id,
+                  $reseller_id,
+                  $year,
+                  $month);
 }
 
 $stmt->execute();
@@ -158,7 +164,7 @@ $stmt1 = $dbTools->getConnection()->prepare($sqlRec);
 
 if (isset($where) && $where != '') {
   $search_value="%".$params['search']['value']."%";
-$stmt1->bind_param('ssssssssssssss',
+$stmt1->bind_param('sssssssssssssssss',
                   $reseller_id,
                   $year,
                   $month,
@@ -169,6 +175,9 @@ $stmt1->bind_param('ssssssssssssss',
                   $year,
                   $month,
                   $reseller_id,
+                  $reseller_id,
+                  $year,
+                  $month,
                   $search_value,
                   $search_value,
                   $search_value,
@@ -176,7 +185,7 @@ $stmt1->bind_param('ssssssssssssss',
 
 }
 else{
-  $stmt1->bind_param('ssssssssss',
+  $stmt1->bind_param('sssssssssssss',
   $reseller_id,
   $year,
   $month,
@@ -186,7 +195,10 @@ else{
   $reseller_id,
   $year,
   $month,
-$reseller_id);
+  $reseller_id,
+  $reseller_id,
+  $year,
+  $month);
 }
 
 
