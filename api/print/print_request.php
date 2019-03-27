@@ -72,6 +72,8 @@ $title_array= array(
     "swap_modem" => 'Swap modem requst',
     "terminate" => 'Terminate request',
     "swap_modem_and_change_speed" => 'Swap modem and change speed request',
+    "suspension" => 'Suspension',
+    "transfer_to_reseller" => 'Transfer to Reseller',
 );
 
 $request_fees=$result['fees_charged'];

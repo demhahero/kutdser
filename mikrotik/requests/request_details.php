@@ -52,6 +52,12 @@ $request_id = intval($_GET["request_id"]);
                   $("#full_name").html(data.request_row.full_name);
                   $("#email").html(data.request_row.email);
                   $("#phone").html(data.request_row.phone);
+                  if (data.request_row.action === "suspension") {
+                    $("#end_of_suspension").html(data.request_row.end_of_suspension);
+                  }
+                  if (data.request_row.action === "transfer_to_reseller") {
+                    $("#transfer_to_reseller_name").html(data.request_row.transfer_to_reseller_name);
+                  }
 
 
 
@@ -155,6 +161,7 @@ $request_id = intval($_GET["request_id"]);
               $("input[name=\"product_category\"]").val(data.request_row.product_category);
               $("input[name=\"product_subscription_type\"]").val(data.request_row.product_subscription_type);
               $("input[name=\"customer_id\"]").val(data.request_order_row.customer_id);
+              $("input[name=\"transfer_to_reseller\"]").val(data.request_row.transfer_to_reseller);
 
               if(data.request_row.verdict.length<=0)
               {
@@ -167,9 +174,14 @@ $request_id = intval($_GET["request_id"]);
                 else if(data.request_row.action==="terminate" || data.request_row.action==="moving")
                 {
                   $("input[name=\"fees_charged\"]").val("82");
-                }else if(data.request_row.action==="change_speed")
+                }
+                else if(data.request_row.action==="change_speed")
                 {
                   $("input[name=\"fees_charged\"]").val("7");
+                }
+                else if(data.request_row.action==="suspension")
+                {
+                  $("input[name=\"fees_charged\"]").val("44");
                 }
                 else{
                   $("input[name=\"fees_charged\"]").val("0");
@@ -215,6 +227,7 @@ $("#no_verdict").submit(function(e){
   var customer_id=$("input[name=\"customer_id\"]").val();
   var verdict=$("select[name=\"verdict\"]").val();
   var fees_charged=$("input[name=\"fees_charged\"]").val();
+  var transfer_to_reseller=$("input[name=\"transfer_to_reseller\"]").val();
 
   $.post("<?= $api_url ?>requests/request_details_api.php"
     ,{
@@ -232,7 +245,8 @@ $("#no_verdict").submit(function(e){
           "product_subscription_type":product_subscription_type,
           "customer_id":customer_id,
           "verdict":verdict,
-          "fees_charged":fees_charged
+          "fees_charged":fees_charged,
+          "transfer_to_reseller":transfer_to_reseller
 
       }, function (data) {
 
@@ -274,6 +288,7 @@ $("#no_verdict").submit(function(e){
           <input type="hidden" name="email" />
           <input type="hidden" name="customer_id" />
           <input type="hidden" name="order_id" />
+          <input type="hidden" name="transfer_to_reseller" />
           <div class="form-group">
             <label for="email">Verdict:</label>
             <select  name="verdict" class="form-control">
@@ -413,6 +428,17 @@ $("#no_verdict").submit(function(e){
                             <td>
 
                             </td>
+                        </tr>
+                        <tr class="request_row_tr">
+                            <td colspan="2" class=" bg-success">End of Suspension Date:</td>
+                            <td colspan="2" id="end_of_suspension">
+
+                            </td>
+                            <td colspan="2" class=" bg-success">Transfer to Reseller</td>
+                            <td colspan="2" id="transfer_to_reseller_name">
+
+                            </td>
+
                         </tr>
 
                         <tr class="no_request_row">

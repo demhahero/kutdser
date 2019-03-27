@@ -4,22 +4,26 @@ if(isset($_POST["post_action"]))
 {
   if($_POST["post_action"]==="get_request_details" && isset($_POST["request_id"]))
   {
-    include_once "../dbconfig.php";
+        include_once "../dbconfig.php";
 
-    $request_id = intval($_POST["request_id"]);
+        $request_id = intval($_POST["request_id"]);
 
-    // get request info and reseller info
-    $query = "SELECT `request_id`, reseller.`customer_id`, `admins`.`username`
-    ,reseller.`full_name` as 'reseller_full_name', `requests`.`order_id`, `creation_date`, `action`,
-     `action_value`,`admins`.`admin_id`, `verdict`, `verdict_date`, `action_on_date`,
-     `product_price`, `requests`.`note`, `requests`.`full_name`, `requests`.`email`, `requests`.`phone`, `product_title`, `product_category`,
-     `product_subscription_type`, `modem_mac_address`, `requests`.`modem_id`,`requests`.`city`,`requests`.`address_line_1`,`requests`.`address_line_2`,`requests`.`postal_code`,
-     `modems`.`mac_address`
-    FROM `requests`
-    INNER JOIN `customers` as reseller on `reseller`.`customer_id`= `requests`.`reseller_id`
-    LEFT JOIN `modems` on `requests`.`modem_id`=`modems`.`modem_id`
-    LEFT JOIN `admins` on `admins`.`admin_id`=`requests`.`admin_id`
-    WHERE `request_id`=?";
+        // get request info and reseller info
+        $query = "SELECT `request_id`, reseller.`customer_id`,
+        `customers`.`full_name` AS `transfer_to_reseller_name`,
+        `admins`.`username`
+        ,reseller.`full_name` as 'reseller_full_name', `requests`.`order_id`, `creation_date`, `action`,
+         `action_value`,`admins`.`admin_id`, `verdict`, `verdict_date`, `action_on_date`,
+         `product_price`, `requests`.`note`, `requests`.`full_name`, `requests`.`email`, `requests`.`phone`,
+          `requests`.`end_of_suspension`,`requests`.`transfer_to_reseller`,`product_title`, `product_category`,
+         `product_subscription_type`, `modem_mac_address`, `requests`.`modem_id`,`requests`.`city`,`requests`.`address_line_1`,`requests`.`address_line_2`,`requests`.`postal_code`,
+         `modems`.`mac_address`
+        FROM `requests`
+        INNER JOIN `customers` as reseller on `reseller`.`customer_id`= `requests`.`reseller_id`
+        LEFT JOIN `modems` on `requests`.`modem_id`=`modems`.`modem_id`
+        LEFT JOIN `admins` on `admins`.`admin_id`=`requests`.`admin_id`
+        LEFT JOIN `customers` ON `customers`.`customer_id`=`requests`.`transfer_to_reseller`
+        WHERE `request_id`=?";
 
 
         $stmt1 = $dbTools->getConnection()->prepare($query);
@@ -37,60 +41,60 @@ if(isset($_POST["post_action"]))
 
 
 
-    $request_modem_mac_address = (strlen($request_row["modem_mac_address"]) > 0 ? $request_row["modem_mac_address"] : $request_row["mac_address"]);
-    $request_row["modem_mac_address"]=$request_modem_mac_address;
-    /// get request's order info
-    $request_order_query = "SELECT `orders`.*,`order_options`.*,`customers`.`full_name`,`orders`.`order_id` as `this_order_id` FROM `orders`
-    INNER JOIN `order_options` on `order_options`.`order_id`=`orders`.`order_id`
-    INNER JOIN `customers` on `customers`.`customer_id`=`orders`.`customer_id`
-    where `orders`.`order_id`=?";
+        $request_modem_mac_address = (strlen($request_row["modem_mac_address"]) > 0 ? $request_row["modem_mac_address"] : $request_row["mac_address"]);
+        $request_row["modem_mac_address"]=$request_modem_mac_address;
+        /// get request's order info
+        $request_order_query = "SELECT `orders`.*,`order_options`.*,`customers`.`full_name`,`orders`.`order_id` as `this_order_id` FROM `orders`
+        INNER JOIN `order_options` on `order_options`.`order_id`=`orders`.`order_id`
+        INNER JOIN `customers` on `customers`.`customer_id`=`orders`.`customer_id`
+        where `orders`.`order_id`=?";
 
 
-            $stmt2 = $dbTools->getConnection()->prepare($request_order_query);
+        $stmt2 = $dbTools->getConnection()->prepare($request_order_query);
 
-            $param_value=$request_row['order_id'];
-            $stmt2->bind_param('s',
-                              $param_value
-                              ); // 's' specifies the variable type => 'string'
+        $param_value=$request_row['order_id'];
+        $stmt2->bind_param('s',
+                          $param_value
+                          ); // 's' specifies the variable type => 'string'
 
 
-            $stmt2->execute();
+        $stmt2->execute();
 
-            $result2 = $stmt2->get_result();
-            $request_order_row = $dbTools->fetch_assoc($result2);
+        $result2 = $stmt2->get_result();
+        $request_order_row = $dbTools->fetch_assoc($result2);
 
-            $request_order_row["order_id"]=$request_order_row["this_order_id"];
-            if ((int) $request_order_row['order_id'] <= 10380) {
-                $request_order_row["displayed_order_id"]= $request_order_row['order_id'];
-            } else {
-                $request_order_row["displayed_order_id"]= (((0x0000FFFF & (int) $request_order_row['order_id']) << 16) + ((0xFFFF0000 & (int) $request_order_row['order_id']) >> 16));
-            }
-    /// indentify start active date
-    $start_active_date = "";
-    if ($request_order_row["product_category"] === "phone") {
-        $start_active_date = $request_order_row["creation_date"];
-    } else if ($request_order_row["product_category"] === "internet") {
-        if ($request_order_row["cable_subscriber"] === "yes") {
-            $start_active_date = $request_order_row["cancellation_date"];
+        $request_order_row["order_id"]=$request_order_row["this_order_id"];
+        if ((int) $request_order_row['order_id'] <= 10380) {
+            $request_order_row["displayed_order_id"]= $request_order_row['order_id'];
         } else {
-            $start_active_date = $request_order_row["installation_date_1"];
+            $request_order_row["displayed_order_id"]= (((0x0000FFFF & (int) $request_order_row['order_id']) << 16) + ((0xFFFF0000 & (int) $request_order_row['order_id']) >> 16));
         }
-    }
-    $request_order_row["start_active_date"]=$start_active_date;
+        /// indentify start active date
+        $start_active_date = "";
+        if ($request_order_row["product_category"] === "phone") {
+            $start_active_date = $request_order_row["creation_date"];
+        } else if ($request_order_row["product_category"] === "internet") {
+            if ($request_order_row["cable_subscriber"] === "yes") {
+                $start_active_date = $request_order_row["cancellation_date"];
+            } else {
+                $start_active_date = $request_order_row["installation_date_1"];
+            }
+        }
+        $request_order_row["start_active_date"]=$start_active_date;
 
-    /// get last approved request for this order if exist;
-    $last_request_query = "SELECT `request_id`, reseller.`customer_id`, `admins`.`username`
-    ,reseller.`full_name`, `requests`.`order_id`, `creation_date`, `action`,
-     `action_value`,`admins`.`admin_id`, `verdict`, `verdict_date`, `action_on_date`,
-     `product_price`, `requests`.`note`, `product_title`, `product_category`,
-     `product_subscription_type`, `modem_mac_address`, `requests`.`modem_id`,`requests`.`city`,`requests`.`address_line_1`,`requests`.`address_line_2`,`requests`.`postal_code`,
-     `modems`.`mac_address`
-    FROM `requests`
-    INNER JOIN `customers` as reseller on `reseller`.`customer_id`= `requests`.`reseller_id`
-    LEFT JOIN `modems` on `requests`.`modem_id`=`modems`.`modem_id`
-    LEFT JOIN `admins` on `admins`.`admin_id`=`requests`.`admin_id`
+        /// get last approved request for this order if exist;
+        $last_request_query = "SELECT `request_id`, reseller.`customer_id`, `admins`.`username`
+        ,reseller.`full_name`, `requests`.`order_id`, `creation_date`, `action`,
+         `action_value`,`admins`.`admin_id`, `verdict`, `verdict_date`, `action_on_date`,
+         `product_price`, `requests`.`note`, `product_title`, `product_category`,
+         `product_subscription_type`, `modem_mac_address`, `requests`.`modem_id`,`requests`.`city`,`requests`.`address_line_1`,`requests`.`address_line_2`,`requests`.`postal_code`,
+         `modems`.`mac_address`
+        FROM `requests`
+        INNER JOIN `customers` as reseller on `reseller`.`customer_id`= `requests`.`reseller_id`
+        LEFT JOIN `modems` on `requests`.`modem_id`=`modems`.`modem_id`
+        LEFT JOIN `admins` on `admins`.`admin_id`=`requests`.`admin_id`
 
-    WHERE `requests`.`order_id`=? and `requests`.`action_on_date` < ? and verdict='approve' ORDER BY action_on_date DESC LIMIT 1";
+        WHERE `requests`.`order_id`=? and `requests`.`action_on_date` < ? and verdict='approve' ORDER BY action_on_date DESC LIMIT 1";
 
 
         $stmt3 = $dbTools->getConnection()->prepare($last_request_query);
@@ -109,44 +113,44 @@ if(isset($_POST["post_action"]))
 
 
 
-    $product_price = $request_order_row['product_price'];
-    $product_title = $request_order_row['product_title'];
-    $product_category = $request_order_row['product_category'];
-    $product_subscription_type = $request_order_row['product_subscription_type'];
-    if (sizeof($last_request_row) > 0) {
-      $last_request_modem_mac_address = (strlen($last_request_row["modem_mac_address"]) > 0 ? $last_request_row["modem_mac_address"] : $last_request_row["mac_address"]);
-      $last_request_row["modem_mac_address"]=$last_request_modem_mac_address;
+        $product_price = $request_order_row['product_price'];
+        $product_title = $request_order_row['product_title'];
+        $product_category = $request_order_row['product_category'];
+        $product_subscription_type = $request_order_row['product_subscription_type'];
+        if (sizeof($last_request_row) > 0) {
+          $last_request_modem_mac_address = (strlen($last_request_row["modem_mac_address"]) > 0 ? $last_request_row["modem_mac_address"] : $last_request_row["mac_address"]);
+          $last_request_row["modem_mac_address"]=$last_request_modem_mac_address;
 
 
-        $product_price = $last_request_row['product_price'];
-        $product_title = $last_request_row['product_title'];
-        $product_category = $last_request_row['product_category'];
-        $product_subscription_type = $last_request_row['product_subscription_type'];
-    }
-if($request_row["action"]!="change_speed")// if not change speed request take these value from the last updated request or order
-{
-  $request_row["product_price"]=$product_price;
-  $request_row["product_title"]=$product_title;
-  $request_row["product_category"]=$product_category;
-  $request_row["product_subscription_type"]=$product_subscription_type;
-}
+            $product_price = $last_request_row['product_price'];
+            $product_title = $last_request_row['product_title'];
+            $product_category = $last_request_row['product_category'];
+            $product_subscription_type = $last_request_row['product_subscription_type'];
+        }
+        if($request_row["action"]!="change_speed")// if not change speed request take these value from the last updated request or order
+        {
+          $request_row["product_price"]=$product_price;
+          $request_row["product_title"]=$product_title;
+          $request_row["product_category"]=$product_category;
+          $request_row["product_subscription_type"]=$product_subscription_type;
+        }
 
-    if($stmt1->errno==0 && $stmt2->errno==0 && $stmt3->errno==0)
-    {
-      $request_row_json = json_encode($request_row);
-      $request_order_row_json = json_encode($request_order_row);
-      $last_request_row_json = json_encode($last_request_row);
-        echo "{\"request_row\" :", $request_row_json
-          ,",\"request_order_row\" :", $request_order_row_json
-          ,",\"last_request_row\" :", $last_request_row_json
-          , ",\"error\":false}";
-    }
-    else {
-      echo "{\"request_row\" :", "{}"
-        ,"\"request_order_row\" :", "{}"
-        ,"\"last_request_row\" :", "{}"
-        , ",\"error\":true}";
-    }
+        if($stmt1->errno==0 && $stmt2->errno==0 && $stmt3->errno==0)
+        {
+          $request_row_json = json_encode($request_row);
+          $request_order_row_json = json_encode($request_order_row);
+          $last_request_row_json = json_encode($last_request_row);
+            echo "{\"request_row\" :", $request_row_json
+              ,",\"request_order_row\" :", $request_order_row_json
+              ,",\"last_request_row\" :", $last_request_row_json
+              , ",\"error\":false}";
+        }
+        else {
+          echo "{\"request_row\" :", "{}"
+            ,"\"request_order_row\" :", "{}"
+            ,"\"last_request_row\" :", "{}"
+            , ",\"error\":true}";
+        }
   }
   else if($_POST["post_action"]==="edit_request" && isset($_POST["request_id"]) && isset($_POST["verdict"]))
     {
@@ -261,6 +265,28 @@ if($request_row["action"]!="change_speed")// if not change speed request take th
 
                   if ($stmt2->errno!=0) {
                     /// $excute_failed
+                    $excute_failed=1;
+                  }
+              }
+              else if ($_POST["action"] === "transfer_to_reseller" && $_POST["verdict"] === "approve"){
+                $param_value1=$_POST['transfer_to_reseller'];
+                $param_value2=$_POST["customer_id"];
+                $query_update_request = "UPDATE `customers` set `reseller_id`=?"
+                          . " WHERE `customer_id`=?";
+
+                  $stmt2 = $dbTools->getConnection()->prepare($query_update_request);
+
+                  $stmt2->bind_param('ss',
+                                    $param_value1,
+                                    $param_value2);
+
+
+                  $stmt2->execute();
+
+                  if ($stmt2->errno!=0) {
+                    /// $excute_failed
+                    print_r($stmt2);
+                    exit();
                     $excute_failed=1;
                   }
               }

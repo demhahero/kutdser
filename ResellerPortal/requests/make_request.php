@@ -23,7 +23,7 @@ $creation_date = new DateTime();
             format: 'mm/dd/yyyy',
             startDate: '+' + fistDayInstallation + 'd'
         });
-
+        $(".transfer_to_reseller").hide();
         $(".moving-field").hide();
         $(".cusotmer-info-field").hide();
         $(".suspension").hide();
@@ -91,6 +91,11 @@ $creation_date = new DateTime();
                 });
 
             }
+            if (data_value == "transfer_to_reseller") {
+                $(".transfer_to_reseller").show();
+            } else {
+                $(".transfer_to_reseller").hide();
+            }
 
 
             if (data_value == "swap_modem") {
@@ -129,6 +134,7 @@ $creation_date = new DateTime();
 
             var product_id = $("select[name=\"product_id\"]").val();
             var end_of_suspension = $("input[name=\"end_of_suspension\"]").val();
+            var transfer_to_reseller = $("select[name=\"transfer_to_reseller\"]").val();
             $.post("<?= $api_url ?>insert_requests_api.php",
                     {
                         order_id: order_id,
@@ -146,6 +152,7 @@ $creation_date = new DateTime();
                         phone: phone,
                         note: note,
                         end_of_suspension: end_of_suspension,
+                        transfer_to_reseller: transfer_to_reseller,
                         reseller_id: reseller_id}, function (data, status) {
                 data = $.parseJSON(data);
                 if (data.inserted == true) {
@@ -234,6 +241,7 @@ $creation_date = new DateTime();
             <option data-value="terminate" value="terminate">Terminate</option>
             <option data-value="customer_information_modification" value="customer_information_modification">Customer Information Modification</option>
             <option data-value="suspension" value="suspension">Suspension</option>
+            <option data-value="transfer_to_reseller" value="transfer_to_reseller">Transfer to Reseller</option>
         </select>
     </div>
     <div class="form-group">
@@ -312,7 +320,20 @@ $creation_date = new DateTime();
         </select>
     </div>
 
+    <div class="form-group transfer_to_reseller" >
+      <label>Transfer to Reseller:</label>
+      <select name="transfer_to_reseller" class="form-control">
 
+        <?php
+        $customer_sql = "SELECT `full_name`,`customer_id` FROM `customers` WHERE `customer_id` !=" .$reseller_id." AND `is_reseller` = 1";
+        $customer_result = $dbToolsReseller->query($customer_sql);
+
+        while ($customer_row = $customer_result->fetch_assoc()) {
+            echo '<option value="'.$customer_row["customer_id"].'">'.$customer_row["full_name"].'</option>';
+        }
+        ?>
+      </select>
+    </div>
 
     <div class="form-group">
         <label>Note:</label>

@@ -5,7 +5,7 @@ include_once "./insert_invoice_function.php";
 
   $query="SELECT
                 `customers`.`customer_id` AS `c_id`,
-                `customers`.`reseller_id`,
+                `customers`.`reseller_id` AS `r_id`,
                 `orders`.*,
                 `order_options`.*
           FROM `customers`
@@ -30,6 +30,7 @@ include_once "./insert_invoice_function.php";
     $dateNow=new DateTime();
     $recurring_date=new DateTime($dateNow->format("Y-m-1"));
     $recurring_date->sub(new DateInterval('P1D'));
+    $customer_row["reseller_id"]=$customer_row["r_id"];
     recurring($dbTools,$customer_row,$recurring_date->format("Y-m-1"),$recurring_date->format("Y-m-t"));
   }
 
