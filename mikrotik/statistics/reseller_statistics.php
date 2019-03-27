@@ -80,6 +80,32 @@ $(document).ready(function () {
           });
         });
       ///////////////// end form post
+      // get total values
+      $.post("<?= $api_url ?>statistics/reseller_statistics_total_api.php",
+              data_id
+      , function (data, status) {
+          data = $.parseJSON(data);
+          ////////////// add total prices for Commission base, all orders with tax and subtotal
+          $("#totalTable").html('<tr>'
+              +'<td  class="bg-default">Commission Base Amount </td>'
+              +'<td class="bg-default">'+data.commission_base_amount+'$</td>'
+              +'<td  class="bg-success">Monthly commission </td>'
+              +'<td class="bg-success">'+data.monthly_commission+'$</td>'
+              +'<td  class="bg-warning">Total Price for subtotal</td>'
+              +'<td class="bg-warning">'+data.subtotal+'$</td>'
+              +'<td  class="bg-danger">Total Price for all orders With Tax</td>'
+              +'<td class="bg-danger">'+data.total_with_tax+'$</td>'
+              +'</tr>');
+        ////////////////////////// add total terminated, new and transfer orders
+          $("#totalTable").append('<tr>'
+              +'<td colspan="2" class="bg-default"> </td>'
+              +'<td class="bg-default">'+''+'</td>'
+              +'<td  class="bg-default">Total New Orders</td>'
+              +'<td class="bg-default">'+data.total_new+'</td>'
+              +'<td colspan="2" class="bg-default">Total Transfer Orders</td>'
+              +'<td class="bg-default">'+data.total_transfer+'</td>'
+              +'</tr>');
+          });
 });
 </script>
 
@@ -132,11 +158,17 @@ $(document).ready(function () {
       <th style="width:50px">Type</th>
       <th style="width:50px">Subtotal</th>
       <th style="width:50px">total with Tax </th>
+      <th style="width:50px">Payment Method </th>
+      <th style="width:50px">Join Type </th>
+      <th style="width:100px">Start Active Date </th>
       <th style="width:50px">Reseller Commission percentage</th>
 </thead>
 <tbody>
 
 </tbody>
+</table>
+<table id="totalTable" class="display table table-striped table-bordered">
+
 </table>
 
 <div id="change_commission" class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-hidden="true" style="display: none;">

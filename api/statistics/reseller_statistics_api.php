@@ -36,7 +36,10 @@ IF(`order_options`.`reseller_commission_percentage`=-1,`resellers`.`reseller_com
 `products_details`.`item_name`,
 `products_details`.`item_price`,
 `products_details`.`valid_date_from`,
-`products_details`.`type_name`
+`products_details`.`type_name`,
+`payment_method`,
+`start_active_date`,
+IF(`order_options`.`cable_subscriber` LIKE 'yes','transfer','new') AS `join_type`
 
 
 FROM (SELECT `order_id`,`customer_id`, sum(IF(`invoices`.`invoice_type_id`=0,`invoice_items`.`item_duration_price`*-1,`invoice_items`.`item_duration_price`)) AS 'subtotal'
@@ -63,7 +66,10 @@ GROUP_CONCAT(`invoice_types`.`type_name`) AS `type_name`
   INNER JOIN `invoice_items` ON `invoice_items`.`invoice_id`=`invoices`.`invoice_id`
   INNER JOIN `invoice_types` ON `invoice_types`.`invoic_type_id` = `invoices`.`invoice_type_id`
   WHERE `invoice_items`.`item_name` LIKE '%Product%' AND `reseller_id` = ?  AND Year(`valid_date_from`)=? and Month(`valid_date_from`)=? GROUP BY `order_id`,`customer_id`
-) AS `products_details` ON  `products_details`.`order_id` = `subtotal`.`order_id`";
+) AS `products_details` ON  `products_details`.`order_id` = `subtotal`.`order_id`
+INNER JOIN (SELECT `customer_id`,
+IF(`merchantref` LIKE '%cache%','Cash on delivery','VISA') AS `payment_method` FROM `merchantrefs` ORDER BY `merchantref` ASC ) AS `payments_method` ON `payments_method`.`customer_id`=`subtotal`.`customer_id`
+LEFT JOIN `customer_active_status` ON `customer_active_status`.`customer_id`= `subtotal`.`customer_id`";
 
 
 // $sqlTot = "SELECT `subtotal`.*,`twt`.`total_with_tax`,`cba`.`commission_base_amount`,`customers`.`full_name`
@@ -89,7 +95,8 @@ if (!empty($params['search']['value'])) {
     $where .= " WHERE ";
     $where .= " ( `subtotal`.`order_id` LIKE ? ";
     $where .= " OR `subtotal`.`customer_id` LIKE ? ";
-    $where .= " OR `full_name` LIKE ? ";
+    $where .= " OR `customers`.`full_name` LIKE ? ";
+    $where .= " OR `payment_method` LIKE ? ";
     $where .= " OR `total_with_tax` LIKE ? ) ";
 }
 
@@ -114,7 +121,8 @@ $stmt = $dbTools->getConnection()->prepare($sqlTot);
 
 if (isset($where) && $where != '') {
   $search_value="%".$params['search']['value']."%";
-$stmt->bind_param('sssssssssssssssss',
+
+$stmt->bind_param('ssssssssssssssssss',
                   $reseller_id,
                   $year,
                   $month,
@@ -128,6 +136,7 @@ $stmt->bind_param('sssssssssssssssss',
                   $reseller_id,
                   $year,
                   $month,
+                  $search_value,
                   $search_value,
                   $search_value,
                   $search_value,
@@ -164,7 +173,7 @@ $stmt1 = $dbTools->getConnection()->prepare($sqlRec);
 
 if (isset($where) && $where != '') {
   $search_value="%".$params['search']['value']."%";
-$stmt1->bind_param('sssssssssssssssss',
+$stmt1->bind_param('ssssssssssssssssss',
                   $reseller_id,
                   $year,
                   $month,
@@ -178,6 +187,7 @@ $stmt1->bind_param('sssssssssssssssss',
                   $reseller_id,
                   $year,
                   $month,
+                  $search_value,
                   $search_value,
                   $search_value,
                   $search_value,
@@ -221,7 +231,10 @@ while ($row = mysqli_fetch_array($queryRecords)) {
     $data[7] = $row['type_name'];
     $data[8] = round((double)$row['subtotal'], 2);
     $data[9] = round((double)$row['total_with_tax'], 2);
-    $data[10] = "%".$row['reseller_commission_percentage']
+    $data[10] = $row['payment_method'];
+    $data[11] = $row['start_active_date'];
+    $data[12] = $row['join_type'];
+    $data[13] = "%".$row['reseller_commission_percentage']
     .'<a data-id="'.$row['order_id'].'" data-id-2="'.$row['customer_commission_percentage'].'" type="button" class="btn btn-danger change_commission" >Change</a>';
     $all_data[] = $data;
 }
