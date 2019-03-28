@@ -84,15 +84,34 @@ $stmt->execute();
 
 $result = $stmt->get_result();
 
-
 $row = mysqli_fetch_array($result);
+////////// get all terminated order
+$sqlquery="SELECT count(*) AS `total_terminated`  FROM `invoices` WHERE `invoice_type_id` = 6 AND `reseller_id` = ?
+AND year(`valid_date_from`)=? AND month(`valid_date_from`)=?";
+
+
+$stmt1 = $dbTools->getConnection()->prepare($sqlquery);
+
+$stmt1->bind_param('sss',
+                    $reseller_id,
+                    $year,
+                    $month);
+
+
+$stmt1->execute();
+
+$result1 = $stmt1->get_result();
+
+
+$row1 = mysqli_fetch_array($result1);
 $json_data = array(
     "total_with_tax" => round((double)$row['total_with_tax'], 2),
     "subtotal" => round((double)$row['subtotal'], 2),
     "monthly_commission" => round((double)$row['monthly_commission'], 2),
     "commission_base_amount" => round((double)$row['commission_base_amount'], 2),
     "total_new" => $row["total_new"],
-    "total_transfer" => $row["total_transfer"]
+    "total_transfer" => $row["total_transfer"],
+    "total_terminated" => $row1["total_terminated"]
 );
 
 echo $json = json_encode($json_data);

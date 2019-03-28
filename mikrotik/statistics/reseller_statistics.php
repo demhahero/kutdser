@@ -98,8 +98,8 @@ $(document).ready(function () {
               +'</tr>');
         ////////////////////////// add total terminated, new and transfer orders
           $("#totalTable").append('<tr>'
-              +'<td colspan="2" class="bg-default"> </td>'
-              +'<td class="bg-default">'+''+'</td>'
+              +'<td colspan="2" class="bg-default">Total terminated orders </td>'
+              +'<td class="bg-default">'+data.total_terminated+'</td>'
               +'<td  class="bg-default">Total New Orders</td>'
               +'<td class="bg-default">'+data.total_new+'</td>'
               +'<td colspan="2" class="bg-default">Total Transfer Orders</td>'
