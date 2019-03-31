@@ -123,7 +123,6 @@ else if (isset($_GET["order_id"]) && isset($_GET['do']) == "product_list") {
         "email" => "",
         "note" => "",
         "end_of_suspension" => "",
-        "transfer_to_reseller" => "",
             //"product_title"=>"",
             //"product_category"=>"",
             //"product_subscription_type"=>"",
@@ -154,7 +153,6 @@ else if (isset($_GET["order_id"]) && isset($_GET['do']) == "product_list") {
         "phone" => "",
         "email" => "",
         "end_of_suspension" => "",
-        "transfer_to_reseller" => "",
     );
 
     if (!isset($_POST["product_id"])) {

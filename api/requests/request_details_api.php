@@ -268,28 +268,7 @@ if(isset($_POST["post_action"]))
                     $excute_failed=1;
                   }
               }
-              else if ($_POST["action"] === "transfer_to_reseller" && $_POST["verdict"] === "approve"){
-                $param_value1=$_POST['transfer_to_reseller'];
-                $param_value2=$_POST["customer_id"];
-                $query_update_request = "UPDATE `customers` set `reseller_id`=?"
-                          . " WHERE `customer_id`=?";
-
-                  $stmt2 = $dbTools->getConnection()->prepare($query_update_request);
-
-                  $stmt2->bind_param('ss',
-                                    $param_value1,
-                                    $param_value2);
-
-
-                  $stmt2->execute();
-
-                  if ($stmt2->errno!=0) {
-                    /// $excute_failed
-                    print_r($stmt2);
-                    exit();
-                    $excute_failed=1;
-                  }
-              }
+              
 
               $verdict_date = new DateTime();
 

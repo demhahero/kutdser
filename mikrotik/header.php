@@ -190,6 +190,7 @@ if (!@include_once "../../api/dbconfig.php")
                                         <ul class="nav child_menu">
                                             <li><a href="<?= $site_url ?>/create_customer.php">Create Reseller</a></li>
                                             <li><a href="<?= $site_url ?>/customers/resellers.php">Resellers</a></li>
+                                            <li><a href="<?= $site_url ?>/customers/customers_transfer.php">Customers Transfer</a></li>
                                             <li><a href="<?= $site_url ?>/reseller_requests/reseller_requests.php">Requests<span class="blink total_reseller_request_sent"></span></a></li>
                                             <li><a href="<?= $site_url ?>/custom_invoice.php">Custom Invoice</a></li>
                                             <li><a href="<?= $site_url ?>/custom_statement.php">Custom Statement</a></li>
