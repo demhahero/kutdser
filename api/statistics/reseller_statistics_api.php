@@ -26,7 +26,7 @@ $year=(isset($_POST["year"])?$_POST["year"]:1990);
 
 $month=(isset($_POST["month"])?$_POST["month"]:1);
 
-$sqlTot="SELECT `subtotal`.*,
+$sqlTot="SELECT DISTINCT `subtotal`.*,
 `twt`.`total_with_tax`,
 `cba`.`commission_base_amount`,
 (`cba`.`commission_base_amount`*(IF(`order_options`.`reseller_commission_percentage`=-1,`resellers`.`reseller_commission_percentage`,`order_options`.`reseller_commission_percentage`)/100)) AS `monthly_commission`,
@@ -50,7 +50,7 @@ INNER JOIN (SELECT `order_id`, `customer_id`,sum(IF(`invoices`.`invoice_type_id`
 ) AS `twt` ON `twt`.`order_id` = `subtotal`.`order_id`
 
 INNER JOIN (SELECT sum(IF(`invoices`.`invoice_type_id`=0,`invoice_items`.`item_duration_price`*-1,`invoice_items`.`item_duration_price`)) AS 'commission_base_amount', `order_id`,`customer_id`
-  FROM `invoices` INNER JOIN `invoice_items` ON `invoice_items`.`invoice_id`=`invoices`.`invoice_id` WHERE `invoice_items`.`item_type` = 'duration' AND `reseller_id` = ?  AND Year(`valid_date_from`)=? and Month(`valid_date_from`)=? GROUP BY `order_id`, `customer_id`
+  FROM `invoices` INNER JOIN `invoice_items` ON `invoice_items`.`invoice_id`=`invoices`.`invoice_id` WHERE  `invoice_items`.`item_name` LIKE '%Product%' AND `reseller_id` = ?  AND Year(`valid_date_from`)=? and Month(`valid_date_from`)=? GROUP BY `order_id`, `customer_id`
 ) AS `cba` ON `cba`.`order_id` = `subtotal`.`order_id`
 INNER JOIN `customers` ON `customers`.`customer_id` = `subtotal`.`customer_id`
 INNER JOIN `order_options` ON `order_options`.`order_id` = `subtotal`.`order_id`
@@ -69,7 +69,7 @@ GROUP_CONCAT(`invoice_types`.`type_name`) AS `type_name`
 ) AS `products_details` ON  `products_details`.`order_id` = `subtotal`.`order_id`
 INNER JOIN (SELECT `customer_id`,
 IF(`merchantref` LIKE '%cache%','Cash on delivery','VISA') AS `payment_method` FROM `merchantrefs` ORDER BY `merchantref` ASC ) AS `payments_method` ON `payments_method`.`customer_id`=`subtotal`.`customer_id`
-LEFT JOIN `customer_active_status` ON `customer_active_status`.`customer_id`= `subtotal`.`customer_id`";
+LEFT JOIN `customer_active_status` ON `customer_active_status`.`customer_id`= `subtotal`.`customer_id` AND `customer_active_status`.`order_id`=`subtotal`.`order_id`";
 
 
 // $sqlTot = "SELECT `subtotal`.*,`twt`.`total_with_tax`,`cba`.`commission_base_amount`,`customers`.`full_name`

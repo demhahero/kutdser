@@ -360,30 +360,67 @@ function moving($dbTools, $postData) {
 
 function recurring($dbTools, $postData, $start, $end) {
 
-  /// check if recuring already exist
-  $suppose_start_recurring_date = new DateTime($end);
-  $suppose_start_recurring_date->add(new DateInterval('P1D'));
-  $sql = "SELECT `invoice_type_id` FROM `invoices`
-        WHERE  `valid_date_from`=?
-        AND `invoices`.`invoice_type_id` = 2
-        AND `invoices`.`customer_id`=?
-        AND `invoices`.`order_id`=?
-        ORDER BY `invoice_id` DESC
-        LIMIT 1";
+    /// check if recuring already exist
+    $suppose_start_recurring_date = new DateTime($end);
+    $suppose_start_recurring_date->add(new DateInterval('P1D'));
+    $sql = "SELECT `invoice_type_id` FROM `invoices`
+          WHERE  `valid_date_from`=?
+          AND `invoices`.`invoice_type_id` = 2
+          AND `invoices`.`customer_id`=?
+          AND `invoices`.`order_id`=?
+          ORDER BY `invoice_id` DESC
+          LIMIT 1";
 
-  $stmt_product = $dbTools->getConnection()->prepare($sql);
-  $param1 = $suppose_start_recurring_date->format("Y-m-d");
-  $param2 = $postData["customer_id"];
-  $param3 = $postData["order_id"];
-  $stmt_product->bind_param('sss', $param1, $param2, $param3);
-  $stmt_product->execute();
+    $stmt_product = $dbTools->getConnection()->prepare($sql);
+    $param1 = $suppose_start_recurring_date->format("Y-m-d");
+    $param2 = $postData["customer_id"];
+    $param3 = $postData["order_id"];
+    $stmt_product->bind_param('sss', $param1, $param2, $param3);
+    $stmt_product->execute();
 
-  $result_product = $stmt_product->get_result();
-  $hasValue = FALSE;
-  while ($product = $dbTools->fetch_assoc($result_product)) {
-      //already has recuring in this month
-      return FALSE; //FALSE;
-  }
+    $result_product = $stmt_product->get_result();
+    $hasValue = FALSE;
+    while ($product = $dbTools->fetch_assoc($result_product)) {
+        //already has recuring in this month
+        return FALSE; //FALSE;
+    }
+    /// check if during the first period after start active date
+    $suppose_start_recurring_date = new DateTime($end);
+    $suppose_start_recurring_date->add(new DateInterval('P1D'));
+    $sql_ = "SELECT `invoice_type_id`,`valid_date_from`,`valid_date_to` FROM `invoices`
+          WHERE `invoices`.`customer_id`=?
+          AND `invoices`.`order_id`=?
+          ORDER BY `invoice_id` DESC
+          LIMIT 1";
+
+    $stmt_ = $dbTools->getConnection()->prepare($sql_);
+    $param1 = $postData["customer_id"];
+    $param2 = $postData["order_id"];
+    $stmt_->bind_param('ss', $param1, $param2);
+    $stmt_->execute();
+
+    $result_ = $stmt_->get_result();
+    while ($invoice_ = $dbTools->fetch_assoc($result_)) {
+      if($invoice_["invoice_type_id"]==1)
+      {
+        $new_order_valid_from=new DateTime($invoice_["valid_date_from"]);
+        $new_order_valid_to=new DateTime($invoice_["valid_date_to"]);
+        $end_recurring_date_=new DateTime($end);
+
+        if($new_order_valid_to->format("Y-m-d")>$end_recurring_date_->format("Y-m-d"))
+        {
+          // don't add recurring as this means new order paid for remaining_days plus one month
+          // and we want to let him pay again as recuring for the month
+          return FALSE;
+        }
+        else if($new_order_valid_to->format("Y-m-d") ==$end_recurring_date_->format("Y-m-d"))
+        {
+          $start=$new_order_valid_from->format("Y-m-d");
+        }
+
+      }
+
+    }
 
     /// get last product price
     $sql = "SELECT `invoice_type_id`,`product_price` FROM `invoices`
@@ -413,6 +450,8 @@ function recurring($dbTools, $postData, $start, $end) {
 
         $product_price = $product["product_price"];
     }
+
+
     if ($product_price < 0) {
 
         return FALSE; // already terminated because doesn't have any invoice int this month
