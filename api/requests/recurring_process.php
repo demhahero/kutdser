@@ -1,6 +1,8 @@
 <?php
 include_once "./insert_invoice_function.php";
-  include_once "../dbconfig.php";
+include "../db_credentials.php";
+include "../tools/DBTools.php";
+$dbTools = new DBTools($servername,$dbusername,$dbpassword,$dbname);
 
 
   $query="SELECT
