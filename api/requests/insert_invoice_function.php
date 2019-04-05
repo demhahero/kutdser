@@ -364,7 +364,7 @@ function recurring($dbTools, $postData, $start, $end) {
     $suppose_start_recurring_date = new DateTime($end);
     $suppose_start_recurring_date->add(new DateInterval('P1D'));
     $sql = "SELECT `invoice_type_id` FROM `invoices`
-          WHERE  `valid_date_from`=?
+          WHERE  date(`valid_date_from`)=?
           AND `invoices`.`invoice_type_id` = 2
           AND `invoices`.`customer_id`=?
           AND `invoices`.`order_id`=?

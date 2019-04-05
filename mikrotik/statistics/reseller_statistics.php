@@ -12,71 +12,70 @@ if(isset($_GET["reseller_id"]))
 
 <script>
 $(document).ready(function () {
-    $('.dataTables_empty').html('<div class="loader"></div>');
-    var data_id={
-      reseller_id:<?=$reseller_id?>,
-      year:<?=$year?>,
-      month:<?=$month?>
-    };
-    var table2=$('#myTable2').DataTable({
-        "bProcessing": true,
-        "serverSide": true,
-        "scrollX": true,   // enables horizontal scrolling
-        "createdRow": function ( row, data, index ) {
-          //console.log(row);
-          //console.log(data);
-          //console.log(index);
-          $('td', row).eq(6).addClass('bg-success');
-          $('td', row).eq(8).addClass('bg-warning');
-          $('td', row).eq(9).addClass('bg-danger');
-        },
-        "ajax": {
-            url: "<?= $api_url ?>statistics/reseller_statistics_api.php", // json datasource
-            type: "post", // type of method  , by default would be get
-            data:data_id,
-            "dataSrc": function ( json ) {
-
-                return json.data;
+      $('.dataTables_empty').html('<div class="loader"></div>');
+      var data_id={
+        reseller_id:<?=$reseller_id?>,
+        year:<?=$year?>,
+        month:<?=$month?>
+      };
+      var table2=$('#myTable2').DataTable({
+          "bProcessing": true,
+          "serverSide": true,
+          "scrollX": true,   // enables horizontal scrolling
+          "createdRow": function ( row, data, index ) {
+            //console.log(row);
+            //console.log(data);
+            //console.log(index);
+            $('td', row).eq(6).addClass('bg-success-temp');
+            $('td', row).eq(8).addClass('bg-warning-temp');
+            $('td', row).eq(9).addClass('bg-danger-temp');
+          },
+          "ajax":
+          {
+              url: "<?= $api_url ?>statistics/reseller_statistics_api.php", // json datasource
+              type: "post", // type of method  , by default would be get
+              data:data_id,
+              "dataSrc": function ( json )
+              {
+                  return json.data;
               },
-            error: function () {  // error handling code
-                $("#myTable2").css("display", "none");
-            }
-        }
-    });
-    $( "#myTable2 tbody" ).on( "click", ".change_commission", function() {
+              error: function ()
+              {  // error handling code
+                  $("#myTable2").css("display", "none");
+              }
+          }
+      });
+      $( "#myTable2 tbody" ).on( "click", ".change_commission", function()
+      {
         $('#change_commission').modal({show:true});
         var order_id = $(this).attr('data-id');
         var reseller_commission_percentage = $(this).attr('data-id-2');
         $("input[name=\"order_id\"]").val(order_id);
         $("input[name=\"reseller_commission_percentage\"]").val(reseller_commission_percentage);
-
       });
 
       //////////////// form post for reseller commission percentage
       $( ".update-form" ).submit(function( event ) {
           event.preventDefault();
-
           var order_id=$("input[name=\"order_id\"]").val();
           var reseller_commission_percentage=$("input[name=\"reseller_commission_percentage\"]").val();
           $.post("<?= $api_url ?>statistics/update_order_reseller_commission_percentage_api.php",
-                  {
-                    "action":"update_order_reseller_commission_percentage",
-                    "edit_id":order_id,
-                    "reseller_commission_percentage": reseller_commission_percentage
-                  }
+            {
+              "action":"update_order_reseller_commission_percentage",
+              "edit_id":order_id,
+              "reseller_commission_percentage": reseller_commission_percentage
+            }
           , function (data, status) {
               data = $.parseJSON(data);
               if (data && data.updated == true) {
                   alert("Record updated");
                   $('#change_commission').modal("hide");
-
                   table2.ajax.reload();
               } else
               {
                 alert("Error: udpate record failed, try again later");
                 $('#change_commission').modal("hide");
               }
-
           });
         });
       ///////////////// end form post
@@ -85,30 +84,54 @@ $(document).ready(function () {
               data_id
       , function (data, status) {
           data = $.parseJSON(data);
-          ////////////// add total prices for Commission base, all orders with tax and subtotal
-          $("#totalTable").html('<tr>'
-              +'<td  class="bg-default">Commission Base Amount </td>'
-              +'<td class="bg-default">'+data.commission_base_amount+'$</td>'
-              +'<td  class="bg-success">Monthly commission </td>'
-              +'<td class="bg-success">'+data.monthly_commission+'$</td>'
-              +'<td  class="bg-warning">Total Price for subtotal</td>'
-              +'<td class="bg-warning">'+data.subtotal+'$</td>'
-              +'<td  class="bg-danger">Total Price for all orders With Tax</td>'
-              +'<td class="bg-danger">'+data.total_with_tax+'$</td>'
-              +'</tr>');
-        ////////////////////////// add total terminated, new and transfer orders
-          $("#totalTable").append('<tr>'
-              +'<td colspan="2" class="bg-default">Total terminated orders </td>'
-              +'<td class="bg-default">'+data.total_terminated+'</td>'
-              +'<td  class="bg-default">Total New Orders</td>'
-              +'<td class="bg-default">'+data.total_new+'</td>'
-              +'<td colspan="2" class="bg-default">Total Transfer Orders</td>'
-              +'<td class="bg-default">'+data.total_transfer+'</td>'
-              +'</tr>');
-          });
+        ////////////// add total prices for Commission base, all orders with tax and subtotal
+        $("#totalTable").html('<tr>'
+            +'<td  class="bg-default">Commission Base Amount </td>'
+            +'<td class="bg-default">'+data.commission_base_amount+'$</td>'
+            +'<td  class="bg-success-temp">Monthly commission </td>'
+            +'<td class="bg-success-temp">'+data.monthly_commission+'$</td>'
+            +'<td  class="bg-warning-temp">Total Price for subtotal</td>'
+            +'<td class="bg-warning-temp">'+data.subtotal+'$</td>'
+            +'<td  class="bg-danger-temp">Total Price for all orders With Tax</td>'
+            +'<td class="bg-danger-temp">'+data.total_with_tax+'$</td>'
+            +'</tr>');
+      ////////////////////////// add total terminated, new and transfer orders
+        $("#totalTable").append('<tr>'
+            +'<td colspan="2" class="bg-default">Total terminated orders </td>'
+            +'<td class="bg-default">'+data.total_terminated+'</td>'
+            +'<td  class="bg-default">Total New Orders</td>'
+            +'<td class="bg-default">'+data.total_new+'</td>'
+            +'<td colspan="2" class="bg-default">Total Transfer Orders</td>'
+            +'<td class="bg-default">'+data.total_transfer+'</td>'
+            +'</tr>');
+
+        $("#totalTable").append('<tr>'
+            +'<td colspan="2" class="bg-default">Total terminated orders per month </td>'
+            +'<td class="bg-default">'+data.total_terminated_per_month+'</td>'
+            +'<td  class="bg-default">Total New Orders per month</td>'
+            +'<td class="bg-default">'+data.total_new_per_month+'</td>'
+            +'<td colspan="2" class="bg-default">Total Transfer Orders per month</td>'
+            +'<td class="bg-default">'+data.total_transfer_per_month+'</td>'
+            +'</tr>');
+        });
 });
 </script>
+<style>
+.bg-success-temp{
+  background-color: #000000;
+  color:#FFFFFF;
+}
+.bg-warning-temp{
+  background-color: #0f0690;
+  color:#FFFFFF;
+}
+.bg-danger-temp{
+  background-color: #fbf06e;
+  color:#000000;
+}
 
+
+</style>
 <title>Reseller Statistics</title>
 <div class="page-header">
     <a href="customers.php">Customers</a>
