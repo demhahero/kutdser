@@ -390,23 +390,18 @@ function recurring($dbTools, $postData, $start, $end) {
     $sql_ = "SELECT `invoice_type_id`,`valid_date_from`,`valid_date_to` FROM `invoices`
           WHERE `invoices`.`customer_id`=?
           AND `invoices`.`order_id`=?
-          ORDER BY `invoice_id` DESC
-          LIMIT 1";
+          AND `invoices`.`invoice_type_id`=1";
 
     $stmt_ = $dbTools->getConnection()->prepare($sql_);
     $param1 = $postData["customer_id"];
     $param2 = $postData["order_id"];
     $stmt_->bind_param('ss', $param1, $param2);
     $stmt_->execute();
-
     $result_ = $stmt_->get_result();
     while ($invoice_ = $dbTools->fetch_assoc($result_)) {
-      if($invoice_["invoice_type_id"]==1)
-      {
         $new_order_valid_from=new DateTime($invoice_["valid_date_from"]);
         $new_order_valid_to=new DateTime($invoice_["valid_date_to"]);
         $end_recurring_date_=new DateTime($end);
-
         if($new_order_valid_to->format("Y-m-d")>$end_recurring_date_->format("Y-m-d"))
         {
           // don't add recurring as this means new order paid for remaining_days plus one month
@@ -418,10 +413,9 @@ function recurring($dbTools, $postData, $start, $end) {
           $start=$new_order_valid_from->format("Y-m-d");
         }
 
-      }
+
 
     }
-
     /// get last product price
     $sql = "SELECT `invoice_type_id`,`product_price` FROM `invoices`
           WHERE  (`valid_date_from`>=? AND `valid_date_from`<=?)
