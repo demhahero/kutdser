@@ -143,6 +143,17 @@ function terminateMonthly($dbTools, $postData) {
 
     $customer_id = $postData["customer_id"];
     $order_id = $postData["order_id"];
+
+    ///// get start active date to check if terminated before start active
+    $query_active_date="SELECT * FROM `customer_active_status` WHERE `customer_id` = ?";
+    $stmt_active_date = $dbTools->getConnection()->prepare($query_active_date);
+    $param1 = $customer_id;
+    $stmt_active_date->bind_param('s', $param1);
+    $stmt_active_date->execute();
+    $result_active_date = $stmt_active_date->get_result();
+    $active_date = $dbTools->fetch_assoc($result_active_date);
+
+    /// get action on date for this request
     $request = "SELECT `action_on_date` FROM `requests` WHERE `request_id`=?";
     $stmt_request = $dbTools->getConnection()->prepare($request);
     $param1 = $postData["request_id"];
@@ -152,6 +163,15 @@ function terminateMonthly($dbTools, $postData) {
     $result_request = $stmt_request->get_result();
     $request = $dbTools->fetch_assoc($result_request);
     $postData["action_on_date"] = $request["action_on_date"];
+
+    // check if terminate action on date is before  start active date
+    $start_active_date=new DateTime($active_date["start_active_date"]);
+    $action_on_date=new DateTime($postData["action_on_date"]);
+    if($start_active_date>$action_on_date)
+    {
+      // if yes then change action on date for terminate to same date as start active date
+      $postData["action_on_date"]=$active_date["start_active_date"];
+    }
     $previous_invoice_query = "SELECT *,DATEDIFF(`valid_date_to`,`valid_date_from`) AS `duration` FROM `invoices` WHERE `invoice_type_id` in (1,2,3) AND `customer_id`=? ORDER BY `valid_date_from` DESC LIMIT 1";
     $stmt1 = $dbTools->getConnection()->prepare($previous_invoice_query);
     $stmt1->bind_param('s', $customer_id);
@@ -240,7 +260,7 @@ function terminateMonthly($dbTools, $postData) {
     $param2 = $new_valid_date_from->format('Y-m-d');
     $param3 = $new_valid_date_to->format('Y-m-d');
     $param4 = $order_id;
-    $param5 = $postData["product_price"];
+    $param5 = 0;
     $param6 = $postData["reseller_id"];
     $stmt3->bind_param('ssssss', $param1, $param2, $param3, $param4, $param5, $param6);
     $stmt3->execute();
@@ -248,6 +268,7 @@ function terminateMonthly($dbTools, $postData) {
     if ($stmt3->insert_id > 0) {
         $invoice_id = $stmt3->insert_id;
     } else {
+
         return false;
     }
     $total = (double) $fees_charged;

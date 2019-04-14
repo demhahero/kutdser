@@ -11,7 +11,7 @@ $params = $_REQUEST;
 //define index of column
 $columns = array(
     0 => 'order_id',
-    1 => 'customer_id',
+    1 => 'full_name',
     2 => 'commission_base_amount',
     3 => 'subtotal',
     4 => 'total_with_tax',
@@ -63,7 +63,7 @@ GROUP_CONCAT(date(`invoices`.`valid_date_from`)) AS `valid_date_from`
 
   FROM `invoices`
   INNER JOIN `invoice_items` ON `invoice_items`.`invoice_id`=`invoices`.`invoice_id`
-  WHERE `invoice_items`.`item_name` LIKE '%Product%' AND `reseller_id` = ?  AND Year(`valid_date_from`)=? and Month(`valid_date_from`)=? GROUP BY `order_id`,`customer_id`
+  WHERE (`invoice_items`.`item_name` LIKE '%Product%' OR `invoice_items`.`item_name` LIKE '%Refund%') AND `reseller_id` = ?  AND Year(`valid_date_from`)=? and Month(`valid_date_from`)=? GROUP BY `order_id`,`customer_id`
 ) AS `products_details` ON  `products_details`.`order_id` = `subtotal`.`order_id`
 LEFT JOIN (
   SELECT
