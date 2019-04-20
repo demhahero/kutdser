@@ -58,6 +58,7 @@ include_once "../header.php";
     <th style="width: 15%">Date</th>
     <th style="width: 5%">Status</th>
     <th style="width: 10%">Print</th>
+    <th style="width: 10%">Print Invoice</th>
 </thead>
 <tbody>
 </tbody>

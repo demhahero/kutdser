@@ -119,6 +119,8 @@ while ($row = mysqli_fetch_array($queryRecords)) {
     $data[5] = $row['status'];
     $data[6] = '<a target="_blank" href="' . $api_url . 'print/print_order.php?order_id='
             . $row['order_id'] . '" class="btn btn-primary btn-xs"><i class="fa fa-print"></i> Print </a>';
+    $data[7] = '<a target="_blank" href="' . $api_url . 'print/print_order_test.php?order_id='
+            . $row['order_id'] . '" class="btn btn-primary btn-xs"><i class="fa fa-print"></i> Print </a>';
     $all_data[] = $data;
 }
 
