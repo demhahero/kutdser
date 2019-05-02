@@ -52,7 +52,6 @@ INNER JOIN (SELECT `order_id`, `customer_id`,sum(IF(`invoices`.`invoice_type_id`
 INNER JOIN (SELECT sum(IF(`invoices`.`invoice_type_id`=0,`invoice_items`.`item_duration_price`*-1,`invoice_items`.`item_duration_price`)) AS 'commission_base_amount', `order_id`,`customer_id`
   FROM `invoices` INNER JOIN `invoice_items` ON `invoice_items`.`invoice_id`=`invoices`.`invoice_id` WHERE  (`invoice_items`.`item_name` LIKE '%Product%' OR `invoice_items`.`item_name` LIKE '%Refund%') AND `reseller_id` = ?  AND Year(`valid_date_from`)=? and Month(`valid_date_from`)=? GROUP BY `order_id`, `customer_id`
 ) AS `cba` ON `cba`.`order_id` = `subtotal`.`order_id`
-INNER JOIN `customers` ON `customers`.`customer_id` = `subtotal`.`customer_id`
 INNER JOIN `order_options` ON `order_options`.`order_id` = `subtotal`.`order_id`
 INNER JOIN `customers` AS `resellers` ON `resellers`.`customer_id` = ?
 INNER JOIN (
@@ -83,7 +82,9 @@ SELECT `invoices`.`invoice_id`, `order_id`,`customer_id`,`invoice_types`.`type_n
 ) AS `types_details` ON  `types_details`.`order_id` = `subtotal`.`order_id`
 INNER JOIN (SELECT `customer_id`,
 IF(`merchantref` LIKE '%cache%','Cash on delivery','VISA') AS `payment_method` FROM `merchantrefs` ORDER BY `merchantref` ASC ) AS `payments_method` ON `payments_method`.`customer_id`=`subtotal`.`customer_id`
-LEFT JOIN `customer_active_status` ON `customer_active_status`.`customer_id`= `subtotal`.`customer_id` AND `customer_active_status`.`order_id`=`subtotal`.`order_id`";
+LEFT JOIN `customer_active_status` ON `customer_active_status`.`customer_id`= `subtotal`.`customer_id` AND `customer_active_status`.`order_id`=`subtotal`.`order_id`
+RIGHT JOIN `customers` ON `customers`.`customer_id` = `subtotal`.`customer_id`
+WHERE `customers`.`reseller_id`=?";
 
 
 // $sqlTot = "SELECT `subtotal`.*,`twt`.`total_with_tax`,`cba`.`commission_base_amount`,`customers`.`full_name`
@@ -136,7 +137,7 @@ $stmt = $dbTools->getConnection()->prepare($sqlTot);
 if (isset($where) && $where != '') {
   $search_value="%".$params['search']['value']."%";
 
-$stmt->bind_param('sssssssssssssssssssss',
+$stmt->bind_param('ssssssssssssssssssssss',
                   $reseller_id,
                   $year,
                   $month,
@@ -153,6 +154,7 @@ $stmt->bind_param('sssssssssssssssssssss',
                   $reseller_id,
                   $year,
                   $month,
+                  $reseller_id,
                   $search_value,
                   $search_value,
                   $search_value,
@@ -162,7 +164,7 @@ $stmt->bind_param('sssssssssssssssssssss',
 }
 else{
 
-  $stmt->bind_param('ssssssssssssssss',
+  $stmt->bind_param('sssssssssssssssss',
                     $reseller_id,
                     $year,
                     $month,
@@ -178,7 +180,8 @@ else{
                   $month,
                   $reseller_id,
                   $year,
-                  $month);
+                  $month,
+                $reseller_id);
 }
 
 $stmt->execute();
@@ -194,7 +197,7 @@ $stmt1 = $dbTools->getConnection()->prepare($sqlRec);
 
 if (isset($where) && $where != '') {
   $search_value="%".$params['search']['value']."%";
-$stmt1->bind_param('sssssssssssssssssssss',
+$stmt1->bind_param('ssssssssssssssssssssss',
                   $reseller_id,
                   $year,
                   $month,
@@ -211,6 +214,7 @@ $stmt1->bind_param('sssssssssssssssssssss',
                   $reseller_id,
                   $year,
                   $month,
+                  $reseller_id,
                   $search_value,
                   $search_value,
                   $search_value,
@@ -219,7 +223,7 @@ $stmt1->bind_param('sssssssssssssssssssss',
 
 }
 else{
-  $stmt1->bind_param('ssssssssssssssss',
+  $stmt1->bind_param('sssssssssssssssss',
   $reseller_id,
   $year,
   $month,
@@ -235,7 +239,8 @@ else{
   $month,
   $reseller_id,
   $year,
-  $month);
+  $month,
+  $reseller_id);
 }
 
 

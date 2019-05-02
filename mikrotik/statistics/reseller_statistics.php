@@ -12,6 +12,10 @@ if(isset($_GET["reseller_id"]))
 
 <script>
 $(document).ready(function () {
+  $("#exportToExcel").click(function(){
+        var get_data="?reseller_id=<?=$reseller_id?>&year=<?=$year?>&month=<?=$month?>";
+        window.open('<?= $api_url ?>statistics/reseller_statistics_export_api.php'+get_data, '_blank');
+      });
       $('.dataTables_empty').html('<div class="loader"></div>');
       var data_id={
         reseller_id:<?=$reseller_id?>,
@@ -169,6 +173,7 @@ $(document).ready(function () {
     <input type="submit" class="btn btn-default" value="Search">
 </form>
 
+<button id="exportToExcel" class="btn btn-success">Export to excel</button>
 <table id="myTable2" class="display table table-striped table-bordered">
     <thead>
       <th style="width:50px">ID</th>
