@@ -15,9 +15,9 @@ function changeSpeedMonthly($dbTools, $postData) {
     $result_request = $stmt_request->get_result();
     $request = $dbTools->fetch_assoc($result_request);
     $postData["action_on_date"] = $request["action_on_date"];
-    $previous_invoice_query = "SELECT *,DATEDIFF(`valid_date_to`,`valid_date_from`) AS `duration` FROM `invoices` WHERE `invoice_type_id` in (1,2,3) AND `customer_id`=? ORDER BY `valid_date_from` DESC LIMIT 1";
+    $previous_invoice_query = "SELECT *,DATEDIFF(`valid_date_to`,`valid_date_from`) AS `duration` FROM `invoices` WHERE `invoice_type_id` in (1,2,3) AND `customer_id`=? AND `order_id`=? ORDER BY `valid_date_from` DESC LIMIT 1";
     $stmt1 = $dbTools->getConnection()->prepare($previous_invoice_query);
-    $stmt1->bind_param('s', $customer_id);
+    $stmt1->bind_param('ss', $customer_id,$order_id);
     $stmt1->execute();
     $result1 = $stmt1->get_result();
     //there is must be at least one invoice as the initial one is new order must be found before make request
@@ -172,9 +172,9 @@ function terminateMonthly($dbTools, $postData) {
       // if yes then change action on date for terminate to same date as start active date
       $postData["action_on_date"]=$active_date["start_active_date"];
     }
-    $previous_invoice_query = "SELECT *,DATEDIFF(`valid_date_to`,`valid_date_from`) AS `duration` FROM `invoices` WHERE `invoice_type_id` in (1,2,3) AND `customer_id`=? ORDER BY `valid_date_from` DESC LIMIT 1";
+    $previous_invoice_query = "SELECT *,DATEDIFF(`valid_date_to`,`valid_date_from`) AS `duration` FROM `invoices` WHERE `invoice_type_id` in (1,2,3) AND `customer_id`=? AND `order_id`=? ORDER BY `valid_date_from` DESC LIMIT 1";
     $stmt1 = $dbTools->getConnection()->prepare($previous_invoice_query);
-    $stmt1->bind_param('s', $customer_id);
+    $stmt1->bind_param('ss', $customer_id,$order_id);
     $stmt1->execute();
     $result1 = $stmt1->get_result();
     //there is must be at least one invoice as the initial one is new order must be found before make request
@@ -873,9 +873,9 @@ function changeSpeedYearly($dbTools, $postData) {
     $result_request = $stmt_request->get_result();
     $request = $dbTools->fetch_assoc($result_request);
     $postData["action_on_date"] = $request["action_on_date"];
-    $previous_invoice_query = "SELECT *,DATEDIFF(`valid_date_to`,`valid_date_from`) AS `duration` FROM `invoices` WHERE `invoice_type_id` in (1,2,3) AND `customer_id`=? ORDER BY `valid_date_from` DESC LIMIT 1";
+    $previous_invoice_query = "SELECT *,DATEDIFF(`valid_date_to`,`valid_date_from`) AS `duration` FROM `invoices` WHERE `invoice_type_id` in (1,2,3) AND `customer_id`=? AND `order_id`=? ORDER BY `valid_date_from` DESC LIMIT 1";
     $stmt1 = $dbTools->getConnection()->prepare($previous_invoice_query);
-    $stmt1->bind_param('s', $customer_id);
+    $stmt1->bind_param('ss', $customer_id,$order_id);
     $stmt1->execute();
     $result1 = $stmt1->get_result();
     //there is must be at least one invoice as the initial one is new order must be found before make request
@@ -1017,9 +1017,9 @@ function terminateYearly($dbTools, $postData) {
     $result_request = $stmt_request->get_result();
     $request = $dbTools->fetch_assoc($result_request);
     $postData["action_on_date"] = $request["action_on_date"];
-    $previous_invoice_query = "SELECT *,DATEDIFF(`valid_date_to`,`valid_date_from`) AS `duration` FROM `invoices` WHERE `invoice_type_id` in (1,2,3) AND `customer_id`=? ORDER BY `valid_date_from` DESC LIMIT 1";
+    $previous_invoice_query = "SELECT *,DATEDIFF(`valid_date_to`,`valid_date_from`) AS `duration` FROM `invoices` WHERE `invoice_type_id` in (1,2,3) AND `customer_id`=? AND `order_id`=? ORDER BY `valid_date_from` DESC LIMIT 1";
     $stmt1 = $dbTools->getConnection()->prepare($previous_invoice_query);
-    $stmt1->bind_param('s', $customer_id);
+    $stmt1->bind_param('ss', $customer_id,$order_id);
     $stmt1->execute();
     $result1 = $stmt1->get_result();
     //there is must be at least one invoice as the initial one is new order must be found before make request
