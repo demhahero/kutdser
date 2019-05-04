@@ -2,6 +2,7 @@
 include_once "../header.php";
 $reseller_id=0;
 $dateNow=new DateTime();
+$dateNow->sub(new DateInterval('P1M'));
 $year=(isset($_GET["year"])?$_GET["year"]:$dateNow->format("Y"));
 $month=(isset($_GET["month"])?$_GET["month"]:$dateNow->format("m"));
 if(isset($_GET["reseller_id"]))
@@ -83,12 +84,25 @@ $(document).ready(function () {
           });
         });
       ///////////////// end form post
+      //// get reseller_name
+      $.post("<?= $api_url ?>statistics/get_reseller_info.php",
+              {
+                "action":"get_reseller_info",
+                "reseller_id":<?=$reseller_id?>
+              }
+      , function (data, status) {
+          data = $.parseJSON(data);
+          page_header=data["resller_info"]["full_name"]+"'s Customers STATISTICS for month <?=$month?> and year <?=$year?>";
+          $(".last").html(page_header);
+        });
+      /// end get resller_name
       // get total values
       $.post("<?= $api_url ?>statistics/reseller_statistics_total_api.php",
               data_id
       , function (data, status) {
           data = $.parseJSON(data);
         ////////////// add total prices for Commission base, all orders with tax and subtotal
+        $('#print_total_commission_base_amount').val(data.monthly_commission);
         $("#totalTable").html('<tr>'
             +'<td  class="bg-default">Commission Base Amount </td>'
             +'<td class="bg-default">'+data.commission_base_amount+'$</td>'
@@ -138,9 +152,9 @@ $(document).ready(function () {
 </style>
 <title>Reseller Statistics</title>
 <div class="page-header">
-    <a href="customers.php">Customers</a>
+    <a href="<?=$site_url?>\resellers.php">Resellers</a>
     <span class="glyphicon glyphicon-play"></span>
-    <a id="customer_full_name" class="last" href=""></a>
+    <a  class="last" href=""></a>
 </div>
 <form class="register-form form-inline" method="get">
     <input name="reseller_id" style="display:none;" value="<?= $_GET["reseller_id"] ?>"/>
@@ -172,7 +186,15 @@ $(document).ready(function () {
     </div>
     <input type="submit" class="btn btn-default" value="Search">
 </form>
-
+<div class="loader"></div>
+<form target="_blank" action="<?= $api_url ?>print/print_statement.php" class="print_form" method="POST">
+  <input name="reseller_id" type="hidden" value="<?= $reseller_id ?>"/>
+  <input name="month" type="hidden" value="<?= $month ?>"/>
+  <input name="year" type="hidden" value="<?= $year ?>"/>
+  <input id="print_total_commission_base_amount" name="total_commission_base_amount" type="hidden" value="0"/>
+  <input type="submit" class="btn btn-success" value="Print Reseller Commission">
+</form>
+<br><br>
 <button id="exportToExcel" class="btn btn-success">Export to excel</button>
 <table id="myTable2" class="display table table-striped table-bordered">
     <thead>

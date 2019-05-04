@@ -17,7 +17,7 @@ FROM
 `twt`.`total_with_tax`,
 `cba`.`commission_base_amount`,
 (`cba`.`commission_base_amount`*(IF(`order_options`.`reseller_commission_percentage`=-1,`resellers`.`reseller_commission_percentage`,`order_options`.`reseller_commission_percentage`)/100)) AS `monthly_commission`,
-`customers`.`full_name`,
+`customer_active_status`.`full_name`,
 `order_options`.`reseller_commission_percentage` AS `customer_commission_percentage`,
 IF(`order_options`.`reseller_commission_percentage`=-1,`resellers`.`reseller_commission_percentage`,`order_options`.`reseller_commission_percentage`) AS `reseller_commission_percentage`,
 `products_details`.`item_name`,
@@ -26,7 +26,7 @@ IF(`order_options`.`reseller_commission_percentage`=-1,`resellers`.`reseller_com
 `types_details`.`type_name`,
 `payment_method`,
 `start_active_date`,
-`cable_subscriber`,
+`status`,
 IF(`order_options`.`cable_subscriber` LIKE 'yes','transfer','new') AS `join_type`
 
 
@@ -40,7 +40,6 @@ INNER JOIN (SELECT `order_id`, `customer_id`,sum(IF(`invoices`.`invoice_type_id`
 INNER JOIN (SELECT sum(IF(`invoices`.`invoice_type_id`=0,`invoice_items`.`item_duration_price`*-1,`invoice_items`.`item_duration_price`)) AS 'commission_base_amount', `order_id`,`customer_id`
   FROM `invoices` INNER JOIN `invoice_items` ON `invoice_items`.`invoice_id`=`invoices`.`invoice_id` WHERE  (`invoice_items`.`item_name` LIKE '%Product%' OR `invoice_items`.`item_name` LIKE '%Refund%') AND `reseller_id` = ?  AND Year(`valid_date_from`)=? and Month(`valid_date_from`)=? GROUP BY `order_id`, `customer_id`
 ) AS `cba` ON `cba`.`order_id` = `subtotal`.`order_id`
-INNER JOIN `customers` ON `customers`.`customer_id` = `subtotal`.`customer_id`
 INNER JOIN `order_options` ON `order_options`.`order_id` = `subtotal`.`order_id`
 INNER JOIN `customers` AS `resellers` ON `resellers`.`customer_id` = ?
 INNER JOIN (
@@ -71,8 +70,9 @@ SELECT `invoices`.`invoice_id`, `order_id`,`customer_id`,`invoice_types`.`type_n
 ) AS `types_details` ON  `types_details`.`order_id` = `subtotal`.`order_id`
 INNER JOIN (SELECT `customer_id`,
 IF(`merchantref` LIKE '%cache%','Cash on delivery','VISA') AS `payment_method` FROM `merchantrefs` ORDER BY `merchantref` ASC ) AS `payments_method` ON `payments_method`.`customer_id`=`subtotal`.`customer_id`
-LEFT JOIN `customer_active_status` ON `customer_active_status`.`customer_id`= `subtotal`.`customer_id` AND `customer_active_status`.`order_id`=`subtotal`.`order_id`
-) AS `statistics`";
+RIGHT JOIN `customer_active_status` ON `customer_active_status`.`customer_id`= `subtotal`.`customer_id` AND `customer_active_status`.`order_id`=`subtotal`.`order_id`
+
+WHERE `customer_active_status`.`reseller_id`=?) AS `statistics`";
 
 $sqlRec = $sqlTot;
 
@@ -83,7 +83,7 @@ mysqli_query($dbTools->getConnection(), "SET CHARACTER SET utf8");
 
 $stmt = $dbTools->getConnection()->prepare($sqlTot);
 
-$stmt->bind_param('ssssssssssssssss',
+$stmt->bind_param('sssssssssssssssss',
                     $reseller_id,
                     $year,
                     $month,
@@ -99,7 +99,8 @@ $stmt->bind_param('ssssssssssssssss',
                     $month,
                     $reseller_id,
                     $year,
-                    $month);
+                    $month,
+                  $reseller_id);
 
 
 $stmt->execute();

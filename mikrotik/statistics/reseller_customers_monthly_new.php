@@ -1,7 +1,13 @@
 <?php
 include_once "../header.php";
-$month=isset($_GET["month"])?$_GET["month"]:5;
-$year=isset($_GET["year"])?$_GET["year"]:2018;
+$reseller_id=0;
+$dateNow=new DateTime();
+$dateNow->sub(new DateInterval('P1M'));
+$year=(isset($_GET["year"])?$_GET["year"]:$dateNow->format("Y"));
+$month=(isset($_GET["month"])?$_GET["month"]:$dateNow->format("m"));
+if(isset($_GET["reseller_id"]))
+  $reseller_id = intval(filter_input(INPUT_GET, 'reseller_id', FILTER_VALIDATE_INT));
+
 ?>
 
 <script>
@@ -85,12 +91,12 @@ $year=isset($_GET["year"])?$_GET["year"]:2018;
 								if(monthInfo["total_price_with_out_router"]<0 && monthInfo["action"]=="terminate")
 								{
 									monthInfo["total_price_with_out_router"]=parseFloat(field["yearlyInvoice"][0]["pricePrevious"]).toFixed(2);
-									
+
 									monthInfo["total_price_with_out_tax"]=parseFloat(monthInfo["total_price_with_out_router"])+82;
 									var qst_tax=parseFloat(monthInfo["total_price_with_out_tax"])*0.09975;
 									var gst_tax=parseFloat(monthInfo["total_price_with_out_tax"])*0.05;
                                     monthInfo["total_price_with_tax_p7"]=parseFloat(parseFloat(monthInfo["total_price_with_out_tax"])+qst_tax+gst_tax).toFixed(2);
-									
+
 									product_title=monthInfo["product_title"]+" for only "+field["yearlyInvoice"][0]["daysPrevious"]+" days";
 								}
 

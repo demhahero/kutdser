@@ -30,7 +30,7 @@ $sqlTot="SELECT DISTINCT `subtotal`.*,
 `twt`.`total_with_tax`,
 `cba`.`commission_base_amount`,
 (`cba`.`commission_base_amount`*(IF(`order_options`.`reseller_commission_percentage`=-1,`resellers`.`reseller_commission_percentage`,`order_options`.`reseller_commission_percentage`)/100)) AS `monthly_commission`,
-`customers`.`full_name`,
+`customer_active_status`.`full_name`,
 `order_options`.`reseller_commission_percentage` AS `customer_commission_percentage`,
 IF(`order_options`.`reseller_commission_percentage`=-1,`resellers`.`reseller_commission_percentage`,`order_options`.`reseller_commission_percentage`) AS `reseller_commission_percentage`,
 `products_details`.`item_name`,
@@ -39,6 +39,7 @@ IF(`order_options`.`reseller_commission_percentage`=-1,`resellers`.`reseller_com
 `types_details`.`type_name`,
 `payment_method`,
 `start_active_date`,
+`status`,
 IF(`order_options`.`cable_subscriber` LIKE 'yes','transfer','new') AS `join_type`
 
 
@@ -82,9 +83,9 @@ SELECT `invoices`.`invoice_id`, `order_id`,`customer_id`,`invoice_types`.`type_n
 ) AS `types_details` ON  `types_details`.`order_id` = `subtotal`.`order_id`
 INNER JOIN (SELECT `customer_id`,
 IF(`merchantref` LIKE '%cache%','Cash on delivery','VISA') AS `payment_method` FROM `merchantrefs` ORDER BY `merchantref` ASC ) AS `payments_method` ON `payments_method`.`customer_id`=`subtotal`.`customer_id`
-LEFT JOIN `customer_active_status` ON `customer_active_status`.`customer_id`= `subtotal`.`customer_id` AND `customer_active_status`.`order_id`=`subtotal`.`order_id`
-RIGHT JOIN `customers` ON `customers`.`customer_id` = `subtotal`.`customer_id`
-WHERE `customers`.`reseller_id`=?";
+RIGHT JOIN `customer_active_status` ON `customer_active_status`.`customer_id`= `subtotal`.`customer_id` AND `customer_active_status`.`order_id`=`subtotal`.`order_id`
+
+WHERE `customer_active_status`.`reseller_id`=?";
 
 
 // $sqlTot = "SELECT `subtotal`.*,`twt`.`total_with_tax`,`cba`.`commission_base_amount`,`customers`.`full_name`
@@ -107,10 +108,10 @@ $sqlRec = $sqlTot;
 
 // check search value exist
 if (!empty($params['search']['value'])) {
-    $where .= " WHERE ";
+    $where .= " AND ";
     $where .= " ( `subtotal`.`order_id` LIKE ? ";
     $where .= " OR `subtotal`.`customer_id` LIKE ? ";
-    $where .= " OR `customers`.`full_name` LIKE ? ";
+    $where .= " OR `customer_active_status`.`full_name` LIKE ? ";
     $where .= " OR `payment_method` LIKE ? ";
     $where .= " OR `type_name` LIKE ? ) ";
 }
@@ -252,7 +253,16 @@ $queryRecords = $result1;
 $all_data=[];
 //iterate on results row and create new index array of data
 while ($row = mysqli_fetch_array($queryRecords)) {
+  $type=$row['type_name'];
 
+  if(is_null($row['type_name']) &&  strpos($row['status'], 'terminate') !== false)
+  {
+    $type="Terminated";
+  }
+  elseif (is_null($row['type_name']) &&  strpos($row['status'], 'active') !== false)
+  {
+    $type="No invoices this month";
+  }
     $data[0] = '<a href="customer_invoices.php?order_id='.$row['order_id'].'&year='.$year.'&month='.$month.'" >'.$row['customer_id'].'</a>';
     $data[1] = $row['full_name'];
     $data[2] = $row['item_name'];
@@ -260,12 +270,12 @@ while ($row = mysqli_fetch_array($queryRecords)) {
     $data[4] = $row['valid_date_from'];
     $data[5] = round((double)$row['commission_base_amount'], 2);
     $data[6] = round((double)$row['monthly_commission'], 2);
-    $data[7] = $row['type_name'];
+    $data[7] = $type;
     $data[8] = round((double)$row['subtotal'], 2);
     $data[9] = round((double)$row['total_with_tax'], 2);
     $data[10] = $row['payment_method'];
-    $data[11] = $row['start_active_date'];
-    $data[12] = $row['join_type'];
+    $data[11] = $row['join_type'];
+    $data[12] = $row['start_active_date'];
     $data[13] = "%".$row['reseller_commission_percentage']
     .'<a data-id="'.$row['order_id'].'" data-id-2="'.$row['customer_commission_percentage'].'" type="button" class="btn btn-danger change_commission" >Change</a>';
     $all_data[] = $data;
