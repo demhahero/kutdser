@@ -95,6 +95,7 @@ while($products_row=$dbToolsReseller->fetch_assoc($products))
                         <a href='' class="product-internet"><img src="<?= $site_url ?>/img/Internet-icon.png" class="img-thumbnail" style="width:150px"/></a>
                         <a href=''  class="product-phone"><img src="<?= $site_url ?>/img/phone-icon.png" class="img-thumbnail" style="width:150px"/></a>
                         <a href=''  class="product-tv"><img src="<?= $site_url ?>/img/tv-icon.png" class="img-thumbnail" style="width:150px"/></a>
+                        <a href=''  class="product-bundles"><img src="<?= $site_url ?>/img/bundles.png" class="img-thumbnail" style="width:150px"/></a>
                     </div>
                 </div>
 
@@ -692,6 +693,48 @@ while($products_row=$dbToolsReseller->fetch_assoc($products))
                         <li class="list-group-item">Tax Fees (QST 9.975%) <span class="badge qst-cost"></span></li>
                         <li class="list-group-item">Tax Fees (GST 5%) <span class="badge gst-cost"></span></li>
                         <li class="list-group-item">Total <span class="badge total"></span></li>
+                    </ul>
+                </div>
+                
+                <div class="bundle_order_details">
+                    <ul class="list-group">
+                        <li class="list-group-item">Product <span class="badge product-name"></span></li>
+                        <li class="list-group-item">Setup fees <span class="badge setup-cost"></span></li>
+                        <li class="list-group-item">Remaining days cost (<span class="remaining-days-from-to"></span>) <span class="badge remaining-days-cost"></span></li>
+                        <li class="list-group-item">Modem cost <span class="badge modem-cost"></span></li>
+                        <li class="list-group-item">Router cost <span class="badge router-cost"></span></li>
+                        <li class="list-group-item">Adapter cost <span class="badge adapter-cost"></span></li>
+                        <li class="list-group-item">Additional Service <span class="badge additional-service-cost"></span></li>
+                        <li class="list-group-item">Static IP <span class="badge static-ip-cost"></span></li>
+                        <li class="list-group-item">Tax Fees (QST 9.975%) <span class="badge qst-cost"></span></li>
+                        <li class="list-group-item">Tax Fees (GST 5%) <span class="badge gst-cost"></span></li>
+                        <li class="list-group-item">Total <span class="badge total"></span></li>
+                        
+                        
+                        <li class="list-group-item">Product <span class="badge phone-product-name"></span></li>
+                        <li class="list-group-item">Setup fees <span class="badge phone-setup-cost"></span></li>
+                        <li class="list-group-item">Remaining days cost (<span class="phone-remaining-days-from-to"></span>) <span class="badge phone-remaining-days-cost"></span></li>
+                        <li class="list-group-item">Modem cost <span class="badge phone-modem-cost"></span></li>
+                        <li class="list-group-item">Router cost <span class="badge phone-router-cost"></span></li>
+                        <li class="list-group-item">Adapter cost <span class="badge phone-adapter-cost"></span></li>
+                        <li class="list-group-item">Additional Service <span class="badge phone-additional-service-cost"></span></li>
+                        <li class="list-group-item">Static IP <span class="badge phone-static-ip-cost"></span></li>
+                        <li class="list-group-item">Tax Fees (QST 9.975%) <span class="badge phone-qst-cost"></span></li>
+                        <li class="list-group-item">Tax Fees (GST 5%) <span class="badge phone-gst-cost"></span></li>
+                        <li class="list-group-item">Total <span class="badge phone-total"></span></li>
+                        
+                        
+                        <li class="list-group-item">Product <span class="badge tv-product-name"></span></li>
+                        <li class="list-group-item">Remaining days cost (<span class="tv-remaining-days-from-to"></span>) <span class="badge tv-remaining-days-cost"></span></li>
+                        <li class="list-group-item">Box price <span class="badge tv-box-price"></span></li>
+                        <li class="list-group-item">Admin Fee <span class="badge tv-admin-fee-price"></span></li>
+                        <span id="add-on-channels">
+                        </span>
+                        <li class="list-group-item">Channels remaining days cost (<span class="tv-remaining-days-from-to"></span>) <span class="badge remaining-days-channels-cost"></span></li>
+
+                        <li class="list-group-item">Tax Fees (QST 9.975%) <span class="tv-badge qst-cost"></span></li>
+                        <li class="list-group-item">Tax Fees (GST 5%) <span class="tv-badge gst-cost"></span></li>
+                        <li class="list-group-item">Total <span class="badge tv-total"></span></li>
                     </ul>
                 </div>
                 <br/>
