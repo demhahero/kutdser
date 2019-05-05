@@ -1040,6 +1040,253 @@ $(document).ready(function () {
             $("div.bundle_order_details span.total").html("$" + total_price.toFixed(2));  
             
 
+
+            
+            //Bundle Phone
+            var total_price = 0;
+            var product_price = 0;
+            var price_of_remainig_days = 0;
+            var adapter_price = 0;
+            var transfer_price = 0;
+            var start_date = ""; // When will the customer join
+            var remainigDays = 0; //Remaining days in the month
+            var value_has_no_tax = 0; // Exclude items that have no tax such as deposits
+            var gst_tax = 0;
+            var qst_tax = 0;
+            var additional_service = 0;
+            var static_ip = 0;
+            var has_discount=false;
+            var free_modem=false;
+            var free_router=false;
+            var free_adapter=false;
+            var free_installation=false;
+            var free_transfer=false;
+
+            //Get product price
+            has_discount = $("div.phone input[name=\"has_discount\"]").val()==='yes';
+            free_modem = $("div.phone input[name=\"free_modem\"]").val()==='yes';
+            free_router = $("div.phone input[name=\"free_router\"]").val()==='yes';
+            free_adapter = $("div.phone input[name=\"free_adapter\"]").val()==='yes';
+            free_installation = $("div.phone input[name=\"free_installation\"]").val()==='yes';
+            free_transfer = $("div.phone input[name=\"free_transfer\"]").val()==='yes';
+
+            //Get product
+            product_price = parseFloat($("div.phone select[name=\"product\"] option:selected").attr("real_price"));
+            if(has_discount)
+              product_price = parseFloat($("div.phone select[name=\"product\"] option:selected").attr("price"));
+
+            //product title
+
+            var title=$("div.phone select[name=\"product\"] option:selected").attr("data_title")+" "+product_price
+            if(has_discount)
+               title=$("div.phone select[name=\"product\"] option:selected").text();
+            //If buy adapter
+            if ($("div.phone input[name=\"options[adapter]\"]:checked").val() == "buy_Cisco_SPA112") {
+                adapter_price = 59.90;
+                if(has_discount && free_adapter)
+                adapter_price=0;
+            }
+            //NOTICE: Have to be changed later
+            //adapter_price = 0;
+
+            //If transfer
+            if ($("div.phone input[name=\"options[you_have_phone_number]\"]:checked").val() == "yes") {
+                transfer_price = 15;
+            }
+
+            //today is the start day
+            start_date = new Date();
+
+            //Calculate the number of days in this month
+            var days_in_month = parseInt(daysInMonth(start_date.getMonth(), start_date.getYear()));
+
+            //Calculate the remaining days in this month
+            remainigDays = days_in_month - start_date.getDate() + 1;
+
+            if (parseInt(start_date.getDate()) == 1) {
+                remainigDays = 0;
+                price_of_remainig_days = 0;
+            } else {
+                //Calculate the price of the remaining days
+                if ($("div.phone select[name=\"product\"] option:selected").text().includes("1 year") != false) { //if yearly payment, divide price by 12 months
+                    //Calculate product for the rest of the month
+                    price_of_remainig_days = parseFloat((product_price / 12) / days_in_month) * remainigDays;
+                } else {
+                    //Calculate product for the rest of the month
+                    price_of_remainig_days = parseFloat(product_price / days_in_month) * remainigDays;
+                }
+            }
+
+            //Calculate total price
+            total_price = product_price + price_of_remainig_days + transfer_price + adapter_price;
+
+            //Calculate texes
+            qst_tax = (total_price - value_has_no_tax) * 0.09975;
+            gst_tax = (total_price - value_has_no_tax) * 0.05;
+
+            //Add taxes to total price
+            total_price += qst_tax + gst_tax;
+
+            //Display price list
+            var monthNames = ["January", "February", "March", "April", "May", "June",
+                "July", "August", "September", "October", "November", "December"
+            ];
+
+            //if first day, don't show remaining days from to
+            if (parseInt(start_date.getDate()) != 1) {
+                $("div.bundle_order_details span.phone-remaining-days-from-to").html("From: " + start_date.getDate() + "/" + monthNames[start_date.getMonth()] + " To " + days_in_month + "/" + monthNames[start_date.getMonth()]);
+            }
+
+            $("div.bundle_order_details span.phone-remaining-days-cost").html("$" + price_of_remainig_days.toFixed(2));
+
+            $("div.bundle_order_details span.phone-setup-cost").html("$" + transfer_price.toFixed(2));
+
+            $("div.bundle_order_details span.phone-adapter-cost").html("$" + adapter_price.toFixed(2));
+
+            $("div.bundle_order_details span.phone-qst-cost").html("$" + qst_tax.toFixed(2));
+
+            $("div.bundle_order_details span.phone-gst-cost").html("$" + gst_tax.toFixed(2));
+
+            $("div.bundle_order_details span.phone-product-name").html(title);
+
+            $("div.bundle_order_details span.phone-total").html("$" + total_price.toFixed(2));
+
+
+
+         
+
+          var total_price = 0;
+          var product_price = 0;
+          var price_of_remainig_days = 0;
+          var price_of_remaining_days_channels = 0;
+          var add_on_channels_price=0;
+          var box_price = 0;
+          var admin_fee = 0;
+          var start_date = ""; // When will the customer join
+          var remainigDays = 0; //Remaining days in the month
+          var value_has_no_tax = 0; // Exclude items that have no tax such as deposits
+          var gst_tax = 0;
+          var qst_tax = 0;
+
+          var has_discount=false;
+          var free_modem=false;
+          var free_router=false;
+          var free_adapter=false;
+          var free_installation=false;
+          var free_transfer=false;
+
+          //Get product price
+          has_discount = $("div.tv input[name=\"has_discount\"]").val()==='yes';
+          free_modem = $("div.tv input[name=\"free_modem\"]").val()==='yes';
+          free_router = $("div.tv input[name=\"free_router\"]").val()==='yes';
+          free_adapter = $("div.tv input[name=\"free_adapter\"]").val()==='yes';
+          free_installation = $("div.tv input[name=\"free_installation\"]").val()==='yes';
+          free_transfer = $("div.tv input[name=\"free_transfer\"]").val()==='yes';
+
+          //Get product
+          product_price = parseFloat($("div.tv select[name=\"product\"] option:selected").attr("real_price"));
+          if(has_discount)
+            product_price = parseFloat($("div.tv select[name=\"product\"] option:selected").attr("price"));
+
+          //product title
+
+          var title=$("div.tv select[name=\"product\"] option:selected").attr("data_title")+" "+product_price
+          if(has_discount)
+             title=$("div.tv select[name=\"product\"] option:selected").text();
+          //If buy adapter
+          if ($("div.tv input[name=\"options[box]\"]:checked").val() == "yes") {
+              box_price = 50;
+              if(has_discount && free_box)
+              box_price=0;
+          }
+          // get add on channels
+          debugger;
+          var add_on_channels=[];
+          $.each($("div.tv select[name=\"options[add_on_channels][]\"]").val(), function( index, value ) {
+
+            var channel = JSON.parse(value);
+            add_on_channels_price+=channel.price;
+            add_on_channels.push(channel);
+          });
+
+          //If transfer
+          if ($("div.tv input[name=\"options[admin_fee]\"]:checked").val() == "yes") {
+              admin_fee = parseFloat($("div.tv input[name=\"options[admin_fee_value]\"]").val());
+          }
+
+          //today is the start day
+          start_date = new Date();
+
+          //Calculate the number of days in this month
+          var days_in_month = parseInt(daysInMonth(start_date.getMonth(), start_date.getYear()));
+
+          //Calculate the remaining days in this month
+          remainigDays = days_in_month - start_date.getDate() + 1;
+
+          if (parseInt(start_date.getDate()) == 1) {
+              remainigDays = 0;
+              price_of_remainig_days = 0;
+              price_of_remaining_days_channels = 0;
+          } else {
+              //Calculate the price of the remaining days
+              if ($("div.tv select[name=\"product\"] option:selected").text().includes("1 year") != false) { //if yearly payment, divide price by 12 months
+                  //Calculate product for the rest of the month
+                  price_of_remainig_days = parseFloat((product_price / 12) / days_in_month) * remainigDays;
+                  $.each(add_on_channels, function( index, channel ) {
+
+                    price_of_remaining_days_channels += parseFloat((channel.price / 12) / days_in_month) * remainigDays;
+                  });
+              } else {
+                  //Calculate product for the rest of the month
+                  price_of_remainig_days = parseFloat(product_price / days_in_month) * remainigDays;
+                  $.each(add_on_channels, function( index, channel ) {
+
+                    price_of_remaining_days_channels += parseFloat(channel.price / days_in_month) * remainigDays;
+                  });
+              }
+          }
+
+          //Calculate total price
+          total_price = product_price+ add_on_channels_price + price_of_remainig_days +price_of_remaining_days_channels + box_price + admin_fee;
+
+          //Calculate texes
+          qst_tax = (total_price - value_has_no_tax) * 0.09975;
+          gst_tax = (total_price - value_has_no_tax) * 0.05;
+
+          //Add taxes to total price
+          total_price += qst_tax + gst_tax;
+
+          //Display price list
+          var monthNames = ["January", "February", "March", "April", "May", "June",
+              "July", "August", "September", "October", "November", "December"
+          ];
+
+          //if first day, don't show remaining days from to
+          if (parseInt(start_date.getDate()) != 1) {
+              $("div.bundle_order_details span.tv-remaining-days-from-to").html("From: " + start_date.getDate() + "/" + monthNames[start_date.getMonth()] + " To " + days_in_month + "/" + monthNames[start_date.getMonth()]);
+          }
+
+          $("div.bundle_order_details span.tv-remaining-days-cost").html("$" + price_of_remainig_days.toFixed(2));
+
+          $("div.bundle_order_details span.tv-box-price").html("$" + box_price.toFixed(2));
+
+          $("div.bundle_order_details span.tv-admin-fee-price").html("$" + admin_fee.toFixed(2));
+          $("div.bundle_order_details span#add-on-channels").html("");
+          $.each(add_on_channels, function( index, channel ) {
+            $("div.tv_order_details span#add-on-channels").append(
+              '<li class="list-group-item">'+channel.text+' <span class="badge">'+channel.price+'</span></li>'
+            )
+            price_of_remaining_days_channels += parseFloat((channel.price / 12) / days_in_month) * remainigDays;
+          });
+          $("div.bundle_order_details span.tv-remaining-days-channels-cost").html("$" + price_of_remaining_days_channels.toFixed(2));
+
+          $("div.bundle_order_details span.tv-qst-cost").html("$" + qst_tax.toFixed(2));
+
+          $("div.bundle_order_details span.tv-gst-cost").html("$" + gst_tax.toFixed(2));
+
+          $("div.bundle_order_details span.tv-product-name").html(title);
+
+          $("div.bundle_order_details span.tv-total").html("$" + total_price.toFixed(2));
       }
     }
 
