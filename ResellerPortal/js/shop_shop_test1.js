@@ -273,6 +273,7 @@ $(document).ready(function () {
         $('#smartwizard').smartWizard("next");
         return false;
     });
+    
     //Select tv product
     $(".product-tv").click(function () {
         product_type = "tv";
@@ -989,15 +990,15 @@ $(document).ready(function () {
             free_installation = $("div.bundle-internet input[name=\"free_installation\"]").val() === 'yes';
             free_transfer = $("div.bundle-internet input[name=\"free_transfer\"]").val() === 'yes';
 
-            product_price = parseFloat($("div.bundle-internet select[name=\"product\"] option:selected").attr("real_price"));
+            product_price = parseFloat($("div.bundle-internet select[name=\"product_internet\"] option:selected").attr("real_price"));
             if (has_discount)
-                product_price = parseFloat($("div.bundle-internet select[name=\"product\"] option:selected").attr("price"));
+                product_price = parseFloat($("div.bundle-internet select[name=\"product_internet\"] option:selected").attr("price"));
 
             //product title
 
-            var title = $("div.bundle-internet select[name=\"product\"] option:selected").attr("data_title") + " " + product_price
+            var title = $("div.bundle-internet select[name=\"product_internet\"] option:selected").attr("data_title") + " " + product_price
             if (has_discount)
-                title = $("div.bundle-internet select[name=\"product\"] option:selected").text();
+                title = $("div.bundle-internet select[name=\"product_internet\"] option:selected").text();
             //If rent modem
             if ($("div.bundle-internet input[name=\"options[inventory_modem_price]\"]").prop('checked') == true)
             {
@@ -1031,7 +1032,7 @@ $(document).ready(function () {
                 additional_service = 5;
 
                 //if yearly, multiply additional+service by 12 months.
-                if ($("div.bundle-internet select[name=\"product\"] option:selected").text().includes("Yearly") != false) {
+                if ($("div.bundle-internet select[name=\"product_internet\"] option:selected").text().includes("Yearly") != false) {
                     additional_service = additional_service * 12;
                 }
             }
@@ -1039,7 +1040,7 @@ $(document).ready(function () {
             if ($("div.bundle-internet input[name=\"options[static_ip]\"]").prop('checked') == true) {
                 static_ip = 20;
                 //if yearly, multiply static ip by 12 months.
-                if ($("div.bundle-internet select[name=\"product\"] option:selected").text().includes("Yearly") != false) {
+                if ($("div.bundle-internet select[name=\"product_internet\"] option:selected").text().includes("Yearly") != false) {
                     static_ip = static_ip * 12;
                 }
 
@@ -1047,10 +1048,10 @@ $(document).ready(function () {
 
             //if NOT yearly payment, check monthly (no contract) for transfer or installation fees.
             //If user selects 60 or 120, then charge him the setup fees anyways.
-            if ($("div.bundle-internet select[name=\"product\"] option:selected").text().includes("Yearly") == false) {
+            if ($("div.bundle-internet select[name=\"product_internet\"] option:selected").text().includes("Yearly") == false) {
                 if ($("div.bundle-internet input[name=\"options[plan]\"]:checked").val() == "monthly"
-                        || $("div.bundle-internet select[name=\"product\"] option:selected").val() == 416
-                        || $("div.bundle-internet select[name=\"product\"] option:selected").val() == 418) {
+                        || $("div.bundle-internet select[name=\"product_internet\"] option:selected").val() == 416
+                        || $("div.bundle-internet select[name=\"product_internet\"] option:selected").val() == 418) {
                     if ($("div.bundle-internet input[name=\"options[cable_subscriber]\"]:checked").val() == "yes")
                     {
                         installation_transfer_cost = 19.90;
@@ -1100,7 +1101,7 @@ $(document).ready(function () {
                 price_of_remainig_days = 0;
             } else {
                 //Calculate the price of the remaining days
-                if ($("div.bundle-internet select[name=\"product\"] option:selected").text().includes("Yearly") != false) { //if yearly payment, divide price by 12 months
+                if ($("div.bundle-internet select[name=\"product_internet\"] option:selected").text().includes("Yearly") != false) { //if yearly payment, divide price by 12 months
                     //Calculate additional + product for the rest of the month
                     price_of_remainig_days = parseFloat((product_price / 12) / days_in_month) * remainigDays;
                     price_of_remainig_days += parseFloat(additional_service / days_in_month) * remainigDays;
@@ -1190,13 +1191,13 @@ $(document).ready(function () {
             free_transfer = $("div.bundle-phone input[name=\"free_transfer\"]").val() === 'yes';
 
             //Get product
-            product_price = parseFloat($("div.bundle-phone select[name=\"product\"] option:selected").attr("real_price"));
+            product_price = parseFloat($("div.bundle-phone select[name=\"product_phone\"] option:selected").attr("real_price"));
             if (has_discount)
-                product_price = parseFloat($("div.bundle-phone select[name=\"product\"] option:selected").attr("price"));
+                product_price = parseFloat($("div.bundle-phone select[name=\"product_phone\"] option:selected").attr("price"));
 
             //product title
 
-            var title = $("div.bundle-phone select[name=\"product\"] option:selected").attr("data_title") + " " + product_price
+            var title = $("div.bundle-phone select[name=\"product_phone\"] option:selected").attr("data_title") + " " + product_price
             if (has_discount)
                 title = $("div.bundle-phone select[name=\"product\"] option:selected").text();
             //If buy adapter
@@ -1227,7 +1228,7 @@ $(document).ready(function () {
                 price_of_remainig_days = 0;
             } else {
                 //Calculate the price of the remaining days
-                if ($("div.bundle-phone select[name=\"product\"] option:selected").text().includes("1 year") != false) { //if yearly payment, divide price by 12 months
+                if ($("div.bundle-phone select[name=\"product_phone\"] option:selected").text().includes("1 year") != false) { //if yearly payment, divide price by 12 months
                     //Calculate product for the rest of the month
                     price_of_remainig_days = parseFloat((product_price / 12) / days_in_month) * remainigDays;
                 } else {
@@ -1303,15 +1304,15 @@ $(document).ready(function () {
             free_transfer = $("div.bundle-tv input[name=\"free_transfer\"]").val() === 'yes';
 
             //Get product
-            product_price = parseFloat($("div.bundle-tv select[name=\"product\"] option:selected").attr("real_price"));
+            product_price = parseFloat($("div.bundle-tv select[name=\"product_tv\"] option:selected").attr("real_price"));
             if (has_discount)
-                product_price = parseFloat($("div.bundle-tv select[name=\"product\"] option:selected").attr("price"));
+                product_price = parseFloat($("div.bundle-tv select[name=\"product_tv\"] option:selected").attr("price"));
 
             //product title
 
-            var title = $("div.bundle-tv select[name=\"product\"] option:selected").attr("data_title") + " " + product_price
+            var title = $("div.bundle-tv select[name=\"product_tv\"] option:selected").attr("data_title") + " " + product_price
             if (has_discount)
-                title = $("div.bundle-tv select[name=\"product\"] option:selected").text();
+                title = $("div.bundle-tv select[name=\"product_tv\"] option:selected").text();
             //If buy adapter
             if ($("div.bundle-tv input[name=\"options[box]\"]:checked").val() == "yes") {
                 box_price = 50;
@@ -1348,7 +1349,7 @@ $(document).ready(function () {
                 price_of_remaining_days_channels = 0;
             } else {
                 //Calculate the price of the remaining days
-                if ($("div.bundle-tv select[name=\"product\"] option:selected").text().includes("1 year") != false) { //if yearly payment, divide price by 12 months
+                if ($("div.bundle-tv select[name=\"product_tv\"] option:selected").text().includes("1 year") != false) { //if yearly payment, divide price by 12 months
                     //Calculate product for the rest of the month
                     price_of_remainig_days = parseFloat((product_price / 12) / days_in_month) * remainigDays;
                     $.each(add_on_channels, function (index, channel) {

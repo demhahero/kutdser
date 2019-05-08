@@ -8,15 +8,7 @@ include 'GlobalOnePaymentXMLTools.php';
 $mGlobalOnePaymentXMLTools = new GlobalOnePaymentXMLTools();
 
 
-/*
-  // For testing purposes
-  $_POST["card_number"] = "5526123000333124";
-  //$_POST["card_type"] = "MasterCard";
-  $_POST["card_expiry"] = "1021";
-  $_POST["card_holders_name"] = "Ali Al-Saffar";
-  $_POST["card_cvv"] = "580";
-  //
- */
+
 $product_id = intval($_POST["product"]);
 $has_discount = $_POST['has_discount']==='yes';
 $free_modem = $_POST['free_modem']==='yes';
