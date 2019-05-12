@@ -1,5 +1,5 @@
 <?php
-
+error_reporting(E_ERROR | E_PARSE);
 function changeSpeedMonthly($dbTools, $postData) {
     $next_days = 0;
     $new_product_price = 0;

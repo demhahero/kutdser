@@ -3,12 +3,6 @@ include_once "../header.php";
 ?>
 
 <?php
-include 'GlobalOnePaymentXMLTools.php';
-
-$mGlobalOnePaymentXMLTools = new GlobalOnePaymentXMLTools();
-
-
-
 $product_id = intval($_POST["product"]);
 $has_discount = $_POST['has_discount'] === 'yes';
 $free_modem = $_POST['free_modem'] === 'yes';
@@ -20,6 +14,8 @@ $free_transfer = $_POST['free_transfer'] === 'yes';
 if (!isset($_POST["options"]["inventory_modem_price"])) {
     $_POST["options"]["inventory_modem_price"] = "no";
 }
+
+
 $_POST["options"]["free_modem"] = $_POST['free_modem'];
 $_POST["options"]["free_router"] = $_POST['free_router'];
 $_POST["options"]["free_adapter"] = $_POST['free_adapter'];
@@ -38,6 +34,7 @@ if ($_POST["options"]["cable_subscriber"] == "yes") {
     $installation_date_1 = $_POST["options"]["installation_date_1"];
     $start_date = new DateTime($installation_date_1);
 }
+
 $start_active_date_string = $start_date->format('Y-m-d');
 //Get product info
 $subscription_period_type = "MONTHLY";
@@ -51,6 +48,7 @@ if ($result_product->num_rows == 0)
     $result_product = $dbToolsReseller->query("SELECT * FROM `products` where `products`.`product_id`='" . $product_id . "'");
 
 $row_product = "";
+
 if ($result_product->num_rows > 0) {
     $row_product = $result_product->fetch_assoc();
     if (strpos($row_product["subscription_type"], 'yearly') !== false) { // Check they type of payment (yearly or monthly)
@@ -89,7 +87,6 @@ $product_duration_price = 0;
 
 
 
-//If rent modem
 //If rent modem
 if ($_POST["options"]["inventory_modem_price"] == "yes") {
     $modem_cost = 59.90;
@@ -278,28 +275,42 @@ if (intval($_POST["customer_id"]) > 0) {
         $secure_card_merchantref = $secure_card_merchantref_row["merchantref"];
     }
 }
-
 ?>
 <title>Checkout</title>
 <script>
+
+    $(document).ready(function () {
+        var is_complete = false;
+        $(window).bind('beforeunload', function () {
+            if (is_complete == false)
+                return 'Please do not leave before checkout processing completes';
+        });
+
+        $("div.processing-content").show();
+        $("div.succeeded-content").hide();
+        $("div.failed-content").hide();
+        function orderSubmittedSuccessfully(order_id) {
+            var myarr = order_id.split("_");
+            $('.print-button').attr("href", "print_order_test.php?invoice_id=" + myarr[0]);
+            $("h3.order-id").html("Order id: " + myarr[1]);
+            $("div.processing-content").hide();
+            $("div.succeeded-content").show();
+            is_complete = true;
+        }
+        function orderFailed(reason) {
+            $("div.processing-content").hide();
+            $("div.failed-content").show();
+            $("span.failed-reason").html("Error: " + reason);
+            is_complete = true;
+        }
+
 <?php
 if ($_POST["card_type"] != "cache_on_delivery") {
     if ($secure_card_merchantref == false) {
         ?>
-            $(document).ready(function () {
-                var is_complete = false;
-                $(window).bind('beforeunload', function () {
-                    if (is_complete == false)
-                        return 'Please do not leave before checkout processing completes';
-                });
-
-                $("div.processing-content").show();
-                $("div.succeeded-content").hide();
-                $("div.failed-content").hide();
-
                 //1- register
                 $("div.process-caption").html("Registering Card...");
-                $.post("checkout_processes_test.php?do=register", {
+                $.post("gateway_processes.php?do=register", {
                     card_number: '<?= $_POST["card_number"] ?>',
                     card_type: '<?= $_POST["card_type"] ?>',
                     card_expiry: '<?= $_POST["card_expiry"] ?>',
@@ -312,7 +323,7 @@ if ($_POST["card_type"] != "cache_on_delivery") {
 
                                 //2- Subscription
                                 $("div.process-caption").html("Making subscription...");
-                                $.post("checkout_processes_test.php?do=subscription", {
+                                $.post("gateway_processes.php?do=subscription", {
                                     subscription_start_date: '<?= $subscription_start_date ?>',
                                     recurring_amount: '<?= $subscription_recurring_amount ?>',
                                     initial_amount: '<?= $subscription_initial_amount ?>',
@@ -324,7 +335,7 @@ if ($_POST["card_type"] != "cache_on_delivery") {
 
                                                 //3- Add Order to customer
                                                 $("div.process-caption").html("Adding order...");
-                                                $.post("checkout_processes_test.php?do=registerCustomerAndAddOrder", {
+                                                $.post("register_customer.php", {
                                                     product: '<?= $product_id ?>',
                                                     full_name: '<?= $_POST["full_name"] ?>',
                                                     address_line_1: `<?= $_POST["address_line_1"] ?>`,
@@ -361,39 +372,13 @@ if ($_POST["card_type"] != "cache_on_delivery") {
                                 orderFailed("Regisatrtion failed. " + data);
                             }
                         });
-
-                function orderSubmittedSuccessfully(order_id) {
-                    var myarr = order_id.split("_");
-                    $('.print-button').attr("href", "print_order_test.php?invoice_id=" + myarr[0]);
-                    $("h3.order-id").html("Order id: " + myarr[1]);
-                    $("div.processing-content").hide();
-                    $("div.succeeded-content").show();
-                    is_complete = true;
-                }
-                function orderFailed(reason) {
-                    $("div.processing-content").hide();
-                    $("div.failed-content").show();
-                    $("span.failed-reason").html("Error: " + reason);
-                    is_complete = true;
-                }
-            });
         <?php
-    } else { //if existed customer
+    } 
+    else { //if existed customer
         ?>
-            $(document).ready(function () {
-                var is_complete = false;
-                $(window).bind('beforeunload', function () {
-                    if (is_complete == false)
-                        return 'Please do not leave before checkout processing completes';
-                });
-
-                $("div.processing-content").show();
-                $("div.succeeded-content").hide();
-                $("div.failed-content").hide();
-
                 //1- Do payment
                 $("div.process-caption").html("Adding order...");
-                $.post("checkout_processes_test.php?do=payment", {
+                $.post("gateway_processes.php?do=payment", {
                     card_number: '<?= $_POST["card_number"] ?>',
                     card_type: '<?= $_POST["card_type"] ?>',
                     card_expiry: '<?= $_POST["card_expiry"] ?>',
@@ -407,7 +392,7 @@ if ($_POST["card_type"] != "cache_on_delivery") {
 
                                 //2- Add Order to customer
                                 $("div.process-caption").html("Adding order...");
-                                $.post("checkout_processes_test.php?do=registerCustomerAndAddOrder", {
+                                $.post("register_customer.php", {
                                     product: '<?= $product_id ?>',
                                     full_name: '<?= $_POST["full_name"] ?>',
                                     address_line_1: `<?= $_POST["address_line_1"] ?>`,
@@ -439,41 +424,14 @@ if ($_POST["card_type"] != "cache_on_delivery") {
                                 orderFailed("Order failed. " + data);
                             }
                         });
-
-                function orderSubmittedSuccessfully(order_id) {
-                    var myarr = order_id.split("_");
-                    $('.print-button').attr("href", "print_order_test.php?invoice_id=" + myarr[0]);
-                    $("h3.order-id").html("Order id: " + myarr[1]);
-                    $("div.processing-content").hide();
-                    $("div.succeeded-content").show();
-                    is_complete = true;
-                }
-                function orderFailed(reason) {
-                    $("div.processing-content").hide();
-                    $("div.failed-content").show();
-                    $("span.failed-reason").html("Error: " + reason);
-                    is_complete = true;
-                }
-            });
         <?php
     }
-} 
-else { //if cache on delivery
+} else { //if cache on delivery
     if ($secure_card_merchantref == false) {
         ?>
-            $(document).ready(function () {
-                var is_complete = false;
-                $(window).bind('beforeunload', function () {
-                    if (is_complete == false)
-                        return 'Please do not leave before checkout processing completes';
-                });
-
-                $("div.processing-content").show();
-                $("div.succeeded-content").hide();
-                $("div.failed-content").hide();
 
                 //1- register
-                $.post("checkout_processes_test.php?do=registerCustomerAndAddOrder", {
+                $.post("gateway_processes.php", {
                     product: '<?= $product_id ?>',
                     full_name: '<?= $_POST["full_name"] ?>',
                     address_line_1: `<?= $_POST["address_line_1"] ?>`,
@@ -499,38 +457,12 @@ else { //if cache on delivery
                                 orderFailed("Order failed. " + data);
                             }
                         });
-
-                function orderSubmittedSuccessfully(order_id) {
-                    var myarr = order_id.split("_");
-                    $('.print-button').attr("href", "print_order_test.php?invoice_id=" + myarr[0]);
-                    $("h3.order-id").html("Order id: " + myarr[1]);
-                    $("div.processing-content").hide();
-                    $("div.succeeded-content").show();
-                    is_complete = true;
-                }
-                function orderFailed(reason) {
-                    $("div.processing-content").hide();
-                    $("div.failed-content").show();
-                    $("span.failed-reason").html("Error: " + reason);
-                    is_complete = true;
-                }
-            });
         <?php
-    } else { //if existed customer
+    } 
+    else { //if existed customer
         ?>
-            $(document).ready(function () {
-                var is_complete = false;
-                $(window).bind('beforeunload', function () {
-                    if (is_complete == false)
-                        return 'Please do not leave before checkout processing completes';
-                });
-
-                $("div.processing-content").show();
-                $("div.succeeded-content").hide();
-                $("div.failed-content").hide();
-
                 //1- Add order
-                $.post("checkout_processes_test.php?do=registerCustomerAndAddOrder", {
+                $.post("register_customer.php", {
                     product: '<?= $product_id ?>',
                     full_name: '<?= $_POST["full_name"] ?>',
                     address_line_1: `<?= $_POST["address_line_1"] ?>`,
@@ -557,26 +489,11 @@ else { //if cache on delivery
                                 orderFailed("Order failed. " + data);
                             }
                         });
-
-                function orderSubmittedSuccessfully(order_id) {
-                    var myarr = order_id.split("_");
-                    $('.print-button').attr("href", "print_order_test.php?invoice_id=" + myarr[0]);
-                    $("h3.order-id").html("Order id: " + myarr[1]);
-                    $("div.processing-content").hide();
-                    $("div.succeeded-content").show();
-                    is_complete = true;
-                }
-                function orderFailed(reason) {
-                    $("div.processing-content").hide();
-                    $("div.failed-content").show();
-                    $("span.failed-reason").html("Error: " + reason);
-                    is_complete = true;
-                }
-            });
         <?php
     }
 }
 ?>
+    });
 </script>
 
 <style>
