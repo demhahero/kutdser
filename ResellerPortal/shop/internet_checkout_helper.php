@@ -2,9 +2,11 @@
 
 class InternetCheckoutHelper {
     var $dbToolsReseller;
+    var $reseller_id;
     
-    function __construct($dbToolsReseller){
+    function __construct($dbToolsReseller, $reseller_id){
         $this->dbToolsReseller = $dbToolsReseller; 
+        $this->reseller_id = $reseller_id;
     }
     function checkoutSetup($params) {
         $product_id = intval($params["product"]);
@@ -44,7 +46,7 @@ class InternetCheckoutHelper {
         $subscription_period_type = "MONTHLY";
         $sql = "SELECT * FROM `products` INNER JOIN `reseller_discounts`
       on `products`.`product_id`=`reseller_discounts`.`product_id`
-      WHERE `reseller_discounts`.`reseller_id`='" . $reseller_id . "'
+      WHERE `reseller_discounts`.`reseller_id`='" . $this->reseller_id . "'
       and `products`.`product_id`='" . $product_id . "'";
         $result_product = $this->dbToolsReseller->query($sql);
 
@@ -280,6 +282,8 @@ class InternetCheckoutHelper {
             }
         }
         
+        
+        
         $result["secure_card_merchantref"] = $secure_card_merchantref;
         $result["start_active_date_string"] = $start_active_date_string;
         $result["subscription_start_date"] = $subscription_start_date;
@@ -289,7 +293,9 @@ class InternetCheckoutHelper {
         $result["subscription_recurring_amount"] = $subscription_recurring_amount;
         $result["subscription_initial_amount"] = $subscription_initial_amount;
         $result["subscription_period_type"] = $subscription_period_type;
-        
+        $result["product_id"] = $product_id;
+        $result["invoice_items"] = $params["invoice_items"];
+        $result["options"] = $params["options"];
         return $result;
     }
 }

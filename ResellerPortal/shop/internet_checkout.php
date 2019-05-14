@@ -4,8 +4,8 @@ include_once "../header.php";
 
 <?php
 include "internet_checkout_helper.php";
-$helper = InternetCheckoutHelper($dbToolsReseller);
-$results = $helper->checkoutSetup($_POST);
+$helper = new InternetCheckoutHelper($dbToolsReseller, $reseller_id);
+$result = $helper->checkoutSetup($_POST);
 $secure_card_merchantref = $result["secure_card_merchantref"] ;
 $start_active_date_string = $result["start_active_date_string"] ;
 $subscription_start_date = $result["subscription_start_date"] ;
@@ -15,10 +15,14 @@ $subscription_start_date = $result["subscription_start_date"] ;
 $subscription_recurring_amount = $result["subscription_recurring_amount"] ;
 $subscription_initial_amount = $result["subscription_initial_amount"] ;
 $subscription_period_type = $result["subscription_period_type"] ;
+$product_id = $result["product_id"];
+$_POST["options"] = $result["options"];
+$_POST["invoice_items"] = $result["invoice_items"];
+
 ?>
 <title>Checkout</title>
-<script>
 
+<script>
     $(document).ready(function () {
         var is_complete = false;
         $(window).bind('beforeunload', function () {
@@ -172,7 +176,7 @@ else { //if cache on delivery
         ?>
 
                 //1- register
-                $.post("gateway_processes.php", {
+                $.post("register_customer.php", {
                     product: '<?= $product_id ?>',
                     full_name: '<?= $_POST["full_name"] ?>',
                     address_line_1: `<?= $_POST["address_line_1"] ?>`,
@@ -223,6 +227,7 @@ else { //if cache on delivery
                     merchantref: 'cache_on_delivery_<?= $merchantref ?>'})
                         .done(function (data) {
                             if (data != 0) {
+                                alert(data);
                                 $("div.process-caption").html("Order Sent Successfully");
                                 orderSubmittedSuccessfully(data);
                             } else {

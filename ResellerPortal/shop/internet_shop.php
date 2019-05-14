@@ -72,7 +72,7 @@ while($products_row=$dbToolsReseller->fetch_assoc($products))
         padding: 20px;
     }
 </style>
-<form class="" action="checkout_internet.php" method="post">
+<form class="" action="internet_checkout.php" method="post">
   <input type ="hidden" id="has_discount" name="has_discount" value="<?= $reseller_row['has_discount']?>"/>
   <input type ="hidden" id="free_router" name="free_router" value="<?= $reseller_row['free_router']?>"/>
   <input type ="hidden" id="free_modem"  name="free_modem" value="<?= $reseller_row['free_modem']?>"/>
