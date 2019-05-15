@@ -55,7 +55,7 @@ while($products_row=$dbToolsReseller->fetch_assoc($products))
 
 <!-- Include SmartWizard JavaScript source -->
 <script type="text/javascript" src="<?= $site_url ?>/js/jquery.smartWizard.min.js"></script>
-<script type="text/javascript" src="<?= $site_url ?>/js/shop_shop_test1.js"></script>
+<script type="text/javascript" src="<?= $site_url ?>/js/internet_shop.js"></script>
 <title>Shop</title>
 
 <style>
