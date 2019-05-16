@@ -1,5 +1,5 @@
 <?php
-
+error_reporting(E_ERROR | E_PARSE);
 include '../dbconfig.php';
 require_once '../../mikrotik/swiftmailer/vendor/autoload.php';
 include 'print_order_class.php';
