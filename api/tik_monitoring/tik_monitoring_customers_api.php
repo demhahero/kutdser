@@ -27,6 +27,7 @@ $where = $sqlTot = $sqlRec = "";
 
 $sqlTot = "SELECT `merchantrefs`.`merchantref`, `merchantrefs`.`order_id`,
     `merchantrefs`.`is_credit`, `customers`.`customer_id` , `customers`.`phone` , customers.address,
+    customers.city, customers.address_line_1, customers.address_line_2, customers.postal_code,
     customers.email, customers.full_name, orders.order_id, resellers.full_name AS 'reseller_name',
     `orders`.`vl_number`,
     customers.reseller_id, `modems`.`mac_address`, `modems`.`modem_id`, `modems`.`ip_address`, `modems`.`router_mac_address`
@@ -50,6 +51,10 @@ if (!empty($params['search']['value'])) {
     $where .= " OR `customers`.`customer_id` LIKE ? ";
     $where .= " OR `customers`.`phone` LIKE ? ";
     $where .= " OR `customers`.`address` LIKE ? ";
+    $where .= " OR `customers`.`city` LIKE ? ";
+    $where .= " OR `customers`.`address_line_1` LIKE ? ";
+    $where .= " OR `customers`.`address_line_2` LIKE ? ";
+    $where .= " OR `customers`.`postal_code` LIKE ? ";
     $where .= " OR `orders`.`vl_number` LIKE ? ";
     $where .= " OR `modems`.`ip_address` LIKE ? ";
     $where .= " OR `modems`.`router_mac_address` LIKE ? ";
@@ -81,7 +86,7 @@ $stmt = $dbTools->getConnection()->prepare($sqlTot);
 
 if (isset($where) && $where != '') {
   $search_value="%".$params['search']['value']."%";
-$stmt->bind_param('ssssssssss',
+$stmt->bind_param('ssssssssssssss',
                   $search_value,
                   $search_value,
                   $search_value,
@@ -91,6 +96,10 @@ $stmt->bind_param('ssssssssss',
                   $search_value,
                   $search_value,
                   $search_value,
+                    $search_value,
+                    $search_value,
+                    $search_value,
+                    $search_value,
                   $search_value );
 
 }
@@ -109,7 +118,11 @@ $stmt1 = $dbTools->getConnection()->prepare($sqlRec);
 if (isset($where) && $where != '') {
   $search_value="%".$params['search']['value']."%";
 
-  $stmt1->bind_param('ssssssssss',
+  $stmt1->bind_param('ssssssssssssss',
+                    $search_value,
+                    $search_value,
+                    $search_value,
+                    $search_value,
                     $search_value,
                     $search_value,
                     $search_value,
