@@ -539,14 +539,15 @@ function recurring($dbTools, $postData, $start, $end) {
         return FALSE; // already terminated because doesn't have any invoice int this month
     }
     // get product title
-    $sql = "(SELECT `requests`.`product_title`,`requests`.`action_on_date` AS `date_active` FROM `requests` INNER JOIN `orders` ON `orders`.`order_id`=`requests`.`order_id` WHERE `customer_id`=? AND `requests`.`verdict`='approve' AND `requests`.`action`='change_speed' AND `action_on_date`<?)
+    $sql = "(SELECT `requests`.`product_title`,`requests`.`action_on_date` AS `date_active` FROM `requests` INNER JOIN `orders` ON `orders`.`order_id`=`requests`.`order_id` WHERE `customer_id`=? AND `orders`.`order_id`=? AND `requests`.`verdict`='approve' AND `requests`.`action`='change_speed' AND `action_on_date`<?)
   UNION
-  (SELECT `product_title`,`creation_date` AS `date_active` FROM `orders` WHERE `customer_id`=? )
+  (SELECT `product_title`,`creation_date` AS `date_active` FROM `orders` WHERE `customer_id`=? AND `orders`.`order_id`=? )
   ORDER BY `date_active` DESC LIMIT 1";
     $stmt_product_title = $dbTools->getConnection()->prepare($sql);
     $param1 = $postData["customer_id"];
-    $param2 = $end;
-    $stmt_product_title->bind_param('sss', $param1, $param2, $param1);
+    $param2 = $postData["order_id"];
+    $param3 = $end;
+    $stmt_product_title->bind_param('sssss', $param1,$param2, $param3, $param1,$param2);
     $stmt_product_title->execute();
 
     $result_product_title = $stmt_product_title->get_result();
@@ -683,14 +684,15 @@ function suspension($dbTools, $postData) {
           return FALSE; // already terminated because doesn't have any invoice int this month
       }
       // get product title
-      $sql = "(SELECT `requests`.`product_title`,`requests`.`action_on_date` AS `date_active` FROM `requests` INNER JOIN `orders` ON `orders`.`order_id`=`requests`.`order_id` WHERE `customer_id`=? AND `requests`.`verdict`='approve' AND `requests`.`action`='change_speed' AND `action_on_date`<?)
+      $sql = "(SELECT `requests`.`product_title`,`requests`.`action_on_date` AS `date_active` FROM `requests` INNER JOIN `orders` ON `orders`.`order_id`=`requests`.`order_id` WHERE `customer_id`=? AND `orders`.`order_id`=? AND `requests`.`verdict`='approve' AND `requests`.`action`='change_speed' AND `action_on_date`<?)
     UNION
-    (SELECT `product_title`,`creation_date` AS `date_active` FROM `orders` WHERE `customer_id`=? )
+    (SELECT `product_title`,`creation_date` AS `date_active` FROM `orders` WHERE `customer_id`=? AND `orders`.`order_id`=?)
     ORDER BY `date_active` DESC LIMIT 1";
       $stmt_product_title = $dbTools->getConnection()->prepare($sql);
       $param1 = $postData["customer_id"];
-      $param2 = $startDate->format("Y-m-d");
-      $stmt_product_title->bind_param('sss', $param1, $param2, $param1);
+      $param2 = $postData["order_id"];
+      $param3 = $startDate->format("Y-m-d");
+      $stmt_product_title->bind_param('sssss', $param1, $param2,$param3, $param1,$param2);
       $stmt_product_title->execute();
 
       $result_product_title = $stmt_product_title->get_result();
