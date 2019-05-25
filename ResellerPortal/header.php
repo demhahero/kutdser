@@ -40,6 +40,19 @@ if(!@include_once "../../api/dbconfig.php")
                     }
               });
             });
+            
+            $.get("<?= $api_url ?>information/get_resellerportal_notification.php",
+                      {
+                        action:"logout"
+                      }
+              , function (data_response, status) {
+                  data_response = $.parseJSON(data_response);
+                  if(data_response["information"]["resellerportal_notification"] != ""){
+                      $(".resellerportal-notification").show();
+                  }
+                  $(".resellerportal-notification").html($(".resellerportal-notification").html() 
+                          + " " + data_response["information"]["resellerportal_notification"]);
+              });
           });
           </script>
 
@@ -67,10 +80,8 @@ if(!@include_once "../../api/dbconfig.php")
     <center>
         <?php if ($is_new_system) { ?>
 
-            <div class="alert alert-danger" style="width: 75%;">
-                <a href="<?= $site_url ?>/system_alerts/system_alerts.php">
-                    <strong>***New Updates!</strong> Dear Reseller <span style="color: red;" ><?= $username; ?></span>, Please click here to know more about our new features that have been added recently.
-                </a>
+            <div class="resellerportal-notification alert alert-danger" style="width: 75%; display: none;">
+                <strong>Warning!</strong> Dear Reseller <span style="color: #ef3232;" ><?= $username; ?>: </span>
             </div>
 
             <?php

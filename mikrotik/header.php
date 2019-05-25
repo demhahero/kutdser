@@ -194,6 +194,7 @@ if (!@include_once "../../api/dbconfig.php")
                                             <li><a href="<?= $site_url ?>/reseller_requests/reseller_requests.php">Requests<span class="blink total_reseller_request_sent"></span></a></li>
                                             <li><a href="<?= $site_url ?>/custom_invoice.php">Custom Invoice</a></li>
                                             <li><a href="<?= $site_url ?>/custom_statement.php">Custom Statement</a></li>
+                                            <li><a href="<?= $site_url ?>/information/edit_information.php">Edit Reseller Portal</a></li>
                                         </ul>
                                     </li>
                                     <li><a><i class="fa fa-bar-chart-o"></i> Data Presentation <span class="fa fa-chevron-down"></span></a>
