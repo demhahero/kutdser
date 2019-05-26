@@ -1,9 +1,10 @@
 <?php
+
+require_once '../../mikrotik/swiftmailer/vendor/autoload.php';
+
 include_once "./insert_invoice_function.php";
-if(isset($_POST["post_action"]))
-{
-  if($_POST["post_action"]==="get_request_details" && isset($_POST["request_id"]))
-  {
+if (isset($_POST["post_action"])) {
+    if ($_POST["post_action"] === "get_request_details" && isset($_POST["request_id"])) {
         include_once "../dbconfig.php";
 
         $request_id = intval($_POST["request_id"]);
@@ -28,10 +29,9 @@ if(isset($_POST["post_action"]))
 
         $stmt1 = $dbTools->getConnection()->prepare($query);
 
-        $param_value=$request_id;
-        $stmt1->bind_param('s',
-                          $param_value
-                          ); // 's' specifies the variable type => 'string'
+        $param_value = $request_id;
+        $stmt1->bind_param('s', $param_value
+        ); // 's' specifies the variable type => 'string'
 
 
         $stmt1->execute();
@@ -42,7 +42,7 @@ if(isset($_POST["post_action"]))
 
 
         $request_modem_mac_address = (strlen($request_row["modem_mac_address"]) > 0 ? $request_row["modem_mac_address"] : $request_row["mac_address"]);
-        $request_row["modem_mac_address"]=$request_modem_mac_address;
+        $request_row["modem_mac_address"] = $request_modem_mac_address;
         /// get request's order info
         $request_order_query = "SELECT `orders`.*,`order_options`.*,`customers`.`full_name`,`orders`.`order_id` as `this_order_id` FROM `orders`
         INNER JOIN `order_options` on `order_options`.`order_id`=`orders`.`order_id`
@@ -52,10 +52,9 @@ if(isset($_POST["post_action"]))
 
         $stmt2 = $dbTools->getConnection()->prepare($request_order_query);
 
-        $param_value=$request_row['order_id'];
-        $stmt2->bind_param('s',
-                          $param_value
-                          ); // 's' specifies the variable type => 'string'
+        $param_value = $request_row['order_id'];
+        $stmt2->bind_param('s', $param_value
+        ); // 's' specifies the variable type => 'string'
 
 
         $stmt2->execute();
@@ -63,11 +62,11 @@ if(isset($_POST["post_action"]))
         $result2 = $stmt2->get_result();
         $request_order_row = $dbTools->fetch_assoc($result2);
 
-        $request_order_row["order_id"]=$request_order_row["this_order_id"];
+        $request_order_row["order_id"] = $request_order_row["this_order_id"];
         if ((int) $request_order_row['order_id'] <= 10380) {
-            $request_order_row["displayed_order_id"]= $request_order_row['order_id'];
+            $request_order_row["displayed_order_id"] = $request_order_row['order_id'];
         } else {
-            $request_order_row["displayed_order_id"]= (((0x0000FFFF & (int) $request_order_row['order_id']) << 16) + ((0xFFFF0000 & (int) $request_order_row['order_id']) >> 16));
+            $request_order_row["displayed_order_id"] = (((0x0000FFFF & (int) $request_order_row['order_id']) << 16) + ((0xFFFF0000 & (int) $request_order_row['order_id']) >> 16));
         }
         /// indentify start active date
         $start_active_date = "";
@@ -80,7 +79,7 @@ if(isset($_POST["post_action"]))
                 $start_active_date = $request_order_row["installation_date_1"];
             }
         }
-        $request_order_row["start_active_date"]=$start_active_date;
+        $request_order_row["start_active_date"] = $start_active_date;
 
         /// get last approved request for this order if exist;
         $last_request_query = "SELECT `request_id`, reseller.`customer_id`, `admins`.`username`
@@ -100,10 +99,8 @@ if(isset($_POST["post_action"]))
         $stmt3 = $dbTools->getConnection()->prepare($last_request_query);
 
 
-        $stmt3->bind_param('ss',
-                          $request_row['order_id'],
-                          $request_row['action_on_date']
-                          ); // 's' specifies the variable type => 'string'
+        $stmt3->bind_param('ss', $request_row['order_id'], $request_row['action_on_date']
+        ); // 's' specifies the variable type => 'string'
 
 
         $stmt3->execute();
@@ -118,8 +115,8 @@ if(isset($_POST["post_action"]))
         $product_category = $request_order_row['product_category'];
         $product_subscription_type = $request_order_row['product_subscription_type'];
         if (sizeof($last_request_row) > 0) {
-          $last_request_modem_mac_address = (strlen($last_request_row["modem_mac_address"]) > 0 ? $last_request_row["modem_mac_address"] : $last_request_row["mac_address"]);
-          $last_request_row["modem_mac_address"]=$last_request_modem_mac_address;
+            $last_request_modem_mac_address = (strlen($last_request_row["modem_mac_address"]) > 0 ? $last_request_row["modem_mac_address"] : $last_request_row["mac_address"]);
+            $last_request_row["modem_mac_address"] = $last_request_modem_mac_address;
 
 
             $product_price = $last_request_row['product_price'];
@@ -127,54 +124,50 @@ if(isset($_POST["post_action"]))
             $product_category = $last_request_row['product_category'];
             $product_subscription_type = $last_request_row['product_subscription_type'];
         }
-        if($request_row["action"]!="change_speed")// if not change speed request take these value from the last updated request or order
-        {
-          $request_row["product_price"]=$product_price;
-          $request_row["product_title"]=$product_title;
-          $request_row["product_category"]=$product_category;
-          $request_row["product_subscription_type"]=$product_subscription_type;
+        if ($request_row["action"] != "change_speed") {// if not change speed request take these value from the last updated request or order
+            $request_row["product_price"] = $product_price;
+            $request_row["product_title"] = $product_title;
+            $request_row["product_category"] = $product_category;
+            $request_row["product_subscription_type"] = $product_subscription_type;
         }
 
-        if($stmt1->errno==0 && $stmt2->errno==0 && $stmt3->errno==0)
-        {
-          $request_row_json = json_encode($request_row);
-          $request_order_row_json = json_encode($request_order_row);
-          $last_request_row_json = json_encode($last_request_row);
+        if ($stmt1->errno == 0 && $stmt2->errno == 0 && $stmt3->errno == 0) {
+            $request_row_json = json_encode($request_row);
+            $request_order_row_json = json_encode($request_order_row);
+            $last_request_row_json = json_encode($last_request_row);
             echo "{\"request_row\" :", $request_row_json
-              ,",\"request_order_row\" :", $request_order_row_json
-              ,",\"last_request_row\" :", $last_request_row_json
-              , ",\"error\":false}";
-        }
-        else {
-          echo "{\"request_row\" :", "{}"
-            ,"\"request_order_row\" :", "{}"
-            ,"\"last_request_row\" :", "{}"
+            , ",\"request_order_row\" :", $request_order_row_json
+            , ",\"last_request_row\" :", $last_request_row_json
+            , ",\"error\":false}";
+        } else {
+            echo "{\"request_row\" :", "{}"
+            , "\"request_order_row\" :", "{}"
+            , "\"last_request_row\" :", "{}"
             , ",\"error\":true}";
         }
-  }
-  else if($_POST["post_action"]==="edit_request" && isset($_POST["request_id"]) && isset($_POST["verdict"]))
-    {
-      include_once "../dbconfig.php";
+    } 
+    else if ($_POST["post_action"] === "edit_request" && isset($_POST["request_id"]) && isset($_POST["verdict"])) {
+        include_once "../dbconfig.php";
 
 
-      $excute_failed=0;
+        $excute_failed = 0;
 
 
-          if ($_POST["action"] === "moving") {
-              $verdict_date = new DateTime();
+        if ($_POST["action"] === "moving") {
+            $verdict_date = new DateTime();
 
-              $param_value1=$admin_id;
-              $param_value2=$_POST["verdict"];
-              $param_value3=$verdict_date->format('Y-m-d');
-              $param_value4=$_POST["product_price"];
-              $param_value5=$_POST["product_title"];
-              $param_value6=$_POST["product_category"];
-              $param_value7=$_POST["product_subscription_type"];
-              $param_value8=$_POST["fees_charged"];
-              $param_value9=$_POST["request_id"];
+            $param_value1 = $admin_id;
+            $param_value2 = $_POST["verdict"];
+            $param_value3 = $verdict_date->format('Y-m-d');
+            $param_value4 = $_POST["product_price"];
+            $param_value5 = $_POST["product_title"];
+            $param_value6 = $_POST["product_category"];
+            $param_value7 = $_POST["product_subscription_type"];
+            $param_value8 = $_POST["fees_charged"];
+            $param_value9 = $_POST["request_id"];
 
 
-              $query_update_request = "UPDATE `requests` SET
+            $query_update_request = "UPDATE `requests` SET
                                       `admin_id`=?,
                                       `verdict`=?,
                                       `verdict_date`=?,
@@ -185,159 +178,194 @@ if(isset($_POST["post_action"]))
                                       `fees_charged`=?
                                       WHERE `requests`.`request_id`=?";
 
+            $stmt1 = $dbTools->getConnection()->prepare($query_update_request);
+
+            $stmt1->bind_param('sssssssss', $param_value1, $param_value2, $param_value3, $param_value4, $param_value5, $param_value6, $param_value7, $param_value8, $param_value9);
+
+
+            $stmt1->execute();
+
+            if ($stmt1->errno != 0) {
+                /// $excute_failed
+                $excute_failed = 1;
+            }
+        } else {
+
+            if (($_POST["action"] === "swap_modem" && $_POST["verdict"] === "approve" ) || ($_POST["verdict"] === "approve" && $_POST["action"] === "change_speed" && is_numeric($_POST["modem_id"]) && (int) $_POST["modem_id"] > 0)) {
+                $param_value1 = $_POST["customer_id"];
+                $query_update_request = "update `modems` set `customer_id`='0' "
+                        . "where `customer_id`=?";
                 $stmt1 = $dbTools->getConnection()->prepare($query_update_request);
 
-                $stmt1->bind_param('sssssssss',
-                                  $param_value1,
-                                  $param_value2,
-                                  $param_value3,
-                                  $param_value4,
-                                  $param_value5,
-                                  $param_value6,
-                                  $param_value7,
-                                  $param_value8,
-                                  $param_value9);
+                $stmt1->bind_param('s', $param_value1);
 
 
                 $stmt1->execute();
 
-                if ($stmt1->errno!=0) {
-                  /// $excute_failed
-                  $excute_failed=1;
+                if ($stmt1->errno != 0) {
+                    /// $excute_failed
+                    $excute_failed = 1;
                 }
-          } else {
 
-              if (($_POST["action"] === "swap_modem" && $_POST["verdict"] === "approve" ) || ($_POST["verdict"] === "approve" && $_POST["action"] === "change_speed" && is_numeric($_POST["modem_id"]) && (int) $_POST["modem_id"] > 0)) {
-                $param_value1=$_POST["customer_id"];
-                  $query_update_request = "update `modems` set `customer_id`='0' "
-                          . "where `customer_id`=?";
-                  $stmt1 = $dbTools->getConnection()->prepare($query_update_request);
+                $param_value2 = $_POST["customer_id"];
+                $param_value3 = $_POST["modem_id"];
+                $query_update_request = "update `modems` set `customer_id`=? "
+                        . "where `modem_id`=?";
+                $stmt2 = $dbTools->getConnection()->prepare($query_update_request);
 
-                  $stmt1->bind_param('s',
-                                    $param_value1);
+                $stmt2->bind_param('ss', $param_value2, $param_value3);
 
 
-                  $stmt1->execute();
+                $stmt2->execute();
 
-                  if ($stmt1->errno!=0) {
+                if ($stmt2->errno != 0) {
                     /// $excute_failed
-                    $excute_failed=1;
-                  }
+                    $excute_failed = 1;
+                }
+            } else if ($_POST["action"] === "customer_information_modification" && $_POST["verdict"] === "approve") {
+                $param_value1 = $_POST['full_name'];
+                $param_value2 = $_POST['phone'];
+                $param_value3 = $_POST['email'];
+                $param_value4 = $_POST["customer_id"];
 
-                  $param_value2=$_POST["customer_id"];
-                  $param_value3=$_POST["modem_id"];
-                  $query_update_request = "update `modems` set `customer_id`=? "
-                          . "where `modem_id`=?";
-                  $stmt2 = $dbTools->getConnection()->prepare($query_update_request);
+                $query_update_request = "UPDATE `customers` set `full_name`=?,"
+                        . " `phone`=?, `email`=? "
+                        . "WHERE `customer_id`=?";
 
-                  $stmt2->bind_param('ss',
-                                    $param_value2,
-                                    $param_value3);
+                $stmt2 = $dbTools->getConnection()->prepare($query_update_request);
+
+                $stmt2->bind_param('ssss', $param_value1, $param_value2, $param_value3, $param_value4);
 
 
-                  $stmt2->execute();
+                $stmt2->execute();
 
-                  if ($stmt2->errno!=0) {
+                if ($stmt2->errno != 0) {
                     /// $excute_failed
-                    $excute_failed=1;
-                  }
-              }
-              else if ($_POST["action"] === "customer_information_modification" && $_POST["verdict"] === "approve"){
-                $param_value1=$_POST['full_name'];
-                $param_value2=$_POST['phone'];
-                $param_value3=$_POST['email'];
-                $param_value4=$_POST["customer_id"];
-
-                  $query_update_request = "UPDATE `customers` set `full_name`=?,"
-                          . " `phone`=?, `email`=? "
-                          . "WHERE `customer_id`=?";
-
-                  $stmt2 = $dbTools->getConnection()->prepare($query_update_request);
-
-                  $stmt2->bind_param('ssss',
-                                    $param_value1,
-                                    $param_value2,
-                                    $param_value3,
-                                    $param_value4);
+                    $excute_failed = 1;
+                }
+            }
 
 
-                  $stmt2->execute();
+            $verdict_date = new DateTime();
 
-                  if ($stmt2->errno!=0) {
-                    /// $excute_failed
-                    $excute_failed=1;
-                  }
-              }
-              
-
-              $verdict_date = new DateTime();
-
-              $param1=$admin_id;
-              $param2=$_POST["verdict"];
-              $param3=$verdict_date->format('Y-m-d');
-              $param4=$_POST["fees_charged"];
-              $param5=$_POST["request_id"];
+            $param1 = $admin_id;
+            $param2 = $_POST["verdict"];
+            $param3 = $verdict_date->format('Y-m-d');
+            $param4 = $_POST["fees_charged"];
+            $param5 = $_POST["request_id"];
 
 
-              $query_update_request = "UPDATE `requests` SET
+            $query_update_request = "UPDATE `requests` SET
                                           `admin_id`=?,
                                           `verdict`=?,
                                           `verdict_date`=?,
                                           `fees_charged`=?
                                           WHERE `requests`.`request_id`=?";
-              $stmt2 = $dbTools->getConnection()->prepare($query_update_request);
+            $stmt2 = $dbTools->getConnection()->prepare($query_update_request);
 
-              $stmt2->bind_param('sssss',
-                                $param1,
-                                $param2,
-                                $param3,
-                                $param4,
-                                $param5);
+            $stmt2->bind_param('sssss', $param1, $param2, $param3, $param4, $param5);
 
 
-              $stmt2->execute();
+            $stmt2->execute();
 
-              if ($stmt2->errno!=0) {
+            if ($stmt2->errno != 0) {
                 /// $excute_failed
-                $excute_failed=1;
-              }
+                $excute_failed = 1;
+            }
+        }
 
 
-          }
-
-
-          if ($excute_failed===0) {
-              if ($_POST["verdict"] === "approve" && $_POST["action"] === "moving") {
-                  $query_update_order = "UPDATE `orders` SET
+        if ($excute_failed === 0) {
+            if ($_POST["verdict"] === "approve" && $_POST["action"] === "moving") {
+                $query_update_order = "UPDATE `orders` SET
                                           `status`=N'sent'
                                           WHERE `orders`.`order_id`=?";
 
-                  $stmt2 = $dbTools->getConnection()->prepare($query_update_order);
+                $stmt2 = $dbTools->getConnection()->prepare($query_update_order);
 
-                  $stmt2->bind_param('s',
-                                    $_POST["order_id"]);
+                $stmt2->bind_param('s', $_POST["order_id"]);
 
 
-                  $stmt2->execute();
+                $stmt2->execute();
 
-                  if ($stmt2->errno==0) {
-                    insertInvoice($dbTools,$_POST);
-                      echo "{\"edited\" :true,\"error\" :\"null\"}";
-                    } else {
-                      echo "{\"edited\" :\"false\",\"error\" :\"failed to insert value\"}";
-                    }
+                if ($stmt2->errno == 0) {
+                    insertInvoice($dbTools, $_POST);
+                    echo "{\"edited\" :true,\"error\" :\"null\"}";
                 } else {
-                  insertInvoice($dbTools,$_POST);
-                  echo "{\"edited\" :true,\"error\" :\"null\"}";
+                    echo "{\"edited\" :\"false\",\"error\" :\"failed to insert value\"}";
                 }
             } else {
-              echo "{\"edited\" :\"false\",\"error\" :\"failed to insert value\"}";
+                insertInvoice($dbTools, $_POST);
+                echo "{\"edited\" :true,\"error\" :\"null\"}";
             }
+        } else {
+            echo "{\"edited\" :\"false\",\"error\" :\"failed to insert value\"}";
+        }
+        
+        //Send email to the reseller after any process.
+        $request_query = "SELECT *
+        FROM `requests`
+        WHERE `request_id`=?";
 
+        $stmt1 = $dbTools->getConnection()->prepare($request_query);
+
+        $stmt1->bind_param('s', $request_id
+        ); // 's' specifies the variable type => 'string'
+
+        $stmt1->execute();
+
+        $result1 = $stmt1->get_result();
+        $result = $dbTools->fetch_assoc($result1);
+        if ($result) {
+            $customer_query = "SELECT *
+            FROM `customers`
+            WHERE `customer_id`=?";
+
+            $stmt2 = $dbTools->getConnection()->prepare($customer_query);
+
+            $stmt2->bind_param('s', $result[0]["reseller_id"]
+            ); // 's' specifies the variable type => 'string'
+
+            $stmt2->execute();
+
+            $result2 = $stmt2->get_result();
+            $result2 = $dbTools->fetch_assoc($result2);    
+
+            sendEmail($result2[0]["email"], "Request " . $request_id . " Updated", "Dear Reseller,\n\r your request has been processed.\n\r Best,");
+        }
+        //End sending email
+         
     }
-}else
-{
-  echo "{\"message\" :", "\"you don't have access to this page\""
+    
+} else {
+    echo "{\"message\" :", "\"you don't have access to this page\""
     , ",\"error\":true}";
 }
+
+function sendEmail($to, $title, $body) {
+    try {
+
+        // Create the Transport
+        $transport = (new Swift_SmtpTransport('mail.amprotelecom.com', 25))
+                ->setUsername('alialsaffar')
+                ->setPassword('zOIq6dX$@Pq44M')
+        ;
+
+        // Create the Mailer using your created Transport
+        $mailer = new Swift_Mailer($transport);
+
+        // Create a message
+        $message = (new Swift_Message('AmProTelecom INC. - ' . $title))
+                ->setFrom(['info@amprotelecom.com' => 'AmProTelecom INC.'])
+                ->setTo([$to])
+                ->setBody($body);
+        ;
+
+        // Send the message
+        $result = $mailer->send($message);
+    } catch (Exception $e) {
+        
+    }
+}
+
 ?>
