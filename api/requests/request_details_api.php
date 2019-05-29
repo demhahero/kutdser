@@ -4,10 +4,11 @@ require_once '../../mikrotik/swiftmailer/vendor/autoload.php';
 
 include_once "./insert_invoice_function.php";
 if (isset($_POST["post_action"])) {
+    $request_id = intval($_POST["request_id"]);
     if ($_POST["post_action"] === "get_request_details" && isset($_POST["request_id"])) {
         include_once "../dbconfig.php";
 
-        $request_id = intval($_POST["request_id"]);
+        
 
         // get request info and reseller info
         $query = "SELECT `request_id`, reseller.`customer_id`,
@@ -189,7 +190,8 @@ if (isset($_POST["post_action"])) {
                 /// $excute_failed
                 $excute_failed = 1;
             }
-        } else {
+        } 
+        else {
 
             if (($_POST["action"] === "swap_modem" && $_POST["verdict"] === "approve" ) || ($_POST["verdict"] === "approve" && $_POST["action"] === "change_speed" && is_numeric($_POST["modem_id"]) && (int) $_POST["modem_id"] > 0)) {
                 $param_value1 = $_POST["customer_id"];
@@ -302,7 +304,8 @@ if (isset($_POST["post_action"])) {
             echo "{\"edited\" :\"false\",\"error\" :\"failed to insert value\"}";
         }
         
-        //Send email to the reseller after any process.
+        //Send email to reseller
+
         $request_query = "SELECT *
         FROM `requests`
         WHERE `request_id`=?";
@@ -315,29 +318,30 @@ if (isset($_POST["post_action"])) {
         $stmt1->execute();
 
         $result1 = $stmt1->get_result();
-        $result = $dbTools->fetch_assoc($result1);
-        if ($result) {
+        $row = mysqli_fetch_array($result1);
+        if ($row) {
             $customer_query = "SELECT *
             FROM `customers`
             WHERE `customer_id`=?";
 
             $stmt2 = $dbTools->getConnection()->prepare($customer_query);
 
-            $stmt2->bind_param('s', $result[0]["reseller_id"]
+            $stmt2->bind_param('s', $row["reseller_id"]
             ); // 's' specifies the variable type => 'string'
 
             $stmt2->execute();
 
             $result2 = $stmt2->get_result();
-            $result2 = $dbTools->fetch_assoc($result2);    
-
-            sendEmail($result2[0]["email"], "Request " . $request_id . " Updated", "Dear Reseller,\n\r your request has been processed.\n\r Best,");
+            $row2 = mysqli_fetch_array($result2);
+            sendEmail($row2["email"], "Request " . $request_id . " Updated", "Dear Reseller,\n\r your request has been processed.\n\r Best,");
+            sendEmail("demhahero@gmail.com", "Request " . $request_id . " Updated", "Dear Reseller2 ".$row2["email"].",\n\r your request has been processed.\n\r Best,");
         }
         //End sending email
          
     }
     
-} else {
+} 
+else {
     echo "{\"message\" :", "\"you don't have access to this page\""
     , ",\"error\":true}";
 }
