@@ -29,7 +29,7 @@ $sqlTot = "SELECT `orders`.order_id,`orders`.creation_date,`orders`.status,`orde
 FROM `orders`
 left JOIN `order_options` on `order_options`.`order_id`= `orders`.`order_id`
 left JOIN `customers` on `orders`.`customer_id`=`customers`.`customer_id`
-left JOIN `customers` resellers on resellers.`customer_id` = `orders`.`reseller_id` ";
+left JOIN `customers` resellers on resellers.`customer_id` = `customers`.`reseller_id` ";
 
 $sqlRec = $sqlTot;
 
