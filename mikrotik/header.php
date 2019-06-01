@@ -183,6 +183,7 @@ if (!@include_once "../../api/dbconfig.php")
                                             <li><a href="<?= $site_url ?>/orders/orders.php">Orders<span class="blink total_order_sent" ></span></a></li>
                                             <li><a href="<?= $site_url ?>/customers/going_to_merge.php">Merges</a></li>
                                             <li><a href="<?= $site_url ?>/orders/phones.php">Phones</a></li>
+                                            <li><a href="<?= $site_url ?>/orders/offer_deadline_list.php">Offers Deadline</a></li>
                                         </ul>
                                     </li>
 
