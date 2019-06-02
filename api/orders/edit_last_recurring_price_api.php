@@ -20,7 +20,7 @@ if (isset($_GET["order_id"]) /* && isset($_GET["action_on_date"]) */) {
     $result1 = $stmt1->get_result();
     $result = $dbTools->fetch_assoc($result1);
     if ($result) {
-        
+
         $start_active_date = "";
         if ($result["product_category"] === "phone") {
             $start_active_date = $result["creation_date"];
@@ -38,104 +38,34 @@ if (isset($_GET["order_id"]) /* && isset($_GET["action_on_date"]) */) {
 } else if (isset($_POST["order_id"])) {
 
     include_once "../dbconfig.php";
-    
+
     $succeeded = true;
-    
+
+
+    $order_id = $_POST["order_id"];
     $product_price = $_POST["product_price"];
-    
-    
-    $invoice_query = "SELECT * FROM `invoices` "
-            . "where order_id= ? and YEAR(valid_date_from) = '2019' and MONTH(valid_date_from) = '5'";
 
-    $stmt1 = $dbTools->getConnection()->prepare($invoice_query);
-
-    $param_value = $_POST["order_id"];
-    $stmt1->bind_param('s', $param_value
-    ); // 's' specifies the variable type => 'string'
-
-
+    $previous_invoice_query = "SELECT `invoice_id` FROM `invoices` WHERE `invoice_type_id` in (1,2,3) AND `order_id`=? ORDER BY `valid_date_from` DESC LIMIT 1";
+    $stmt1 = $dbTools->getConnection()->prepare($previous_invoice_query);
+    $stmt1->bind_param('s', $order_id);
     $stmt1->execute();
-    
+
     if($stmt1->errno != 0)
         $succeeded = FALSE;
-    
+
     $result1 = $stmt1->get_result();
     $invoice_row = $dbTools->fetch_assoc($result1);
-    if ($invoice_row) {    
-        $invoice_row["invoice_id"];
-        
-        
-        $invoice_items_query = "SELECT * FROM `invoice_items` "
-            . "where `invoice_id`= ?  order by `invoice_item_id` asc";
-
-        $stmt1 = $dbTools->getConnection()->prepare($invoice_items_query);
-
-        $param_value = $invoice_row["invoice_id"];
-        $stmt1->bind_param('s', $param_value
-        ); // 's' specifies the variable type => 'string'
-
-
+    if ($invoice_row) {
+        $query = "UPDATE `invoices` SET `product_price`=? WHERE `invoice_id`=?";
+        $stmt1 = $dbTools->getConnection()->prepare($query);
+        $stmt1->bind_param('ss', $product_price, $invoice_row["invoice_id"]);
         $stmt1->execute();
-        
-        $result1 = $stmt1->get_result();
-        $total_price = 0;
-        
-        
         if($stmt1->errno != 0)
             $succeeded = FALSE;
-        while($invoice_items_row = $dbTools->fetch_assoc($result1)){
-            if(substr($invoice_items_row["item_name"], 0, 7)=="product"){
-                $total_price+= $product_price;
-                $query = "UPDATE `invoice_items` SET `item_price`=?,"
-                . "`item_duration_price`=? WHERE `invoice_item_id`=?";
-
-                $stmt1 = $dbTools->getConnection()->prepare($query);
-
-                $stmt1->bind_param('sss', $product_price, $product_price, $invoice_items_row['invoice_item_id']);
-
-
-                $stmt1->execute();
-                
-                if($stmt1->errno != 0)
-                    $succeeded = FALSE;
-            } else if($invoice_items_row["item_name"] == "Router price"
-                    || $invoice_items_row["item_name"] == "Additional service price"
-                    || $invoice_items_row["item_name"] == "Static IP price"){
-                $total_price+= $invoice_items_row["item_price"];
-            } else if($invoice_items_row["item_name"] == "QST Tax"){
-                $qst = $total_price * 0.09975;
-                $query = "UPDATE `invoice_items` SET `item_price`=?,"
-                . "`item_duration_price`=? WHERE `invoice_item_id`=?";
-
-                $stmt1 = $dbTools->getConnection()->prepare($query);
-
-                $stmt1->bind_param('sss', $qst, $qst, $invoice_items_row['invoice_item_id']);
-
-
-                $stmt1->execute();
-                
-                if($stmt1->errno != 0)
-                    $succeeded = FALSE;
-            } else if($invoice_items_row["item_name"] == "GST Tax"){
-                $gst = $total_price * 0.05;
-                $query = "UPDATE `invoice_items` SET `item_price`=?,"
-                . "`item_duration_price`=? WHERE `invoice_item_id`=?";
-
-                $stmt1 = $dbTools->getConnection()->prepare($query);
-
-                $stmt1->bind_param('sss', $gst, $gst, $invoice_items_row['invoice_item_id']);
-
-
-                $stmt1->execute();
-                
-                if($stmt1->errno != 0)
-                    $succeeded = FALSE;
-            }
-        }
     }
-    
 
-    
+
+
     if ($succeeded) {
         echo "{\"inserted\" :true,\"error\" :\"null\"}";
     } else {
