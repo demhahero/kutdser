@@ -305,7 +305,6 @@ if (isset($_POST["post_action"])) {
         }
         
         //Send email to reseller
-
         $request_query = "SELECT *
         FROM `requests`
         WHERE `request_id`=?";

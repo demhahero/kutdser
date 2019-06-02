@@ -1,4 +1,6 @@
 <?php
+require_once '../../mikrotik/swiftmailer/vendor/autoload.php';
+
 if(isset($_POST["action"]))
 {
   if($_POST["action"]==="get_order_by_id" && isset($_POST["order_id"]))
@@ -104,6 +106,51 @@ if(isset($_POST["action"]))
         $order = $stmt1->get_result();
         if ($stmt1->errno==0) {
             echo "{\"edited\" :true,\"error\" :\"null\"}";
+            
+            //Send email to reseller
+            $order_query = "SELECT *
+                FROM `orders`
+                WHERE `order_id`=?";
+
+            $stmt1 = $dbTools->getConnection()->prepare($order_query);
+
+            $stmt1->bind_param('s', $edit_id
+            ); // 's' specifies the variable type => 'string'
+
+            $stmt1->execute();
+
+            $result1 = $stmt1->get_result();
+            $row = mysqli_fetch_array($result1);
+            if ($row) {
+                $customer_query = "SELECT *
+                    FROM `customers`
+                    WHERE `customer_id`=?";
+
+                $stmt2 = $dbTools->getConnection()->prepare($customer_query);
+
+                $stmt2->bind_param('s', $row["reseller_id"]
+                ); // 's' specifies the variable type => 'string'
+
+                $stmt2->execute();
+
+                $result2 = $stmt2->get_result();
+                $row2 = mysqli_fetch_array($result2);
+                
+                $displayed_order_id = (((0x0000FFFF & (int) $edit_id) << 16) + ((0xFFFF0000 & (int) $edit_id) >> 16));
+                
+                sendEmail($row2["email"], "Order " . $displayed_order_id . " has been updated", "Dear Reseller ". $row2["full_name"] .","
+                        . "\n\r Your order ". $displayed_order_id ." has been processed."
+                        . "\n\r Actual installation time is ". $actual_installation_date 
+                        . " from:".$actual_installation_time_from." to:".$actual_installation_time_to
+                        . "\n\r All the best,");
+                
+                sendEmail("demhahero@gmail.com", "Order " . $displayed_order_id . " has been updated", "Dear Reseller ". $row2["full_name"] .","
+                        . "\n\r Your order ". $displayed_order_id ." has been processed."
+                        . "\n\r Actual installation time is ". $actual_installation_date 
+                        . " from:".$actual_installation_time_from." to:".$actual_installation_time_to
+                        . "\n\r All the best,");
+            }
+            //End sending email
         } else {
 
             echo "{\"edited\" :\"false\",\"error\" :\"failed to insert value\"}";
@@ -115,5 +162,32 @@ if(isset($_POST["action"]))
 {
   echo "{\"message\" :", "\"you don't have access to this page\""
     , ",\"error\":true}";
+}
+
+
+function sendEmail($to, $title, $body) {
+    try {
+
+        // Create the Transport
+        $transport = (new Swift_SmtpTransport('mail.amprotelecom.com', 25))
+                ->setUsername('alialsaffar')
+                ->setPassword('zOIq6dX$@Pq44M')
+        ;
+
+        // Create the Mailer using your created Transport
+        $mailer = new Swift_Mailer($transport);
+
+        // Create a message
+        $message = (new Swift_Message('AmProTelecom INC. - ' . $title))
+                ->setFrom(['info@amprotelecom.com' => 'AmProTelecom INC.'])
+                ->setTo([$to])
+                ->setBody($body);
+        ;
+
+        // Send the message
+        $result = $mailer->send($message);
+    } catch (Exception $e) {
+        
+    }
 }
 ?>
