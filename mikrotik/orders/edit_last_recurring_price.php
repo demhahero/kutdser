@@ -23,6 +23,7 @@ include_once "../header.php";
         });
         
         $(".submit").click(function () {
+            /*
             var order_id = "<?= $_GET['order_id'] ?>";
             var product_price = $("input[name=\"product_price\"]").val();
 
@@ -35,6 +36,7 @@ include_once "../header.php";
                 } else
                     alert("Error, try again");
             });
+            */
             return false;
         });
 

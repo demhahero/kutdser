@@ -44,9 +44,9 @@ include_once "../header.php";
     }
 </style>
 
-<title>Orders</title>
+<title>Offer Deadline list</title>
 <div class="page-header">
-    <a class="last" href="">Orders</a>
+    <a class="last" href="">Offer Deadline list</a>
 </div>
 
 <table id="myTable2"  class="display table table-striped table-bordered">
@@ -55,10 +55,10 @@ include_once "../header.php";
     <th style="width: 20%">Customer</th>
     <th style="width: 20%">Reseller</th>
     <th style="width: 15%">Product</th>
-    <th style="width: 15%">Date</th>
-    <th style="width: 5%">Status</th>
-    <th style="width: 10%">Edit Recurring</th>
-    <th style="width: 10%">Print Invoice</th>
+    <th style="width: 7%">Offer Starts</th>
+    <th style="width: 7%">Offer Ends</th>
+    <th style="width: 10%">Prices</th>
+    <th style="width: 8%">Print Invoice</th>
 </thead>
 <tbody>
 </tbody>

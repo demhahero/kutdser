@@ -7,8 +7,10 @@ if (isset($_GET["order_id"]) /* && isset($_GET["action_on_date"]) */) {
         `invoices`.`product_price` as `last_invoice_product_price` FROM `orders`
         INNER JOIN `order_options` on `order_options`.`order_id`=`orders`.`order_id`
         INNER JOIN `customers` on `customers`.`customer_id`=`orders`.`customer_id`
-        INNER JOIN `invoices` on `invoices`.`order_id`=`orders`.`order_id` and `invoices`.`invoice_type_id` in (1,2,3)
-    
+        LEFT JOIN `invoices` on `invoices`.`order_id`=`orders`.`order_id` and `invoices`.`invoice_type_id` in (1,2,3) 
+        and MONTH(`invoices`.`valid_date_from`)='".date("m")."' and YEAR(`invoices`.`valid_date_from`)='".date("Y")."'  
+        LEFT JOIN `requests` on `requests`.`order_id`=`orders`.`order_id` 
+        and `requests`.`action` in ('terminate', 'change_speed')
         where `orders`.`order_id`=? order by `invoices`.valid_date_from desc";
 
     $stmt1 = $dbTools->getConnection()->prepare($order_query);
@@ -21,29 +23,29 @@ if (isset($_GET["order_id"]) /* && isset($_GET["action_on_date"]) */) {
     $stmt1->execute();
 
     $result1 = $stmt1->get_result();
-    $result = $dbTools->fetch_assoc($result1);
-    if ($result) {
+    $order_row = $dbTools->fetch_assoc($result1);
+    if ($order_row) {
 
         $start_active_date = "";
-        if ($result["product_category"] === "phone") {
-            $start_active_date = $result["creation_date"];
-        } else if ($result["product_category"] === "internet") {
-            if ($result["cable_subscriber"] === "yes") {
-                $start_active_date = $result["cancellation_date"];
+        if ($order_row["product_category"] === "phone") {
+            $start_active_date = $order_row["creation_date"];
+        } else if ($order_row["product_category"] === "internet") {
+            if ($order_row["cable_subscriber"] === "yes") {
+                $start_active_date = $order_row["cancellation_date"];
             } else {
-                $start_active_date = $result["installation_date_1"];
+                $start_active_date = $order_row["installation_date_1"];
             }
         }
-        $result["start_active_date"] = $start_active_date;
+        $order_row["start_active_date"] = $start_active_date;
         
-        $converted = DateTime::createFromFormat("Y-m-d H:i:s", $result["start_active_date"]);
+        $converted = DateTime::createFromFormat("Y-m-d H:i:s", $order_row["start_active_date"]);
         $converted1Year = $converted->add(new DateInterval("P1Y"));
         
         if($converted1Year->format("d") != "1")
             $converted1Year->modify('first day of next month');
         
-        $result["offer_end"] = $converted1Year->format("Y-m-d H:i:s");
-        $json = json_encode($result);
+        $order_row["offer_end"] = $converted1Year->format("Y-m-d H:i:s");
+        $json = json_encode($order_row);
         echo "{\"order\" :", $json, "}";
     }
 } else if (isset($_POST["order_id"])) {
