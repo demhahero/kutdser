@@ -5,37 +5,41 @@ $(document).ready(function () {
         closeOnSelect: false
     });
 
+    $(".tablinks").click(function(){
+        return false;
+    });
+
     var product_type = "internet";
 
-    function setupInternetForm() {
-        $("div.internet label.subscriber-on").hide();
-        $("div.internet input.modem-off").prop("checked", true);
-        $("div.internet input.router-off").prop("checked", true);
-        $("div.internet input.subscriber-off").prop("checked", true);
+    function setupBundleForm() {
+        $("div.bundle label.subscriber-on").hide();
+        $("div.bundle input.modem-off").prop("checked", true);
+        $("div.bundle input.router-off").prop("checked", true);
+        $("div.bundle input.subscriber-off").prop("checked", true);
 
-        $("div.internet div.modem-inventory-list").hide();
+        $("div.bundle div.modem-inventory-list").hide();
         //jQuery( "div.modem-info" ).hide();
 
-        $("div.internet input.subscriber").change(function () {
+        $("div.bundle input.subscriber").change(function () {
             if (this.value == "yes") {
-                $("div.internet div.installation").hide();
-                $("div.internet label.subscriber-on").show();
+                $("div.bundle div.installation").hide();
+                $("div.bundle label.subscriber-on").show();
             } else {
-                $("div.internet div.installation").show();
-                $("div.internet label.subscriber-on").hide();
+                $("div.bundle div.installation").show();
+                $("div.bundle label.subscriber-on").hide();
             }
         });
 
-        $("div.internet input.modem").change(function () {
+        $("div.bundle input.modem").change(function () {
             if (this.value == "rent") {
-                $("div.internet div.modem-inventory-list").hide();
-                $("div.internet div.modem-info").hide();
+                $("div.bundle div.modem-inventory-list").hide();
+                $("div.bundle div.modem-info").hide();
             } else if (this.value == "own_modem") {
-                $("div.internet div.modem-inventory-list").hide();
-                $("div.internet div.modem-info").show();
+                $("div.bundle div.modem-inventory-list").hide();
+                $("div.bundle div.modem-info").show();
             } else if (this.value == "inventory") {
-                $("div.internet div.modem-info").hide();
-                $("div.internet div.modem-inventory-list").show();
+                $("div.bundle div.modem-info").hide();
+                $("div.bundle div.modem-inventory-list").show();
             }
 
         });
@@ -49,39 +53,39 @@ $(document).ready(function () {
             fistDayCancelattion = "4";
         }
 
-        $('div.internet #datePicker1').prop("readonly", true);
-        $('div.internet #datePicker2').prop("readonly", true);
-        $('div.internet #datePicker3').prop("readonly", true);
-        $('div.internet #datePicker4').prop("readonly", true);
-        $('div.internet #datePicker5').prop("readonly", true);
+        $('div.bundle #datePicker1').prop("readonly", true);
+        $('div.bundle #datePicker2').prop("readonly", true);
+        $('div.bundle #datePicker3').prop("readonly", true);
+        $('div.bundle #datePicker4').prop("readonly", true);
+        $('div.bundle #datePicker5').prop("readonly", true);
 
-        $('div.internet #datePicker4').datepicker({
+        $('div.bundle #datePicker4').datepicker({
             format: 'mm/dd/yyyy',
             daysOfWeekDisabled: [0, 6],
             startDate: '+' + fistDayCancelattion + 'd'
         });
-        $('div.internet #datePicker5').datepicker({
+        $('div.bundle #datePicker5').datepicker({
             format: 'mm/dd/yyyy',
             startDate: '+' + fistDayInstallation + 'd',
             daysOfWeekDisabled: [0, 6],
             endDate: currentDate
         });
-        $('div.internet #datePicker2').datepicker({
+        $('div.bundle #datePicker2').datepicker({
             format: 'mm/dd/yyyy',
             startDate: '+' + fistDayInstallation + 'd',
             daysOfWeekDisabled: [0, 6],
             endDate: currentDate
         });
-        $('div.internet #datePicker3').datepicker({
+        $('div.bundle #datePicker3').datepicker({
             format: 'mm/dd/yyyy',
             startDate: '+' + fistDayInstallation + 'd',
             daysOfWeekDisabled: [0, 6],
             endDate: currentDate
         });
 
-        $("div.internet input.plan-monthly").prop("checked", true);
+        $("div.bundle input.plan-monthly").prop("checked", true);
 
-        $('div.internet #check-service-availability').click(function () {
+        $('div.bundle #check-service-availability').click(function () {
             PopupCenter("http://www.videotron.com/vcom/catalog/template/tool/_service_availability.jsp?lang=en&captchaRequired={1}&_requestid=3113680", "Check Service Availabilty", 600, 400);
             return false;
         });
@@ -135,25 +139,27 @@ $(document).ready(function () {
 
     var temp_content = null;
     var last_temp = "internet";
-    //Select Internet product
-    $(".product-internet").click(function () {
-        product_type = "internet";
+
+
+    $(".product-bundle").click(function () {
+        product_type = "bundle";
         $("div.phone").hide();
         $("div.phone :input").attr("disabled", true);
         $("div.phone select").attr("disabled", true);
 
-        $("div.internet").show();
-        $("div.internet :input").attr("disabled", false);
-        $("div.internet select").attr("disabled", false);
-
-        $("div.bundle").hide();
-        $("div.bundle :input").attr("disabled", true);
-        $("div.bundle select").attr("disabled", true);
+        $("div.internet").hide();
+        $("div.internet :input").attr("disabled", true);
+        $("div.internet select").attr("disabled", true);
 
         $("div.tv").hide();
         $("div.tv :input").attr("disabled", true);
         $("div.tv select").attr("disabled", true);
-        setupInternetForm();
+
+        $("div.bundle").show();
+        $("div.bundle :input").attr("disabled", false);
+        $("div.bundle select").attr("disabled", false);
+        setupBundleForm();
+
         $('#smartwizard').smartWizard("next");
         return false;
     });
@@ -342,10 +348,9 @@ $(document).ready(function () {
     });
 
     function priceCalculator() {
-        $("div.tv_order_details").hide();
-        $("div.bundle_order_details").hide();
-        $("div.order_details").show();
-        if (product_type == "internet") {
+        $("div.bundle_order_details").show();
+        if (product_type == "bundle") {
+            
             var total_price = 0;
             var product_price = 0;
             var price_of_remainig_days = 0;
@@ -368,64 +373,64 @@ $(document).ready(function () {
 
 
             //Get product price
-            has_discount = $("input[name=\"has_discount\"]").val() === 'yes';
-            free_modem = $("input[name=\"free_modem\"]").val() === 'yes';
-            free_router = $("input[name=\"free_router\"]").val() === 'yes';
-            free_adapter = $("input[name=\"free_adapter\"]").val() === 'yes';
-            free_installation = $("input[name=\"free_installation\"]").val() === 'yes';
-            free_transfer = $("input[name=\"free_transfer\"]").val() === 'yes';
+            has_discount = $("div.bundle-internet input[name=\"has_discount\"]").val() === 'yes';
+            free_modem = $("div.bundle-internet input[name=\"free_modem\"]").val() === 'yes';
+            free_router = $("div.bundle-internet input[name=\"free_router\"]").val() === 'yes';
+            free_adapter = $("div.bundle-internet input[name=\"free_adapter\"]").val() === 'yes';
+            free_installation = $("div.bundle-internet input[name=\"free_installation\"]").val() === 'yes';
+            free_transfer = $("div.bundle-internet input[name=\"free_transfer\"]").val() === 'yes';
 
-            product_price = parseFloat($("select[name=\"product\"] option:selected").attr("real_price"));
+            product_price = parseFloat($("div.bundle-internet select[name=\"product_internet\"] option:selected").attr("real_price"));
             if (has_discount)
-                product_price = parseFloat($("select[name=\"product\"] option:selected").attr("price"));
+                product_price = parseFloat($("div.bundle-internet select[name=\"product_internet\"] option:selected").attr("price"));
 
             //product title
 
-            var title = $("select[name=\"product\"] option:selected").attr("data_title") + " " + product_price
+            var title = $("div.bundle-internet select[name=\"product_internet\"] option:selected").attr("data_title") + " " + product_price
             if (has_discount)
-                title = $("select[name=\"product\"] option:selected").text();
+                title = $("div.bundle-internet select[name=\"product_internet\"] option:selected").text();
             //If rent modem
-            if ($("input[name=\"options[inventory_modem_price]\"]").prop('checked') == true)
+            if ($("div.bundle-internet input[name=\"options[inventory_modem_price]\"]").prop('checked') == true)
             {
                 modem_cost = 59.90;
             }
-            if ($("input[name=\"options[modem]\"]:checked").val() == "rent") {
+            if ($("div.bundle-internet input[name=\"options[modem]\"]:checked").val() == "rent") {
                 modem_cost = 59.90;
                 if (has_discount && free_modem)
                     modem_cost = 0;
                 //Deposit has no tax
                 //value_has_no_tax = modem_cost;
             }
-            if ($("input[name=\"options[modem]\"]:checked").val() == "buy") {
+            if ($("div.bundle-internet input[name=\"options[modem]\"]:checked").val() == "buy") {
                 modem_cost = 200;
             }
 
-            if ($("input[name=\"options[router]\"]:checked").val() == "rent") { //If rent router
+            if ($("div.bundle-internet input[name=\"options[router]\"]:checked").val() == "rent") { //If rent router
                 router_cost = 2.90;
                 if (has_discount && free_router)
                     router_cost = 0;
-            } else if ($("input[name=\"options[router]\"]:checked").val() == "rent_hap_lite") { //If rent router hap lite
+            } else if ($("div.bundle-internet input[name=\"options[router]\"]:checked").val() == "rent_hap_lite") { //If rent router hap lite
                 router_cost = 4.90;
-            } else if ($("input[name=\"options[router]\"]:checked").val() == "buy_hap_ac_lite") { //if buy hap ac lite
+            } else if ($("div.bundle-internet input[name=\"options[router]\"]:checked").val() == "buy_hap_ac_lite") { //if buy hap ac lite
                 router_cost = 74.00;
-            } else if ($("input[name=\"options[router]\"]:checked").val() == "buy_hap_mini") { //if buy hap mini
+            } else if ($("div.bundle-internet input[name=\"options[router]\"]:checked").val() == "buy_hap_mini") { //if buy hap mini
                 router_cost = 39.90;
             }
 
             //Check additional service
-            if ($("input[name=\"options[additional_service]\"]").prop('checked') == true) {
+            if ($("div.bundle-internet input[name=\"options[additional_service]\"]").prop('checked') == true) {
                 additional_service = 5;
 
                 //if yearly, multiply additional+service by 12 months.
-                if ($("select[name=\"product\"] option:selected").text().includes("Yearly") != false) {
+                if ($("div.bundle-internet select[name=\"product_internet\"] option:selected").text().includes("Yearly") != false) {
                     additional_service = additional_service * 12;
                 }
             }
             //Check static ip
-            if ($("input[name=\"options[static_ip]\"]").prop('checked') == true) {
+            if ($("div.bundle-internet input[name=\"options[static_ip]\"]").prop('checked') == true) {
                 static_ip = 20;
                 //if yearly, multiply static ip by 12 months.
-                if ($("select[name=\"product\"] option:selected").text().includes("Yearly") != false) {
+                if ($("div.bundle-internet select[name=\"product_internet\"] option:selected").text().includes("Yearly") != false) {
                     static_ip = static_ip * 12;
                 }
 
@@ -433,11 +438,11 @@ $(document).ready(function () {
 
             //if NOT yearly payment, check monthly (no contract) for transfer or installation fees.
             //If user selects 60 or 120, then charge him the setup fees anyways.
-            if ($("select[name=\"product\"] option:selected").text().includes("Yearly") == false) {
-                if ($("input[name=\"options[plan]\"]:checked").val() == "monthly"
-                        || $("select[name=\"product\"] option:selected").val() == 416
-                        || $("select[name=\"product\"] option:selected").val() == 418) {
-                    if ($("input[name=\"options[cable_subscriber]\"]:checked").val() == "yes")
+            if ($("div.bundle-internet select[name=\"product_internet\"] option:selected").text().includes("Yearly") == false) {
+                if ($("div.bundle-internet input[name=\"options[plan]\"]:checked").val() == "monthly"
+                        || $("div.bundle-internet select[name=\"product_internet\"] option:selected").val() == 416
+                        || $("div.bundle-internet select[name=\"product_internet\"] option:selected").val() == 418) {
+                    if ($("div.bundle-internet input[name=\"options[cable_subscriber]\"]:checked").val() == "yes")
                     {
                         installation_transfer_cost = 19.90;
                         if (has_discount && free_transfer)
@@ -456,10 +461,10 @@ $(document).ready(function () {
 
 
             //if transfer
-            if ($("input[name=\"options[cable_subscriber]\"]:checked").val() == "yes") {
+            if ($("div.bundle-internet input[name=\"options[cable_subscriber]\"]:checked").val() == "yes") {
 
                 //Convert cancellation_date to Date
-                start_date = parseDate($("input[name=\"options[cancellation_date]\"]").val());
+                start_date = parseDate($("div.bundle-internet input[name=\"options[cancellation_date]\"]").val());
 
                 //Calculate the number of days in this month
                 var days_in_month = parseInt(daysInMonth(start_date.getMonth(), start_date.getYear()));
@@ -469,7 +474,7 @@ $(document).ready(function () {
             } else { //if new installation
 
                 //Convert installation_date_1 to Date
-                start_date = parseDate($("input[name=\"options[installation_date_1]\"]").val());
+                start_date = parseDate($("div.bundle-internet input[name=\"options[installation_date_1]\"]").val());
 
                 //Calculate the number of days in this month
                 var days_in_month = parseInt(daysInMonth(start_date.getMonth(), start_date.getYear()));
@@ -486,7 +491,7 @@ $(document).ready(function () {
                 price_of_remainig_days = 0;
             } else {
                 //Calculate the price of the remaining days
-                if ($("select[name=\"product\"] option:selected").text().includes("Yearly") != false) { //if yearly payment, divide price by 12 months
+                if ($("div.bundle-internet select[name=\"product_internet\"] option:selected").text().includes("Yearly") != false) { //if yearly payment, divide price by 12 months
                     //Calculate additional + product for the rest of the month
                     price_of_remainig_days = parseFloat((product_price / 12) / days_in_month) * remainigDays;
                     price_of_remainig_days += parseFloat(additional_service / days_in_month) * remainigDays;
@@ -496,9 +501,9 @@ $(document).ready(function () {
                     price_of_remainig_days = parseFloat(product_price / days_in_month) * remainigDays;
                     price_of_remainig_days += parseFloat(additional_service / days_in_month) * remainigDays;
                     price_of_remainig_days += parseFloat(static_ip / days_in_month) * remainigDays;
-                    if ($("input[name=\"options[router]\"]:checked").val() == "rent") {
+                    if ($("div.bundle-internet input[name=\"options[router]\"]:checked").val() == "rent") {
                         price_of_remainig_days += parseFloat(router_cost / days_in_month) * remainigDays;
-                    } else if ($("input[name=\"options[router]\"]:checked").val() == "rent_hap_lite") {
+                    } else if ($("div.bundle-internet input[name=\"options[router]\"]:checked").val() == "rent_hap_lite") {
                         price_of_remainig_days += parseFloat(router_cost / days_in_month) * remainigDays;
                     }
                 }
@@ -521,29 +526,278 @@ $(document).ready(function () {
 
             //if first day, don't show remaining days from to
             if (parseInt(start_date.getDate()) != 1) {
-                $("div.order_details span.remaining-days-from-to").html("From: " + start_date.getDate() + "/" + monthNames[start_date.getMonth()] + " To " + days_in_month + "/" + monthNames[start_date.getMonth()]);
+                $("div.bundle_order_details span.internet-remaining-days-from-to").html("From: " + start_date.getDate() + "/" + monthNames[start_date.getMonth()] + " To " + days_in_month + "/" + monthNames[start_date.getMonth()]);
             }
 
-            $("div.order_details span.remaining-days-cost").html("$" + price_of_remainig_days.toFixed(2));
+            $("div.bundle_order_details span.internet-remaining-days-cost").html("$" + price_of_remainig_days.toFixed(2));
 
-            $("div.order_details span.setup-cost").html("$" + installation_transfer_cost.toFixed(2));
+            $("div.bundle_order_details span.internet-setup-cost").html("$" + installation_transfer_cost.toFixed(2));
 
-            $("div.order_details span.modem-cost").html("$" + modem_cost.toFixed(2));
+            $("div.bundle_order_details span.internet-modem-cost").html("$" + modem_cost.toFixed(2));
 
-            $("div.order_details span.router-cost").html("$" + router_cost.toFixed(2));
+            $("div.bundle_order_details span.internet-router-cost").html("$" + router_cost.toFixed(2));
 
-            $("div.order_details span.additional-service-cost").html("$" + additional_service.toFixed(2));
+            $("div.bundle_order_details span.internet-additional-service-cost").html("$" + additional_service.toFixed(2));
 
-            $("div.order_details span.static-ip-cost").html("$" + static_ip.toFixed(2));
+            $("div.bundle_order_details span.internet-static-ip-cost").html("$" + static_ip.toFixed(2));
 
-            $("div.order_details span.qst-cost").html("$" + qst_tax.toFixed(2));
+            $("div.bundle_order_details span.internet-qst-cost").html("$" + qst_tax.toFixed(2));
 
-            $("div.order_details span.gst-cost").html("$" + gst_tax.toFixed(2));
+            $("div.bundle_order_details span.internet-gst-cost").html("$" + gst_tax.toFixed(2));
 
-            $("div.order_details span.product-name").html(title);
+            $("div.bundle_order_details span.internet-product-name").html(title + "$");
 
-            $("div.order_details span.total").html("$" + total_price.toFixed(2));
-        } 
+            $("div.bundle_order_details span.internet-total").html("$" + total_price.toFixed(2));
+
+
+
+
+            //Bundle Phone
+            var total_price = 0;
+            var product_price = 0;
+            var price_of_remainig_days = 0;
+            var adapter_price = 0;
+            var transfer_price = 0;
+            var start_date = ""; // When will the customer join
+            var remainigDays = 0; //Remaining days in the month
+            var value_has_no_tax = 0; // Exclude items that have no tax such as deposits
+            var gst_tax = 0;
+            var qst_tax = 0;
+            var additional_service = 0;
+            var static_ip = 0;
+            var has_discount = false;
+            var free_modem = false;
+            var free_router = false;
+            var free_adapter = false;
+            var free_installation = false;
+            var free_transfer = false;
+
+            //Get product price
+            has_discount = $("div.bundle-phone input[name=\"has_discount\"]").val() === 'yes';
+            free_modem = $("div.bundle-phone input[name=\"free_modem\"]").val() === 'yes';
+            free_router = $("div.bundle-phone input[name=\"free_router\"]").val() === 'yes';
+            free_adapter = $("div.bundle-phone input[name=\"free_adapter\"]").val() === 'yes';
+            free_installation = $("div.bundle-phone input[name=\"free_installation\"]").val() === 'yes';
+            free_transfer = $("div.bundle-phone input[name=\"free_transfer\"]").val() === 'yes';
+
+            //Get product
+            product_price = parseFloat($("div.bundle-phone select[name=\"product_phone\"] option:selected").attr("real_price"));
+            if (has_discount)
+                product_price = parseFloat($("div.bundle-phone select[name=\"product_phone\"] option:selected").attr("price"));
+
+            //product title
+
+            var title = $("div.bundle-phone select[name=\"product_phone\"] option:selected").attr("data_title") + " " + product_price
+            if (has_discount)
+                title = $("div.bundle-phone select[name=\"product\"] option:selected").text();
+            //If buy adapter
+            if ($("div.bundle-phone input[name=\"options[adapter]\"]:checked").val() == "buy_Cisco_SPA112") {
+                adapter_price = 59.90;
+                if (has_discount && free_adapter)
+                    adapter_price = 0;
+            }
+            //NOTICE: Have to be changed later
+            //adapter_price = 0;
+
+            //If transfer
+            if ($("div.bundle-phone input[name=\"options[you_have_phone_number]\"]:checked").val() == "yes") {
+                transfer_price = 15;
+            }
+
+            //today is the start day
+            start_date = new Date();
+
+            //Calculate the number of days in this month
+            var days_in_month = parseInt(daysInMonth(start_date.getMonth(), start_date.getYear()));
+
+            //Calculate the remaining days in this month
+            remainigDays = days_in_month - start_date.getDate() + 1;
+
+            if (parseInt(start_date.getDate()) == 1) {
+                remainigDays = 0;
+                price_of_remainig_days = 0;
+            } else {
+                //Calculate the price of the remaining days
+                if ($("div.bundle-phone select[name=\"product_phone\"] option:selected").text().includes("1 year") != false) { //if yearly payment, divide price by 12 months
+                    //Calculate product for the rest of the month
+                    price_of_remainig_days = parseFloat((product_price / 12) / days_in_month) * remainigDays;
+                } else {
+                    //Calculate product for the rest of the month
+                    price_of_remainig_days = parseFloat(product_price / days_in_month) * remainigDays;
+                }
+            }
+
+            //Calculate total price
+            total_price = product_price + price_of_remainig_days + transfer_price + adapter_price;
+
+            //Calculate texes
+            qst_tax = (total_price - value_has_no_tax) * 0.09975;
+            gst_tax = (total_price - value_has_no_tax) * 0.05;
+
+            //Add taxes to total price
+            total_price += qst_tax + gst_tax;
+
+            //Display price list
+            var monthNames = ["January", "February", "March", "April", "May", "June",
+                "July", "August", "September", "October", "November", "December"
+            ];
+
+            //if first day, don't show remaining days from to
+            if (parseInt(start_date.getDate()) != 1) {
+                $("div.bundle_order_details span.phone-remaining-days-from-to").html("From: " + start_date.getDate() + "/" + monthNames[start_date.getMonth()] + " To " + days_in_month + "/" + monthNames[start_date.getMonth()]);
+            }
+
+            $("div.bundle_order_details span.phone-remaining-days-cost").html("$" + price_of_remainig_days.toFixed(2));
+
+            $("div.bundle_order_details span.phone-setup-cost").html("$" + transfer_price.toFixed(2));
+
+            $("div.bundle_order_details span.phone-adapter-cost").html("$" + adapter_price.toFixed(2));
+
+            $("div.bundle_order_details span.phone-qst-cost").html("$" + qst_tax.toFixed(2));
+
+            $("div.bundle_order_details span.phone-gst-cost").html("$" + gst_tax.toFixed(2));
+
+            $("div.bundle_order_details span.phone-product-name").html(title + "$");
+
+            $("div.bundle_order_details span.phone-total").html("$" + total_price.toFixed(2));
+
+
+
+
+
+            var total_price = 0;
+            var product_price = 0;
+            var price_of_remainig_days = 0;
+            var price_of_remaining_days_channels = 0;
+            var add_on_channels_price = 0;
+            var box_price = 0;
+            var admin_fee = 0;
+            var start_date = ""; // When will the customer join
+            var remainigDays = 0; //Remaining days in the month
+            var value_has_no_tax = 0; // Exclude items that have no tax such as deposits
+            var gst_tax = 0;
+            var qst_tax = 0;
+
+            var has_discount = false;
+            var free_modem = false;
+            var free_router = false;
+            var free_adapter = false;
+            var free_installation = false;
+            var free_transfer = false;
+
+            //Get product price
+            has_discount = $("div.bundle-tv input[name=\"has_discount\"]").val() === 'yes';
+            free_modem = $("div.bundle-tv input[name=\"free_modem\"]").val() === 'yes';
+            free_router = $("div.bundle-tv input[name=\"free_router\"]").val() === 'yes';
+            free_adapter = $("div.bundle-tv input[name=\"free_adapter\"]").val() === 'yes';
+            free_installation = $("div.bundle-tv input[name=\"free_installation\"]").val() === 'yes';
+            free_transfer = $("div.bundle-tv input[name=\"free_transfer\"]").val() === 'yes';
+
+            //Get product
+            product_price = parseFloat($("div.bundle-tv select[name=\"product_tv\"] option:selected").attr("real_price"));
+            if (has_discount)
+                product_price = parseFloat($("div.bundle-tv select[name=\"product_tv\"] option:selected").attr("price"));
+
+            //product title
+
+            var title = $("div.bundle-tv select[name=\"product_tv\"] option:selected").attr("data_title") + " " + product_price
+            if (has_discount)
+                title = $("div.bundle-tv select[name=\"product_tv\"] option:selected").text();
+            //If buy adapter
+            if ($("div.bundle-tv input[name=\"options[box]\"]:checked").val() == "yes") {
+                box_price = 50;
+                if (has_discount && free_box)
+                    box_price = 0;
+            }
+            // get add on channels
+            debugger;
+            var add_on_channels = [];
+            $.each($("div.bundle-tv select[name=\"options[add_on_channels][]\"]").val(), function (index, value) {
+
+                var channel = JSON.parse(value);
+                add_on_channels_price += channel.price;
+                add_on_channels.push(channel);
+            });
+
+            //If transfer
+            if ($("div.bundle-tv input[name=\"options[admin_fee]\"]:checked").val() == "yes") {
+                admin_fee = parseFloat($("div.bundle-tv input[name=\"options[admin_fee_value]\"]").val());
+            }
+
+            //today is the start day
+            start_date = new Date();
+
+            //Calculate the number of days in this month
+            var days_in_month = parseInt(daysInMonth(start_date.getMonth(), start_date.getYear()));
+
+            //Calculate the remaining days in this month
+            remainigDays = days_in_month - start_date.getDate() + 1;
+
+            if (parseInt(start_date.getDate()) == 1) {
+                remainigDays = 0;
+                price_of_remainig_days = 0;
+                price_of_remaining_days_channels = 0;
+            } else {
+                //Calculate the price of the remaining days
+                if ($("div.bundle-tv select[name=\"product_tv\"] option:selected").text().includes("1 year") != false) { //if yearly payment, divide price by 12 months
+                    //Calculate product for the rest of the month
+                    price_of_remainig_days = parseFloat((product_price / 12) / days_in_month) * remainigDays;
+                    $.each(add_on_channels, function (index, channel) {
+
+                        price_of_remaining_days_channels += parseFloat((channel.price / 12) / days_in_month) * remainigDays;
+                    });
+                } else {
+                    //Calculate product for the rest of the month
+                    price_of_remainig_days = parseFloat(product_price / days_in_month) * remainigDays;
+                    $.each(add_on_channels, function (index, channel) {
+
+                        price_of_remaining_days_channels += parseFloat(channel.price / days_in_month) * remainigDays;
+                    });
+                }
+            }
+
+            //Calculate total price
+            total_price = product_price + add_on_channels_price + price_of_remainig_days + price_of_remaining_days_channels + box_price + admin_fee;
+
+            //Calculate texes
+            qst_tax = (total_price - value_has_no_tax) * 0.09975;
+            gst_tax = (total_price - value_has_no_tax) * 0.05;
+
+            //Add taxes to total price
+            total_price += qst_tax + gst_tax;
+
+            //Display price list
+            var monthNames = ["January", "February", "March", "April", "May", "June",
+                "July", "August", "September", "October", "November", "December"
+            ];
+
+            //if first day, don't show remaining days from to
+            if (parseInt(start_date.getDate()) != 1) {
+                $("div.bundle_order_details span.tv-remaining-days-from-to").html("From: " + start_date.getDate() + "/" + monthNames[start_date.getMonth()] + " To " + days_in_month + "/" + monthNames[start_date.getMonth()]);
+            }
+
+            $("div.bundle_order_details span.tv-remaining-days-cost").html("$" + price_of_remainig_days.toFixed(2));
+
+            $("div.bundle_order_details span.tv-box-price").html("$" + box_price.toFixed(2));
+
+            $("div.bundle_order_details span.tv-admin-fee-price").html("$" + admin_fee.toFixed(2));
+            $("div.bundle_order_details span#add-on-channels").html("");
+            $.each(add_on_channels, function (index, channel) {
+                $("div.tv_order_details span#add-on-channels").append(
+                        '<li class="list-group-item">' + channel.text + ' <span class="badge">' + channel.price + '</span></li>'
+                        )
+                price_of_remaining_days_channels += parseFloat((channel.price / 12) / days_in_month) * remainigDays;
+            });
+            $("div.bundle_order_details span.tv-remaining-days-channels-cost").html("$" + price_of_remaining_days_channels.toFixed(2));
+
+            $("div.bundle_order_details span.tv-qst-cost").html("$" + qst_tax.toFixed(2));
+
+            $("div.bundle_order_details span.tv-gst-cost").html("$" + gst_tax.toFixed(2));
+
+            $("div.bundle_order_details span.tv-product-name").html(title + "$");
+
+            $("div.bundle_order_details span.tv-total").html("$" + total_price.toFixed(2));
+        }
     }
 
     //Convert string to a Date
