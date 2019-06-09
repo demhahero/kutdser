@@ -227,7 +227,7 @@ if(isset($_GET["order_id"]))
 <a target="_blank" href="<?= $api_url ?>print/print_order.php?order_id=<?php echo $_GET["order_id"]; ?>" class="btn btn-success print-button">Print</a>
 <button id="send_by_email" class="btn btn-danger print-button check-alert" data-href="#">Send by Email</button>
 <a id="usage" class="btn btn-primary print-button" href="#">Usage</a>
-
+<a id="invoices"  class="btn btn-dark print-button" href="invoices.php?order_id=<?php echo $_GET["order_id"]; ?>">Invoices</a>
 <br>
 <br>
 <div>
