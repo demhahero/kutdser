@@ -19,6 +19,50 @@ include_once "../header.php";
                 }
             }
         });
+  
+        <?php
+            if($admin_type == 1){
+        ?>
+        $('body').on('dblclick', '.editable', function(){
+            if($(this).children().length){
+                
+            }
+            else{
+                str = $(this).html();
+                str = str.substring(0, str.length - 1);
+                $(this).html("<input old-value='"+str+"'  style='color:black;' value='"+str+"'>"
+                +"<button class=\"btn yes-change\"><i class=\"glyphicon glyphicon-ok\"></i></button>"
+                +"<button class=\"btn no-change\"><i class=\"glyphicon glyphicon-remove\"></i></button>");
+            }
+            
+        });
+        
+        
+        $('body').on('click', '.yes-change', function(){
+            
+            var invoice_item_id = $(this).closest('tr').attr('id');
+            var item_duration_price = $(this).parent().find("input").val();
+  
+            $.post("<?= $api_url ?>orders/invoice_edit_api.php",
+                    {invoice_item_id: invoice_item_id, item_duration_price: item_duration_price}
+                    , function (data, status) {
+                        data = $.parseJSON(data);
+                        if (data.updated == true) {
+                            alert("Value updated");
+                        } else
+                            alert("Error, try again");
+            });
+            $(this).parent().html($(this).parent().find("input").val()+"$");
+                
+        });
+        
+        $('body').on('click', '.no-change', function(){
+            $(this).parent().html($(this).parent().find("input").attr('old-value')+"$");
+        });
+        
+        <?php
+            }
+        ?>
     });
 </script>
 <style>
@@ -43,6 +87,7 @@ include_once "../header.php";
         0% { transform: rotate(0deg); }
         100% { transform: rotate(360deg); }
     }
+    
 </style>
 
 <title>Invoices</title>

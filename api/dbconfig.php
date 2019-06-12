@@ -31,6 +31,7 @@ if (strpos($_SERVER['REQUEST_URI'], 'mikrotik') !== false) {
 
         $username = $admin_row["username"];
         $admin_id = $admin_row["admin_id"];
+        $admin_type = $admin_row["type"];
     }
 } else if (strpos($_SERVER['REQUEST_URI'], 'ResellerPortal') !== false) {
     include $_SERVER['DOCUMENT_ROOT'] . $root_folder."/api/tools/DBTools.php";
@@ -94,6 +95,7 @@ if (strpos($_SERVER['REQUEST_URI'], 'mikrotik') !== false) {
 
     $username = $admin_row["username"];
     $admin_id = $admin_row["admin_id"];
+    $admin_type = $admin_row["type"];
 }  else if (strpos($_SERVER['REQUEST_URI'], 'ipspeedlist') !== false) {
 
     include $_SERVER['DOCUMENT_ROOT'] . "/api/tools/DBTools.php";
@@ -121,5 +123,6 @@ if (strpos($_SERVER['REQUEST_URI'], 'mikrotik') !== false) {
 
     $username = $admin_row["username"];
     $admin_id = $admin_row["admin_id"];
+    $admin_type = $admin_row["type"];
 }
 ?>

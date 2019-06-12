@@ -101,10 +101,17 @@ while ($row = mysqli_fetch_array($queryRecords)) {
             . "</thead>"
             . "<tbody class='collapse' id='accordion-".$row['invoice_id']."'>";
     while ($invoice_item_row = mysqli_fetch_array($invoice_items_result)) {
-        $data[4] = $data[4]."<tr>";
+        $data[4] = $data[4]."<tr id='".$invoice_item_row['invoice_item_id']."'>";
         $data[4] = $data[4]."<td>".$invoice_item_row['item_name']."</td>";
-        $data[4] = $data[4]."<td>".$invoice_item_row['item_price']."$</td>";
-        $data[4] = $data[4]."<td>".$invoice_item_row['item_duration_price']."$</td>";       
+        
+        if($row['type_name'] == "Refund"){
+            $data[4] = $data[4]."<td>".$invoice_item_row['item_price']."$</td>";
+            $data[4] = $data[4]."<td  class='editable'>".$invoice_item_row['item_duration_price']."$</td>";
+        }
+        else{
+            $data[4] = $data[4]."<td>".$invoice_item_row['item_price']."$</td>";
+            $data[4] = $data[4]."<td>".$invoice_item_row['item_duration_price']."$</td>";
+        }
         $data[4] = $data[4]."<td>".$invoice_item_row['item_type']."</td>";        
         $data[4] = $data[4]."</tr>";
     }
