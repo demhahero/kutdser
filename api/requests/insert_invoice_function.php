@@ -953,7 +953,7 @@ function changeSpeedYearly($dbTools, $postData) {
     $new_valid_date_from = new DateTime($postData["action_on_date"]);
     $new_valid_date_to = new DateTime($previous_invoice["valid_date_to"]);
     // if price divided between two months (remaining days from previous month)
-    if ($new_valid_date_from >= $valid_date_to) {
+    if ($new_valid_date_from > $valid_date_to) {
         // if action on date (new_valid_date_from) after end of previous invoice (after valid_date_to)
         // then calculate new_valid_date_to and assume recurring invoice before
         // set valid date from and to as new recuring duration
@@ -1162,7 +1162,7 @@ function terminateYearly($dbTools, $postData) {
     $new_valid_date_from = new DateTime($postData["action_on_date"]);
     $new_valid_date_to = new DateTime($previous_invoice["valid_date_to"]);
     // if price divided between two months (remaining days from previous month)
-    if ($new_valid_date_from >= $valid_date_to) {
+    if ($new_valid_date_from > $valid_date_to) {
         // if action on date (new_valid_date_from) after end of previous invoice (after valid_date_to)
         // then calculate new_valid_date_to and assume recurring invoice before
         // set valid date from and to as new recuring duration
