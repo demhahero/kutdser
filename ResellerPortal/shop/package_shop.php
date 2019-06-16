@@ -105,7 +105,7 @@ while ($products_row = $dbToolsReseller->fetch_assoc($products)) {
 
 <script>
     function openCity(evt, cityName) {
-        
+
         var i, tabcontent, tablinks;
         tabcontent = document.getElementsByClassName("tabcontent");
         for (i = 0; i < tabcontent.length; i++) {
@@ -156,28 +156,49 @@ while ($products_row = $dbToolsReseller->fetch_assoc($products)) {
                     </div>
                 <?PHP } ?>
                 <div class="bundle">
+                    <div class="row" style="width:100% !important;">
+                        <div class="col-sm-12" >
+                            <p class="rounded form-row form-row-wide custom_check-service-availabilty  ">
+                            <div class="panel panel-success">
+                                <div class="panel-heading">Package</div>
+                                <div class="panel-body">
+                                    <select name="product" class="form-control">
+                                        <?php
+                                        foreach ($products_rows as $product):
+                                            if ($product['category'] === "bundle") {
+                                                $price = $product['price'];
+                                                $title = $product['title'];
 
+                                                if ($has_discount && isset($product['discount']) && (int) $product['discount'] > 0) {
+
+                                                    $price = (float) $product['price'] - ((float) $product['price'] * (((float) $product['discount'] / 100)));
+                                                    $price = round($price, 2);
+                                                    $discount_duration = $product['discount_duration'];
+                                                    $discount_duration = str_replace("_", " ", $discount_duration);
+                                                    $discount_duration = ucfirst($discount_duration);
+                                                    $title = $product['title'] . " (" . $product['price'] . " $) (with discount " . $product['discount'] . "% for " . $discount_duration . ")";
+                                                }
+                                                ?>
+                                                <option real_price='<?= $product['price'] ?>' data_title='<?= $product['title'] ?>'  price='<?= $price ?>' value='<?= $product['product_id'] ?>' type="<?= $product['subscription_type'] ?>"> <?= $title . " (" . $price . "$)" ?></option>
+                                            <?php
+                                            }
+                                        endforeach;
+                                        ?>
+                                    </select>
+                                </div>
+                            </div>
+                            </p>
+                        </div>
+                    </div>
                     <div class="tab">
                         <button class="tablinks" onclick="openCity(event, 'Internet')">Internet</button>
                         <button class="tablinks" onclick="openCity(event, 'Phone')">Phone</button>
-                        <button class="tablinks" onclick="openCity(event, 'TV')">TV</button>
                     </div>
 
                     <div id="Internet" class="tabcontent">
-                        <h3>Internet</h3>
                         <div class="bundle-internet">
-                            <div class="row" style="width:100% !important;">
-                                <div class="col-sm-12" >
-                                    <p class="rounded form-row form-row-wide custom_check-service-availabilty  ">
-                                    <div class="panel panel-success">
-                                        <div class="panel-heading">Speed</div>
-                                        <div class="panel-body">
-                                            Internet 10 Mbps
-                                        </div>
-                                    </div>
-                                    </p>
-                                </div>
-                            </div>
+
+                            <h3>Internet</h3>
                             <div class="row" style="width:100% !important;">
                                 <div class="col-sm-12" >
                                     <p class="rounded form-row form-row-wide custom_check-service-availabilty  ">
@@ -224,7 +245,7 @@ while ($products_row = $dbToolsReseller->fetch_assoc($products)) {
                                             <label class="radio-inline">
                                                 <input type="radio" class="input-text plan plan-monthly-2 custom-options custom_field" data-price="" name="options[plan]" value="yearly"   />Yearly Contract, Payment Monthly (Free Installation)<br/>
                                                 <?= $free_installation ? " </br><span style='color:green;' class='discount_offer' >you have a limited offer, now installation fees are free for you  </span>" : "" ?>
-                                                <?= $free_transfer ? " </br><span style='color:green;' class='discount_offer'>you have a limited offer, now transfer fees are free for you  </span>" : "" ?>
+<?= $free_transfer ? " </br><span style='color:green;' class='discount_offer'>you have a limited offer, now transfer fees are free for you  </span>" : "" ?>
                                             </label><br/>
                                         </div>
                                     </div>
@@ -240,15 +261,15 @@ while ($products_row = $dbToolsReseller->fetch_assoc($products)) {
                                         <div class="panel-body">
                                             <label class="radio-inline">
                                                 <input type="radio" class="input-text modem custom-options custom_field" data-price="60" name="options[modem]" value="rent" />Free Rent Modem ($59.90 deposit)
-                                                <?= $free_modem ? "<span style='color:green' class='discount_offer'> you have a limited offer free modem deposit</span>" : "" ?>
+<?= $free_modem ? "<span style='color:green' class='discount_offer'> you have a limited offer free modem deposit</span>" : "" ?>
                                             </label>
                                             <br/>
-                                            <?php if ($reseller_id === "190") { ?>
+<?php if ($reseller_id === "190") { ?>
                                                 <label class="radio-inline">
                                                     <input type="radio" class="input-text modem custom-options custom_field" data-price="200" name="options[modem]" value="buy" />Business Modem
                                                 </label>
                                                 <br/>
-                                            <?php } ?>
+<?php } ?>
                                             <label class="radio-inline">
                                                 <input type="radio" class="input-text modem custom-options custom_field" data-price="60" name="options[modem]" value="inventory" />Reseller Inventory
                                             </label>
@@ -285,7 +306,7 @@ while ($products_row = $dbToolsReseller->fetch_assoc($products)) {
                                         <div class="panel-body">
                                             <label class="radio-inline">
                                                 <input type="radio" class="input-text custom-options custom_field rent-router" data-price="2.90" name="options[router]" value="rent" />Rent WIFI Router MikroTik Hap Series ($2.90)
-                                                <?= $free_router ? " <span style='color:green;' class='discount_offer'>you have a limited offer, now router rent is free for you  </span>" : "" ?>
+<?= $free_router ? " <span style='color:green;' class='discount_offer'>you have a limited offer, now router rent is free for you  </span>" : "" ?>
                                             </label><br/>
                                             <label class="radio-inline">
                                                 <input type="radio" class="input-text custom-options custom_field" data-price="4.90" name="options[router]" value="rent_hap_lite"   />Rent WIFI Router MikroTik Hap lite ($4.90)<br/>
@@ -446,7 +467,7 @@ while ($products_row = $dbToolsReseller->fetch_assoc($products)) {
                                     </div>
                                     </p>
                                 </div>
-                                <?php if ($reseller_id === "190" || $reseller_id === "1379") { ?>
+<?php if ($reseller_id === "190" || $reseller_id === "1379") { ?>
                                     <div class="col-sm-6" >
                                         <p class="rounded form-row form-row-wide custom_check-service-availabilty  ">
                                         <div class="panel panel-primary">
@@ -459,7 +480,7 @@ while ($products_row = $dbToolsReseller->fetch_assoc($products)) {
                                         </div>
                                         </p>
                                     </div>
-                                <?PHP } ?>
+<?PHP } ?>
                             </div>
                         </div> 
                     </div>
@@ -467,18 +488,6 @@ while ($products_row = $dbToolsReseller->fetch_assoc($products)) {
                     <div id="Phone" class="tabcontent">
                         <h3>Phone</h3>
                         <div class="bundle-phone">
-                            <div class="row" style="width:100% !important;">
-                                <div class="col-sm-12" >
-                                    <p class="rounded form-row form-row-wide custom_check-service-availabilty  ">
-                                    <div class="panel panel-success">
-                                        <div class="panel-heading">Phone</div>
-                                        <div class="panel-body">
-                                            Canadian Phone
-                                        </div>
-                                    </div>
-                                    </p>
-                                </div>
-                            </div>
                             <div class="row" style="width:100% !important;">
                                 <div class="col-sm-12" >
                                     <p class="rounded form-row form-row-wide custom_phone-adapter  ">
@@ -490,7 +499,7 @@ while ($products_row = $dbToolsReseller->fetch_assoc($products)) {
                                             </label><br/>
                                             <label class="radio-inline">
                                                 <input type="radio" checked class="input-text plan custom-options custom_field" data-price="" name="options[adapter]" value="buy_Cisco_SPA112"   />Buy Cisco SPA112 2-Port Phone Adapter ($59.90)<br/>
-                                                <?= $free_adapter ? "<span style='color:green;' class='discount_offer'>you have limited offer free Adapter (CISCO ATA) </span>" : "" ?><br/>
+<?= $free_adapter ? "<span style='color:green;' class='discount_offer'>you have limited offer free Adapter (CISCO ATA) </span>" : "" ?><br/>
                                             </label><br/>
                                         </div>
                                     </div>
@@ -534,81 +543,6 @@ while ($products_row = $dbToolsReseller->fetch_assoc($products)) {
                             </div>
                         </div>
                     </div>
-
-                    <div id="TV" class="tabcontent">
-                        <h3>TV</h3>
-                        <div class="bundle-tv">
-                            <div class="row" style="width:100% !important;">
-                                <div class="col-sm-12" >
-                                    <p class="rounded form-row form-row-wide custom_check-service-availabilty  ">
-                                    <div class="panel panel-success">
-                                        <div class="panel-heading">TV Channel</div>
-                                        <div class="panel-body">
-                                            TV Basic Package
-
-                                        </div>
-                                    </div>
-                                    </p>
-                                </div>
-                            </div>
-                            <div class="row" style="width:100% !important;">
-                                <div class="col-sm-12" >
-                                    <p class="rounded form-row form-row-wide custom_tv-box  ">
-                                    <div class="panel panel-primary">
-                                        <div class="panel-heading">BOX $50</div>
-                                        <div class="panel-body">
-                                            <label class="radio-inline">
-                                                <input type="checkbox" class="input-text plan custom-options custom_field" data-price="" name="options[box]" value="yes" />Buy Box for ($50)<br/>
-                                            </label><br/>
-
-                                        </div>
-                                    </div>
-                                    <input type="hidden" name="options[product_type]" value="tv" />
-                                    </p>
-                                </div>
-                                <div class="col-sm-12" >
-                                    <p class="rounded form-row form-row-wide custom_tv-admin-fee  ">
-                                    <div class="panel panel-primary">
-                                        <div class="panel-heading">Admin Fee</div>
-                                        <div class="panel-body">
-                                            <label class="radio-inline">
-                                                <input type="checkbox" class=" input-text plan plan-monthly custom-options custom_field" data-price="" name="options[admin_fee]" value="yes" />Add Admin Fee<br/>
-                                            </label><br/>
-                                            <label class="tv_admin_fee">
-                                                Admin Fee:<br/>
-                                                <input type="number" class="input-text plan plan-monthly custom-options custom_field" data-price="" name="options[admin_fee_value]" value="0" /><br/>
-                                            </label><br/>
-
-                                        </div>
-                                    </div>
-                                    </p>
-                                </div>
-                                <div class="col-sm-12" >
-                                    <p class="rounded form-row form-row-wide custom_province  ">
-                                    <div class="panel panel-primary">
-                                        <div class="panel-heading">Add on channel(s)</div>
-                                        <div class="panel-body">
-                                            <label class="radio-inline">
-                                                Please select channel(s):<br/>
-                                                <select name="options[add_on_channels][]" class="input-text plan plan-monthly custom-options custom_field js-example-basic-multiple" style="width:100%"  multiple="multiple">
-                                                    <?php
-                                                    $tv_channels = $dbToolsReseller->query("SELECT * FROM `tv_channels` WHERE `tv_channel_active`=1");
-                                                    while ($tv_channel = $dbToolsReseller->fetch_assoc($tv_channels)) {
-                                                        echo "<option value='{\"id\":" . $tv_channel["tv_channel_id"] . ",\"price\":" . $tv_channel["tv_channel_price"] . ",\"text\":\"" . $tv_channel["tv_channel_name"] . "\"}' >" . $tv_channel["tv_channel_name"] . "</option>\n";
-                                                    }
-                                                    ?>
-                                                </select>
-                                            </label><br/>
-
-                                        </div>
-                                    </div>
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-
 
 
                 </div>  
@@ -671,38 +605,25 @@ while ($products_row = $dbToolsReseller->fetch_assoc($products)) {
 
                 <div class="bundle_order_details">
                     <ul class="list-group">
-                        <li class="list-group-item">Internet Product <span class="badge internet-product-name"></span></li>
+                        <h4>Package</h4>
+                        <li class="list-group-item">Product <span class="badge product-name"></span></li>
+                        <li class="list-group-item">Remaining days cost (<span class="remaining-days-from-to"></span>) <span class="badge remaining-days-cost"></span></li>
+                        
+                        <h4>Internet</h4>
                         <li class="list-group-item">Setup fees <span class="badge internet-setup-cost"></span></li>
-                        <li class="list-group-item">Remaining days cost (<span class="internet-remaining-days-from-to"></span>) <span class="badge internet-remaining-days-cost"></span></li>
                         <li class="list-group-item">Modem cost <span class="badge internet-modem-cost"></span></li>
                         <li class="list-group-item">Router cost <span class="badge internet-router-cost"></span></li>
                         <li class="list-group-item">Additional Service <span class="badge internet-additional-service-cost"></span></li>
                         <li class="list-group-item">Static IP <span class="badge internet-static-ip-cost"></span></li>
-                        <li class="list-group-item">Tax Fees (QST 9.975%) <span class="badge internet-qst-cost"></span></li>
-                        <li class="list-group-item">Tax Fees (GST 5%) <span class="badge internet-gst-cost"></span></li>
-                        <li class="list-group-item">Total <span class="badge internet-total"></span></li>
 
-                        <hr>
-                        <li class="list-group-item">Phone Product <span class="badge phone-product-name"></span></li>
-                        <li class="list-group-item">Setup fees <span class="badge phone-setup-cost"></span></li>
-                        <li class="list-group-item">Remaining days cost (<span class="phone-remaining-days-from-to"></span>) <span class="badge phone-remaining-days-cost"></span></li>
+                        <h4>Phone</h4>
                         <li class="list-group-item">Adapter cost <span class="badge phone-adapter-cost"></span></li>
-                        <li class="list-group-item">Tax Fees (QST 9.975%) <span class="badge phone-qst-cost"></span></li>
-                        <li class="list-group-item">Tax Fees (GST 5%) <span class="badge phone-gst-cost"></span></li>
-                        <li class="list-group-item">Total <span class="badge phone-total"></span></li>
 
-                        <hr>
-                        <li class="list-group-item">TV Product <span class="badge tv-product-name"></span></li>
-                        <li class="list-group-item">Remaining days cost (<span class="tv-remaining-days-from-to"></span>) <span class="badge tv-remaining-days-cost"></span></li>
-                        <li class="list-group-item">Box price <span class="badge tv-box-price"></span></li>
-                        <li class="list-group-item">Admin Fee <span class="badge tv-admin-fee-price"></span></li>
-                        <span id="add-on-channels">
-                        </span>
-                        <li class="list-group-item">Channels remaining days cost (<span class="tv-remaining-days-from-to"></span>) <span class="badge tv-remaining-days-channels-cost"></span></li>
-
-                        <li class="list-group-item">Tax Fees (QST 9.975%) <span class="badge tv-qst-cost"></span></li>
-                        <li class="list-group-item">Tax Fees (GST 5%) <span class="badge tv-gst-cost"></span></li>
-                        <li class="list-group-item">Total <span class="badge tv-total"></span></li>
+                        
+                        <h4>Total + Taxes</h4>
+                        <li class="list-group-item">Tax Fees (QST 9.975%) <span class="badge qst-cost"></span></li>
+                        <li class="list-group-item">Tax Fees (GST 5%) <span class="badge gst-cost"></span></li>
+                        <li class="list-group-item">Total <span class="badge total"></span></li>
                     </ul>
                 </div>
 
