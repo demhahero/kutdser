@@ -26,7 +26,8 @@ $where = $sqlTot = $sqlRec = "";
 $sqlTot = "SELECT `orders`.order_id,`orders`.creation_date,`orders`.status,`orders`.reseller_id,`orders`.customer_id,
     orders.product_title,orders.product_category,orders.product_subscription_type,resellers.full_name as 'reseller_name',
     `customers`.`full_name` as 'customer_name', `order_options`.`modem_mac_address`, `order_options`.`cable_subscriber`,
-    `order_options`.`cancellation_date`, `order_options`.`installation_date_1`, `order_options`.`product_price`, `order_options`.`discount`
+    `order_options`.`cancellation_date`, `order_options`.`installation_date_1`, `order_options`.`product_price`, 
+    `order_options`.`discount`, `order_options`.`discount_duration`
 FROM `orders`
 left JOIN `order_options` on `order_options`.`order_id`= `orders`.`order_id`
 left JOIN `customers` on `orders`.`customer_id`=`customers`.`customer_id`
@@ -122,7 +123,14 @@ while ($row = mysqli_fetch_array($queryRecords)) {
 
     $converted = DateTime::createFromFormat("Y-m-d H:i:s", $row["start_active_date"]);
     $start_active_date = clone $converted;
-    $converted1Year = $converted->add(new DateInterval("P1Y"));
+    
+    $deadline_symbol = "P1Y";
+    if ($row["discount_duration"] == 'six_months')
+        $deadline_symbol = 'P6M';
+    if ($row["discount_duration"] == 'three_months')
+        $deadline_symbol = 'P3M';
+    
+    $converted1Year = $converted->add(new DateInterval($deadline_symbol));
 
     if ($converted1Year->format("d") != "1")
         $converted1Year->modify('first day of next month');
