@@ -137,7 +137,7 @@ if(!@include_once "../../api/dbconfig.php")
                         {
                           ?>
                           <li><a href="<?= $site_url ?>/customers/statistics.php">Statistics</a></li>
-                          <li><a href="<?= $site_url ?>/shop/shop_test1.php">Shop tv</a></li>
+                          <li><a href="<?= $site_url ?>/shop/bundle_shop.php">Bundles</a></li>
 
                         <?PHP
                         }

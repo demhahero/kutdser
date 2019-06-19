@@ -1,4 +1,8 @@
 <?php
+/*
+ * change folders name to bundle
+requests only terminate for bundle
+*/
 error_reporting(E_ERROR | E_PARSE);
 include '../dbconfig.php';
 require_once '../../mikrotik/swiftmailer/vendor/autoload.php';

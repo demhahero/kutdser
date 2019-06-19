@@ -47,7 +47,7 @@ while ($products_row = $dbToolsReseller->fetch_assoc($products)) {
 
 <!-- Include SmartWizard JavaScript source -->
 <script type="text/javascript" src="<?= $site_url ?>/js/jquery.smartWizard.min.js"></script>
-<script type="text/javascript" src="<?= $site_url ?>/js/package_shop.js"></script>
+<script type="text/javascript" src="<?= $site_url ?>/js/bundle_shop.js"></script>
 
 <title>Shop</title>
 
@@ -121,7 +121,7 @@ while ($products_row = $dbToolsReseller->fetch_assoc($products)) {
         return false;
     }
 </script>
-<form class="" action="package_checkout_test.php" method="post">
+<form class="" action="bundle_checkout.php" method="post">
     <input type ="hidden" id="has_discount" name="has_discount" value="<?= $reseller_row['has_discount'] ?>"/>
     <input type ="hidden" id="free_router" name="free_router" value="<?= $reseller_row['free_router'] ?>"/>
     <input type ="hidden" id="free_modem"  name="free_modem" value="<?= $reseller_row['free_modem'] ?>"/>
@@ -240,10 +240,7 @@ while ($products_row = $dbToolsReseller->fetch_assoc($products)) {
                                         <div class="panel-heading">Plan</div>
                                         <div class="panel-body">
                                             <label class="radio-inline">
-                                                <input type="radio" checked  class="input-text plan plan-monthly custom-options custom_field" data-price="" name="options[plan]" value="monthly" />Monthly Payment ($60.00 New Installation Fees <b>OR</b> $19.90 Transfer Fees for <span style="color:red;">current Cable subscriber</span>)
-                                            </label><br/>
-                                            <label class="radio-inline">
-                                                <input type="radio" class="input-text plan plan-monthly-2 custom-options custom_field" data-price="" name="options[plan]" value="yearly"   />Yearly Contract, Payment Monthly (Free Installation)<br/>
+                                                <input type="radio" checked disabled="" class="input-text plan plan-monthly-2 custom-options custom_field" data-price="" name="options[plan]" value="yearly"   />Yearly Contract, Payment Monthly (Free Installation)<br/>
                                                 <?= $free_installation ? " </br><span style='color:green;' class='discount_offer' >you have a limited offer, now installation fees are free for you  </span>" : "" ?>
 <?= $free_transfer ? " </br><span style='color:green;' class='discount_offer'>you have a limited offer, now transfer fees are free for you  </span>" : "" ?>
                                             </label><br/>
@@ -608,15 +605,15 @@ while ($products_row = $dbToolsReseller->fetch_assoc($products)) {
                         <h4>Package</h4>
                         <li class="list-group-item">Product <span class="badge product-name"></span></li>
                         <li class="list-group-item">Remaining days cost (<span class="remaining-days-from-to"></span>) <span class="badge remaining-days-cost"></span></li>
+                        <li class="list-group-item">Setup fees<span class="badge setup-cost"></span></li>
                         
-                        <h4>Internet</h4>
-                        <li class="list-group-item">Setup fees <span class="badge internet-setup-cost"></span></li>
+                        <h4>-Internet</h4>
                         <li class="list-group-item">Modem cost <span class="badge internet-modem-cost"></span></li>
                         <li class="list-group-item">Router cost <span class="badge internet-router-cost"></span></li>
                         <li class="list-group-item">Additional Service <span class="badge internet-additional-service-cost"></span></li>
                         <li class="list-group-item">Static IP <span class="badge internet-static-ip-cost"></span></li>
 
-                        <h4>Phone</h4>
+                        <h4>-Phone</h4>
                         <li class="list-group-item">Adapter cost <span class="badge phone-adapter-cost"></span></li>
 
                         

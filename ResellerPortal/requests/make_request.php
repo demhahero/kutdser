@@ -231,8 +231,14 @@ $creation_date = new DateTime();
                 <?php
             }
             ?>
+            <?php
+            if($order_row['product_category'] != "bundle"){
+            ?>    
             <option data-value="swap_modem" value="swap_modem">Swap Modem</option>
             <option data-value="moving" value="moving">Moving</option>
+            <?php
+            }
+            ?>
             <option data-value="terminate" value="terminate">Terminate</option>
             <option data-value="customer_information_modification" value="customer_information_modification">Customer Information Modification</option>
             <option data-value="suspension" value="suspension">Suspension</option>

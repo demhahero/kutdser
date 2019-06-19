@@ -81,6 +81,7 @@ class PackageCheckoutHelper {
         $qst_tax = 0;
         $additional_service = 0;
         $static_ip = 0;
+        $adapter_cost = 0;
 
 /////////////// invoice related variables
 
@@ -154,6 +155,11 @@ class PackageCheckoutHelper {
                 }
             }
         }
+        
+            //If transfer Phone
+        if ($params["options"]["you_have_phone_number"] == "yes") {
+            $installation_transfer_cost+= 15;
+        }
 
 
 //get number of days in this month
@@ -195,8 +201,18 @@ class PackageCheckoutHelper {
             }
         }
 
+        
+        //Phone options
+        //If rent adapter
+        if ($_POST["options"]["adapter"] == "buy_Cisco_SPA112") {
+            $adapter_cost = 59.90;
+            if($has_discount && $free_adapter)
+                $adapter_cost=0;
+        }       
+        
 //Calculate total price
-        $total_price = $product_price + $price_of_remaining_days + $installation_transfer_cost + $router_cost + $modem_cost + $additional_service + $static_ip;
+        $total_price = $product_price + $price_of_remaining_days + $installation_transfer_cost + $router_cost 
+                + $modem_cost + $additional_service + $static_ip + $adapter_cost;
 
 //Calculate texes
         $qst_tax = ($total_price - $value_has_no_tax) * 0.09975;
@@ -227,6 +243,7 @@ class PackageCheckoutHelper {
         $params["invoice_items"][] = ["item_name" => "Static IP price", "item_price" => $static_ip, "item_duration_price" => ($static_ip + $static_ip_duration_price), "item_type" => "duration"];
         $params["invoice_items"][] = ["item_name" => "QST tax", "item_price" => $qst_tax, "item_duration_price" => $qst_tax, "item_type" => "once"];
         $params["invoice_items"][] = ["item_name" => "GST tax", "item_price" => $gst_tax, "item_duration_price" => $gst_tax, "item_type" => "once"];
+        $params["invoice_items"][]=["item_name"=>"adapter_price","item_price"=> $adapter_cost,"item_duration_price"=> $adapter_cost,"item_type"=>"once"];
 
 //Calculate recurring amount
         $subscription_recurring_amount = $product_price + $additional_service + $static_ip;
@@ -281,7 +298,6 @@ class PackageCheckoutHelper {
                 $secure_card_merchantref = $secure_card_merchantref_row["merchantref"];
             }
         }
-        
         
         
         $result["secure_card_merchantref"] = $secure_card_merchantref;

@@ -227,7 +227,6 @@ else { //if cache on delivery
                     merchantref: 'cache_on_delivery_<?= $merchantref ?>'})
                         .done(function (data) {
                             if (data != 0) {
-                                alert(data);
                                 $("div.process-caption").html("Order Sent Successfully");
                                 orderSubmittedSuccessfully(data);
                             } else {

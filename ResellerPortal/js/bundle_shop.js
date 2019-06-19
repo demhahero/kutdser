@@ -5,7 +5,7 @@ $(document).ready(function () {
         closeOnSelect: false
     });
 
-    $(".tablinks").click(function(){
+    $(".tablinks").click(function () {
         return false;
     });
 
@@ -175,51 +175,57 @@ $(document).ready(function () {
     });
 
     function validateChooseProduct() {
-        if (product_type == "internet") {
-            //If own_moden selected, you have to enter modem information
-            if ($("input[name=\"options[modem]\"]:checked").val() == "own_modem") {
-                if ($("input[name=\"options[modem_serial_number]\"]").val().length < 3
-                        || $("input[name=\"options[modem_mac_address]\"]").val().length < 3
-                        || $("input[name=\"options[modem_modem_type]\"]").val().length < 3
-                        ) {
-                    alert("Enter modem information");
-                    return false;
-                }
-            } else if ($("input[name=\"options[modem]\"]:checked").val() == "inventory") { // if inventory selected and has no modem
-                if ($("select[name=\"options[modem_id]\"] option:selected").val() == null) {
-                    alert("You have no modems in your inventory");
-                    return false;
-                }
+
+        //If own_moden selected, you have to enter modem information
+        if ($("input[name=\"options[modem]\"]:checked").val() == "own_modem") {
+            if ($("input[name=\"options[modem_serial_number]\"]").val().length < 3
+                    || $("input[name=\"options[modem_mac_address]\"]").val().length < 3
+                    || $("input[name=\"options[modem_modem_type]\"]").val().length < 3
+                    ) {
+                alert("Enter modem information");
+                return false;
+            }
+        } else if ($("input[name=\"options[modem]\"]:checked").val() == "inventory") { // if inventory selected and has no modem
+            if ($("select[name=\"options[modem_id]\"] option:selected").val() == null) {
+                alert("You have no modems in your inventory");
+                return false;
+            }
+        }
+
+        //If customer is currently a cable subscriber, he has to enter his provider name and cancellation date.
+        if ($("input[name=\"options[cable_subscriber]\"]:checked").val() == "yes") {
+            if (($("select[name=\"options[current_cable_provider]\"]").val().length < 3 && $("input[name=\"options[subscriber_other]\"]").val().length < 3)
+                    || $("input[name=\"options[cancellation_date]\"]").val().length < 3
+                    ) {
+                alert("Enter current provider's name and cancellation date");
+                return false;
+            }
+        }
+
+        //If customer is not a cable subscriber, he has to pick dates and times for installation
+        if ($("input[name=\"options[cable_subscriber]\"]:checked").val() == "no") {
+            if ($("input[name=\"options[installation_date_1]\"]").val().length < 3
+                    || $("input[name=\"options[installation_date_2]\"]").val().length < 3
+                    || $("input[name=\"options[installation_date_3]\"]").val().length < 3
+                    || $("input[name=\"options[installation_time_1]\"]:checked").val().length < 3
+                    || $("input[name=\"options[installation_time_2]\"]:checked").val().length < 3
+                    || $("input[name=\"options[installation_time_3]\"]:checked").val().length < 3
+                    ) {
+                alert("Enter three dates and times for installation");
+                return false;
+            }
+        }
+        
+        if ($("input[name=\"options[you_have_phone_number]\"]:checked").val() == "yes"
+                    && $("input[name=\"options[current_phone_number]\"]").val() == "") {
+                alert("Enter your current phone number");
+                return false;
             }
 
-            //If customer is currently a cable subscriber, he has to enter his provider name and cancellation date.
-            if ($("input[name=\"options[cable_subscriber]\"]:checked").val() == "yes") {
-                if (($("select[name=\"options[current_cable_provider]\"]").val().length < 3 && $("input[name=\"options[subscriber_other]\"]").val().length < 3)
-                        || $("input[name=\"options[cancellation_date]\"]").val().length < 3
-                        ) {
-                    alert("Enter current provider's name and cancellation date");
-                    return false;
-                }
-            }
+        return true;
 
-            //If customer is not a cable subscriber, he has to pick dates and times for installation
-            if ($("input[name=\"options[cable_subscriber]\"]:checked").val() == "no") {
-                if ($("input[name=\"options[installation_date_1]\"]").val().length < 3
-                        || $("input[name=\"options[installation_date_2]\"]").val().length < 3
-                        || $("input[name=\"options[installation_date_3]\"]").val().length < 3
-                        || $("input[name=\"options[installation_time_1]\"]:checked").val().length < 3
-                        || $("input[name=\"options[installation_time_2]\"]:checked").val().length < 3
-                        || $("input[name=\"options[installation_time_3]\"]:checked").val().length < 3
-                        ) {
-                    alert("Enter three dates and times for installation");
-                    return false;
-                }
-            }
-
-            return true;
-        } 
     }
-    
+
     var has_discount_input = $("#has_discount").val();
     var free_modem_input = $("#free_modem").val();
     var free_router_input = $("#free_router").val();
@@ -350,7 +356,7 @@ $(document).ready(function () {
     function priceCalculator() {
         $("div.bundle_order_details").show();
         if (product_type == "bundle") {
-            
+
             var total_price = 0;
             var product_price = 0;
             var price_of_remainig_days = 0;
@@ -370,7 +376,7 @@ $(document).ready(function () {
             var free_adapter = false;
             var free_installation = false;
             var free_transfer = false;
-
+           
 
             //Get product price
             has_discount = $("div.bundle-internet input[name=\"has_discount\"]").val() === 'yes';
@@ -389,8 +395,8 @@ $(document).ready(function () {
             var title = $("div.bundle select[name=\"product\"] option:selected").attr("data_title") + " " + product_price
             if (has_discount)
                 title = $("div.bundle select[name=\"product\"] option:selected").text();
-            
-            
+
+
             //If rent modem
             if ($("div.bundle-internet input[name=\"options[inventory_modem_price]\"]").prop('checked') == true)
             {
@@ -459,6 +465,11 @@ $(document).ready(function () {
 
                 }
             }
+            
+            //for phone add installation fees
+            if ($("input[name=\"options[you_have_phone_number]\"]:checked").val() == "yes") {
+                installation_transfer_cost = installation_transfer_cost + 15;
+            }
 
 
 
@@ -514,7 +525,7 @@ $(document).ready(function () {
             //Calculate total price
             total_price = product_price + price_of_remainig_days + installation_transfer_cost + router_cost + modem_cost + additional_service + static_ip;
 
-            
+
 
             //Display price list
             var monthNames = ["January", "February", "March", "April", "May", "June",
@@ -528,7 +539,7 @@ $(document).ready(function () {
 
             $("div.bundle_order_details span.remaining-days-cost").html("$" + price_of_remainig_days.toFixed(2));
 
-            $("div.bundle_order_details span.internet-setup-cost").html("$" + installation_transfer_cost.toFixed(2));
+            $("div.bundle_order_details span.setup-cost").html("$" + installation_transfer_cost.toFixed(2));
 
             $("div.bundle_order_details span.internet-modem-cost").html("$" + modem_cost.toFixed(2));
 
@@ -540,7 +551,7 @@ $(document).ready(function () {
 
             $("div.bundle_order_details span.product-name").html(title + "$");
 
-            
+
 
 
             //If buy adapter
@@ -549,9 +560,10 @@ $(document).ready(function () {
                 if (has_discount && free_adapter)
                     adapter_price = 0;
             }
+            
 
             $("div.bundle_order_details span.phone-adapter-cost").html("$" + adapter_price.toFixed(2));
-            
+
             total_price = total_price + adapter_price;
             //Calculate texes
             qst_tax = (total_price - value_has_no_tax) * 0.09975;
@@ -559,15 +571,15 @@ $(document).ready(function () {
 
             //Add taxes to total price
             total_price += qst_tax + gst_tax;
-            
-            
+
+
             $("div.bundle_order_details span.qst-cost").html("$" + qst_tax.toFixed(2));
 
             $("div.bundle_order_details span.gst-cost").html("$" + gst_tax.toFixed(2));
-            
+
             $("div.bundle_order_details span.total").html("$" + total_price.toFixed(2));
 
-            
+
         }
     }
 
@@ -583,7 +595,7 @@ $(document).ready(function () {
     }
 
     //if customer has phone, show the current phone field
-    $("label.current-phone-subscriber").hide();
+    $("label.current-phone-subscriber").show();
     $("input.new-number").prop("checked", true);
     $("input.phone-subscriber").change(function () {
         if (this.value == "yes") {
