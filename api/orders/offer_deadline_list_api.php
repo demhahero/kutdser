@@ -30,7 +30,7 @@ $sqlTot = "SELECT `orders`.order_id,`orders`.creation_date,`orders`.status,`orde
 FROM `orders`
 left JOIN `order_options` on `order_options`.`order_id`= `orders`.`order_id`
 left JOIN `customers` on `orders`.`customer_id`=`customers`.`customer_id`
-inner JOIN `invoices` on `invoices`.`order_id`=`orders`.`order_id` and `invoices`.`invoice_type_id` in (1,2,3) 
+left JOIN `invoices` on `invoices`.`order_id`=`orders`.`order_id` and `invoices`.`invoice_type_id` in (1,2,3) 
 and MONTH(`invoices`.`valid_date_from`)='" . date("m") . "' and YEAR(`invoices`.`valid_date_from`)='" . date("Y") . "' 
 left JOIN `customers` resellers on resellers.`customer_id` = `customers`.`reseller_id` 
 where product_title LIKE '%discount%' and `orders`.`order_id` not in (select `order_id` from `requests` 
