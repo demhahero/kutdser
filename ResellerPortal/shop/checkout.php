@@ -411,12 +411,12 @@ if (intval($_POST["customer_id"]) > 0) {
     }
 }
 
-// **** FOR TESTING PURPOSES ONLY - START
-//echo $subscription_initial_amount . " - " . $subscription_recurring_amount . " - " . $subscription_start_date;
-
-//$subscription_initial_amount = "0.01";
-//$subscription_recurring_amount = "1";
-// **** FOR TESTING PURPOSES ONLY - END
+$_POST["full_name"] = addslashes($_POST["full_name"]);
+$_POST["address_line_1"] = addslashes($_POST["address_line_1"]);
+$_POST["address_line_2"] = addslashes($_POST["address_line_2"]);
+$_POST["postal_code"] = addslashes($_POST["postal_code"]);
+$_POST["city"] = addslashes($_POST["city"]);
+$_POST["note"] = addslashes($_POST["note"]);
 ?>
 <title>Checkout</title>
 <script>
