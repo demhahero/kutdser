@@ -496,10 +496,44 @@ function recurring($dbTools, $postData, $start, $end) {
             $start = $new_order_valid_from->format("Y-m-d");
         }
     }
+    ///////////// check if terminated
+    $start_recurring_date = new DateTime($end);
+    $start_recurring_date->add(new DateInterval('P1D'));
+    $end_recurring_date = new DateTime($start_recurring_date->format("Y-m-t"));
+    if ($postData["product_subscription_type"] == "YEARLY" || $postData["product_subscription_type"] == "yearly") {
+
+        $start_recurring_date = new DateTime($end);
+        $start_recurring_date->add(new DateInterval('P1D'));
+        $end_recurring_date = new DateTime($start_recurring_date->format("Y-m-d"));
+        $end_recurring_date->add(new DateInterval('P1Y'));
+        $end_recurring_date->sub(new DateInterval('P1D'));
+    }
+
+    $sql = "SELECT `invoice_type_id`,`product_price` FROM `invoices`
+          WHERE  `valid_date_from`< ?
+          AND `invoices`.`invoice_type_id` =6
+          AND `invoices`.`customer_id`=?
+          AND `invoices`.`order_id`=?";
+
+    $stmt_product = $dbTools->getConnection()->prepare($sql);
+    $param1 = $start_recurring_date->format("Y-m-d");
+    $param3 = $postData["customer_id"];
+    $param4 = $postData["order_id"];
+    $stmt_product->bind_param('sss', $param1,  $param3, $param4);
+    $stmt_product->execute();
+
+    $result_product = $stmt_product->get_result();
+    $hasValue = FALSE;
+    $product_price = -1;
+    while ($product = $dbTools->fetch_assoc($result_product)) {
+    return "terminate"; //FALSE;
+
+    }
+    //////////// end check terminated
     /// get last product price
     $sql = "SELECT `invoice_type_id`,`product_price` FROM `invoices`
           WHERE  (`valid_date_from`>=? AND `valid_date_from`<=?)
-          AND `invoices`.`invoice_type_id` IN (1,2,3,6)
+          AND `invoices`.`invoice_type_id` IN (1,2,3)
           AND `invoices`.`customer_id`=?
           AND `invoices`.`order_id`=?
           ORDER BY `invoice_id` DESC
@@ -518,10 +552,6 @@ function recurring($dbTools, $postData, $start, $end) {
     $product_price = -1;
     while ($product = $dbTools->fetch_assoc($result_product)) {
         $hasValue = TRUE;
-        if ($product["invoice_type_id"] == 6) {//then this is terminated
-            return "terminate"; //FALSE;
-        }
-
         $product_price = $product["product_price"];
     }
 
@@ -574,17 +604,7 @@ function recurring($dbTools, $postData, $start, $end) {
     $stmt_invoice = $dbTools->getConnection()->prepare($invoice_query);
     $param1 = $postData["customer_id"];
 
-    $start_recurring_date = new DateTime($end);
-    $start_recurring_date->add(new DateInterval('P1D'));
-    $end_recurring_date = new DateTime($start_recurring_date->format("Y-m-t"));
-    if ($postData["product_subscription_type"] == "YEARLY" || $postData["product_subscription_type"] == "yearly") {
 
-        $start_recurring_date = new DateTime($end);
-        $start_recurring_date->add(new DateInterval('P1D'));
-        $end_recurring_date = new DateTime($start_recurring_date->format("Y-m-d"));
-        $end_recurring_date->add(new DateInterval('P1Y'));
-        $end_recurring_date->sub(new DateInterval('P1D'));
-    }
 
 
     $param2 = $start_recurring_date->format("Y-m-d");
