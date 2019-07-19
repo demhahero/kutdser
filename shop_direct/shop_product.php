@@ -3,6 +3,9 @@ error_reporting( E_ALL );
 include_once "header.php";
 $dbToolsReseller->query("SET CHARACTER SET utf8");
 
+$product_id=(isset($_GET["product_id"])?$_GET["product_id"]:-1);
+
+
 $reseller = $dbToolsReseller->query("SELECT `discount_expire_date`,`has_discount`,`free_modem`,`free_router`,`free_adapter`,`free_installation`,`free_transfer`,`full_name` FROM `customers` WHERE `customer_id` = '" . $reseller_id . "'");
 $reseller_row=$dbToolsReseller->fetch_assoc($reseller);
 
@@ -33,16 +36,34 @@ else {
 }
 
 
-$products = $dbToolsReseller->query("SELECT * FROM `products` INNER JOIN `reseller_discounts` on `products`.`product_id`=`reseller_discounts`.`product_id` WHERE `reseller_discounts`.`reseller_id`='" . $reseller_id . "' and `products`.`product_id` NOT IN ('699','700')");
+$query="SELECT * FROM `products` INNER JOIN `reseller_discounts` on `products`.`product_id`=`reseller_discounts`.`product_id` WHERE `reseller_discounts`.`reseller_id`='" . $reseller_id . "' and `products`.`product_id` =?";
+$stmt1 = $dbTools->getConnection()->prepare($query);
 
+
+$stmt1->bind_param('s',
+                  $product_id
+                  ); // 's' specifies the variable type => 'string'
+
+
+$stmt1->execute();
+
+$products = $stmt1->get_result();
 if($products->num_rows ==0)
-$products = $dbToolsReseller->query("SELECT * FROM `products`where `products`.`product_id` NOT IN ('699','700')");
-$products_rows=[];
-while($products_row=$dbToolsReseller->fetch_assoc($products))
 {
-  array_push($products_rows,$products_row);
-}
+$query="SELECT * FROM `products`where `products`.`product_id` =?";
+$stmt1 = $dbTools->getConnection()->prepare($query);
 
+
+$stmt1->bind_param('s',
+                  $product_id
+                  ); // 's' specifies the variable type => 'string'
+
+
+$stmt1->execute();
+
+$products = $stmt1->get_result();
+}
+$product=$dbToolsReseller->fetch_assoc($products);
 
 ?>
 
@@ -56,10 +77,22 @@ while($products_row=$dbToolsReseller->fetch_assoc($products))
 
 <!-- Include SmartWizard JavaScript source -->
 <script type="text/javascript" src="js/jquery.smartWizard.min.js"></script>
-<script type="text/javascript" src="<?= $site_url ?>/js/shop_shop.js"></script>
+<?php
+if($product['category']==="internet"){
+  ?>
+  <script type="text/javascript" src="js/shop_internet.js"></script>
+  <?php
+}else if ($product['category']==="phone"){
+  ?>
+  <script type="text/javascript" src="js/shop_phone.js"></script>
+  <?php
+} ?>
+
 <title>Shop</title>
 
+
 <style>
+
     #step-1{
         padding: 20px;
     }
@@ -67,9 +100,6 @@ while($products_row=$dbToolsReseller->fetch_assoc($products))
         padding: 20px;
     }
     #step-3{
-        padding: 20px;
-    }
-    #step-4{
         padding: 20px;
     }
 </style>
@@ -83,23 +113,13 @@ while($products_row=$dbToolsReseller->fetch_assoc($products))
     <!-- SmartWizard html -->
     <div id="smartwizard">
         <ul>
-            <li><a href="#step-1">Step 1<br /><small>Choose Product</small></a></li>
-            <li><a href="#step-2">Step 2<br /><small>Product details</small></a></li>
-            <li><a href="#step-3">Step 3<br /><small>Customer's Information</small></a></li>
-            <li><a href="#step-4">Step 4<br /><small>Checkout</small></a></li>
+            <li><a href="#step-1">Step 1<br /><small>Product details</small></a></li>
+            <li><a href="#step-2">Step 2<br /><small>Customer's Information</small></a></li>
+            <li><a href="#step-3">Step 3<br /><small>Checkout</small></a></li>
         </ul>
 
         <div>
             <div id="step-1" class="">
-                <div class="row">
-                    <div class="col-md-4 col-md-offset-4 d-inline">
-                        <a href='' class="product-internet"><img src="<?= $site_url ?>/img/Internet-icon.png" class="img-thumbnail" style="width:150px"/></a>
-                        <a href=''  class="product-phone"><img src="<?= $site_url ?>/img/phone-icon.png" class="img-thumbnail" style="width:150px"/></a>
-                    </div>
-                </div>
-
-            </div>
-            <div id="step-2" class="">
 
               <?PHP
               if($discount_days_remaining>0){?>
@@ -109,6 +129,9 @@ while($products_row=$dbToolsReseller->fetch_assoc($products))
                     Your offer discount will ends after  <strong><?= $discount_days_remaining?></strong>
                   </div>
               <?PHP }?>
+              <?php
+              if($product['category']==="internet"){
+                ?>
                 <div class="internet">
                     <div class="row" style="width:100% !important;">
                         <div class="col-sm-12" >
@@ -117,7 +140,7 @@ while($products_row=$dbToolsReseller->fetch_assoc($products))
                                 <div class="panel-heading">Speed</div>
                                 <div class="panel-body">
                                     <select name="product" class="form-control">
-                                      <?php foreach ($products_rows as $product):
+                                      <?php
                                           if ($product['category']==="internet"){
                                             $price=$product['price'];
                                             $title=$product['title'];
@@ -137,7 +160,7 @@ while($products_row=$dbToolsReseller->fetch_assoc($products))
                                             ?>
                                         <option real_price='<?=$product['price']?>' data_title='<?= $product['title']?>'  price='<?= $price?>' value='<?= $product['product_id']?>' type="<?= $product['subscription_type']?>"> <?= $title." (".$price."$)"?></option>
                                       <?php }
-                                      endforeach; ?>
+                                       ?>
                                     </select>
                                 </div>
                             </div>
@@ -427,6 +450,10 @@ while($products_row=$dbToolsReseller->fetch_assoc($products))
                         <?PHP }?>
                     </div>
                 </div>
+
+                <?php
+              }else if ($product['category']==="phone"){
+                ?>
                 <div class="phone">
                     <div class="row" style="width:100% !important;">
                         <div class="col-sm-12" >
@@ -435,7 +462,7 @@ while($products_row=$dbToolsReseller->fetch_assoc($products))
                                 <div class="panel-heading">Phone</div>
                                 <div class="panel-body">
                                     <select name="product" class="form-control">
-                                      <?php foreach ($products_rows as $product):
+                                      <?php
                                           if ($product['category']==="phone"){
                                             $price=$product['price'];
                                             $title=$product['title'];
@@ -455,7 +482,7 @@ while($products_row=$dbToolsReseller->fetch_assoc($products))
                                             ?>
                                         <option real_price='<?=$product['price']?>' data_title='<?= $product['title']?>' price='<?= $price?>' value='<?= $product['product_id']?>' type="<?= $product['subscription_type']?>"> <?= $title." (".$price."$)"?></option>
                                       <?php }
-                                      endforeach; ?>
+                                       ?>
                                     </select>
                                 </div>
                             </div>
@@ -516,8 +543,11 @@ while($products_row=$dbToolsReseller->fetch_assoc($products))
                         </div>
                     </div>
                 </div>
+              <?php
+              }
+              ?>
             </div>
-            <div id="step-3" class="">
+            <div id="step-2" class="">
                 <div class="form-group">
                     <label>Customer:</label>
                     <select name="customer_id" class="form-control customer_list">
@@ -570,7 +600,7 @@ while($products_row=$dbToolsReseller->fetch_assoc($products))
                     </div>
                 </div>
             </div>
-            <div id="step-4" class="">
+            <div id="step-3" class="">
                 <div class="order_details">
                     <ul class="list-group">
                         <li class="list-group-item">Product <span class="badge product-name"></span></li>
