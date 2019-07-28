@@ -60,6 +60,34 @@ if (strpos($_SERVER['REQUEST_URI'], 'mikrotik') !== false) {
             header('Location: ' . $site_url . '/login.php');
         }
     }
+} else if (strpos($_SERVER['REQUEST_URI'], 'customer_portal') !== false) {
+    include $_SERVER['DOCUMENT_ROOT'] . $root_folder."/api/tools/DBTools.php";
+    $dbTools = new DBTools($servername, $dbusername, $dbpassword, $dbname);
+
+    include $_SERVER['DOCUMENT_ROOT'] . $root_folder."/ResellerPortal/tools/DBTools.php";
+    $dbToolsReseller = new DBToolsReseller($servername, $dbusername, $dbpassword, $dbname);
+    $site_url = $root_url."/customer_portal";
+    $api_url = $root_url."/api/";
+    if ($page != "login.php") {
+
+        $session_id = stripslashes($_SESSION["session_id"]);
+
+
+        if ($session_id == FALSE)
+            header('Location: ' . $site_url . '/login.php');
+
+        $query = $dbTools->query("SELECT * FROM `customers` WHERE `session_id`='" . $session_id . "'");
+        while ($row = $query->fetch_assoc()) {
+            $username = $row["username"];
+            $reseller_id = 190;
+            $customer_id=$row["customer_id"];
+
+        }
+
+        if ($username == null) {
+          header('Location: ' . $site_url . '/login.php');
+        }
+    }
 } else if (strpos($_SERVER['REQUEST_URI'], 'api') !== false) {
 
     include $_SERVER['DOCUMENT_ROOT'] . $root_folder."/api/tools/DBTools.php";
@@ -105,7 +133,7 @@ if (strpos($_SERVER['REQUEST_URI'], 'mikrotik') !== false) {
 
 
     $session_id = stripslashes($_SESSION["session_id"]);
-    
+
     $admin_result = $dbTools->query("SELECT * FROM `admins` WHERE `session_id`='" . $session_id . "' AND `session_id`!=''");
 
     if (!$admin_row = $admin_result->fetch_assoc()) {

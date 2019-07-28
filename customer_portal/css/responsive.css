@@ -1,0 +1,274 @@
+@media (max-width: 1200px) {
+    ._pBox {
+        height: auto;
+        margin-bottom: 30px;
+    }
+    ._cta a.btn {
+        max-width: 175px;
+        margin-top: 25px;
+    }
+    ._cta {
+        text-align: center !important;
+    }
+    a._next {
+        display: none;
+    }
+    ol._thumbs li {
+        width: 50%;
+        margin-bottom: 15px;
+    }
+}
+@media (max-width: 1199px) and (min-width: 992px) {
+    ._cBanner ol._thumbs li {
+        width: 33%;
+        max-width: 100%;
+    }
+    ._table .btn {
+        font-size: 11px;
+    }
+    .navbar-dark .navbar-nav .nav-link {
+        letter-spacing: 0;
+    }
+    .navbar-dark .navbar-nav > li + li {
+        margin-left: 5px;
+    }
+    ._logins a.btn {
+        margin-right: 15px;
+    }
+    nav.navbar {
+        font-size: 11px;
+    }
+}
+@media (max-width: 991px){
+    ._vps {
+        height: auto;
+    }
+    ._vps ._img {
+        left: auto;
+        position: relative;
+    }
+    ._banner ._img {
+        margin-top: 50px;
+    }
+    ._banner._trio {
+        height: auto;
+        padding-bottom: 0;
+    }
+    ._banner._trio ._bitch {
+        position: relative;
+        left: auto;
+    }
+    .__support ._holder {
+        padding-left: 25px;
+        padding-right: 25px;
+    }
+    ._cBanner #carouselDeal {
+        margin-left: 0;
+    }
+    ._cBanner ol._thumbs li {
+        max-width: 100%;
+        width: 100%;
+    }
+    ._hero ._img {
+        margin-top: 50px;
+    }
+    ._btnz,._btnz .text-right {
+        text-align: center !important;
+    }
+    ._btnz .text-right .btn {
+        margin-top: 25px;
+    }
+    ._cBanner ._left {
+        padding: 35px 25px;
+    }
+    ._cBanner ._right {
+        padding: 35px 25px;
+    }
+    #carouselDeal ._holder {
+        margin-bottom: 25px;
+    }
+    ._iconBox {
+        height: auto;
+        margin-bottom: 25px;
+    }
+    ._dual .navbar-dark ._logins a.btn {
+        color: #fff;
+        border-color: #fff;
+    }
+    ._dual .navbar-dark .navbar-nav .nav-link,._dual .navbar-dark ._logins a {
+        color: #fff;
+    }
+    .navbar-dark .navbar-nav li {
+        margin-bottom: 15px;
+    }
+    .navbar-dark .navbar-nav li._selection:after {
+        display: none;
+    }
+    .navbar-dark .navbar-nav > li + li {
+        margin-left: 0;
+    }
+    .navbar-collapse {
+        padding: 15px;
+        background: #1a2980;
+    }
+    .navbar-toggler {
+        background: #1a2980;
+        outline: none;
+        box-shadow: none;
+    }
+    ._copy ._social {
+        text-align: center;
+        margin-top: 15px;
+    }
+    ._copy {
+        text-align: center;
+    }
+    ._widget {
+        margin-bottom: 25px;
+    }
+    ._table {
+        max-width: 500px;
+        width: 100%;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    ._dText {
+        margin-bottom: 50px;
+    }
+}
+@media (max-width: 991px) and (min-width: 768px) {
+}
+@media (min-width: 768px){
+}
+@media (max-width: 767px) {
+	._bitch {
+		left: 0;	
+	}
+    ._benefits {
+        padding-bottom: 75px;
+        margin-top: 75px !important;
+    }
+    .table tr:nth-child(odd) {
+        background: rgba(245, 245, 245, 0.3);
+    }
+    .table td {
+        line-height: 30px;
+    }
+    td._tBtn {
+        width: auto;
+    }
+    .table tr td[data-title]:before {
+        content: attr(data-title) ": ";
+        font-weight: 600;
+        float: left;
+    }
+    .table tr td {
+        display: block;
+        text-align: right;
+        clear: both;
+    }
+    .table thead {
+        display: none;
+    }
+    ._banner._adj {
+        padding-top: 100px;
+    }
+    ._banner h1 br {
+        display: none;
+    }
+    ._banner._trio ._bitch {
+        bottom: -40px;
+    }
+    ._tHead ul li {
+        padding: 20px 30px;
+    }
+    ._wDetails {
+        padding-top: 0;
+        padding-bottom: 75px;
+    }
+    ._wDetails:before {
+        width: 100%;
+    }
+    ._bundles._adj {
+        padding-top: 75px;
+    }
+    ._hero,._hero._internet {
+        padding-top: 100px;
+    }
+    ._uiSlider {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+    ._hero._management {
+        padding-top: 75px;
+        margin-bottom: 75px;
+    }
+    ._plainBox._side {
+        padding-left: 90px;
+    }
+    h1 {
+        font-size: 36px;
+    }
+    h2 {
+        font-size: 32px;
+    }
+    ._cta {
+        padding: 25px;
+    }
+    ._management {
+        margin-top: 0;
+    }
+    h2._title + p br {
+        display: none;
+    }
+    nav.navbar {
+        top: 15px;
+    }
+    ._hero._bs {
+        padding-top: 100px;
+    }
+    ._hero ._img {
+        margin-top: 25px;
+    }
+    ._copy {
+        margin-top: 0;
+    }
+    ._widget {
+        text-align: center;
+    }
+    ._values {
+        padding: 75px 0 0 0;
+    }
+    ._deals,._bundles,._portal,._attributes {
+        padding: 75px 0;
+    }
+    ol._thumbs {
+        margin-left: auto;
+    }
+    ol._thumbs li {
+        width: 100%;
+    }
+    ._banner {
+        padding-top: 75px;
+    }
+}
+@media (max-width: 767px) and (min-width: 736px) {
+}
+@media (max-width: 735px) and (min-width: 685px) {
+}
+@media (max-width: 684px) and (min-width: 667px) {
+}
+@media (max-width: 666px) and (min-width: 568px) {
+}
+@media (max-width: 767px) and (min-width: 480px) {
+}
+@media (max-width: 567px) and (min-width: 480px) {
+}
+@media (max-width: 479px) {
+}
+@media (max-width: 479px) and (min-width: 414px) {
+}
+@media (max-width: 413px) and (min-width: 375px) {
+}
+@media (max-width: 374px) and (min-width: 320px) {
+}

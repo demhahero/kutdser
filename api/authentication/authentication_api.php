@@ -7,13 +7,18 @@ if(isset($_POST["action"]))
     include "../db_credentials.php";
     include "../tools/DBTools.php";
     $dbTools = new DBTools($servername,$dbusername,$dbpassword,$dbname);
-
-    $query="SELECT * FROM `admins` WHERE `username`=?";
-    $query_update="UPDATE `admins` SET `session_id`=? WHERE `username`=?";
     if(isset($_POST["reseller"]))// check if login from mikrotik or resellerPortal
     {
       $query="SELECT * FROM `customers` WHERE `username`=?";
       $query_update="UPDATE `customers` SET `session_id`=? WHERE `customer_id`=?";
+    }
+    elseif (isset($_POST["customer"])) {
+      $query="SELECT * FROM `customers` WHERE `username`=?";
+      $query_update="UPDATE `customers` SET `session_id`=? WHERE `customer_id`=?";
+    }
+    else{
+      $query="SELECT * FROM `admins` WHERE `username`=?";
+      $query_update="UPDATE `admins` SET `session_id`=? WHERE `username`=?";
     }
 
     $username = stripslashes(filter_input(INPUT_POST, 'username', FILTER_SANITIZE_SPECIAL_CHARS));
@@ -55,6 +60,15 @@ if(isset($_POST["action"]))
                                  $admin_row["customer_id"]
                                  ); // 's' specifies the variable type => 'string'
              }
+             if(isset($_POST["customer"]))// check if login from customer_portal
+             {
+
+               $session_id=$admin_row["session_id"];
+               $stmt->bind_param('ss',
+                                 $session_id,
+                                 $admin_row["customer_id"]
+                                 ); // 's' specifies the variable type => 'string'
+             }
              else{
 
                $stmt->bind_param('ss',
@@ -78,9 +92,10 @@ if(isset($_POST["action"]))
                 //   setcookie("session_id", $session_id, time() + (86400 * 30), "/");
                 // }
                 // else
-                 {
+
                   $_SESSION["session_id"] = $session_id;
-                }
+
+
 
 
                   echo "{\"login\" :", "true"
