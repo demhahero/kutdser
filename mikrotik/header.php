@@ -46,6 +46,19 @@ if (!@include_once "../../api/dbconfig.php")
         <script type="text/javascript" src="<?= $site_url ?>/js/datatable.min.js"></script>
         <script>
             $(document).ready(function () {
+                $.post("<?= $api_url ?>settings/settings_api.php"
+                        , function (data_response, status) {
+                            data_response = $.parseJSON(data_response);
+                            if (data_response.error == false) {
+                                $('.title').html(data_response['settings']['name']);
+                            } else
+                            {
+                                alert(data_response.error);
+
+                            }
+                        });
+
+
                 $(".logout").click(function () {
                     $.post("<?= $api_url ?>authentication/authentication_api.php",
                             {
@@ -62,57 +75,54 @@ if (!@include_once "../../api/dbconfig.php")
                         }
                     });
                 });
-                function getUpdates(){
-                $.post("<?= $api_url ?>orders/order_sent_count_api.php",
-                        {
-                            action: "get_total_order_sent"
+                function getUpdates() {
+                    $.post("<?= $api_url ?>orders/order_sent_count_api.php",
+                            {
+                                action: "get_total_order_sent"
+                            }
+                    , function (response, status) {
+                        response = $.parseJSON(response);
+                        if (!response.error) {
+                            if (response.total_order_sent > 0)
+                            {
+                                $('.total_order_sent').html(response.total_order_sent);
+                            } else {
+                                $('.total_order_sent').html("");
+                            }
+                            if (response.total_request_sent > 0)
+                            {
+                                $('.total_request_sent').html(response.total_request_sent);
+                            } else {
+                                $('.total_request_sent').html("");
+                            }
+                            if (response.total_reseller_request_sent > 0)
+                            {
+                                $('.total_reseller_request_sent').html(response.total_reseller_request_sent);
+                            } else {
+                                $('.total_reseller_request_sent').html("");
+                            }
+                        } else {
+                            $('.total_order_sent').html("");
+                            $('.total_request_sent').html("");
+                            $('.total_reseller_request_sent').html("");
                         }
-                , function (response, status) {
-                    response = $.parseJSON(response);
-                    if (!response.error) {
-                        if(response.total_order_sent>0)
-                        {
-                          $('.total_order_sent').html(response.total_order_sent);
-                        }
-                        else{
-                          $('.total_order_sent').html("");
-                        }
-                        if(response.total_request_sent>0)
-                        {
-                          $('.total_request_sent').html(response.total_request_sent);
-                        }
-                        else{
-                          $('.total_request_sent').html("");
-                        }
-                        if(response.total_reseller_request_sent>0)
-                        {
-                          $('.total_reseller_request_sent').html(response.total_reseller_request_sent);
-                        }
-                        else{
-                          $('.total_reseller_request_sent').html("");
-                        }
-                    } else {
-                        $('.total_order_sent').html("");
-                        $('.total_request_sent').html("");
-                        $('.total_reseller_request_sent').html("");
                     }
+                    );
                 }
-                );
-              }
-              (function worker() {
+                (function worker() {
 
-                      getUpdates();
-                      setTimeout(worker, 60000);
+                    getUpdates();
+                    setTimeout(worker, 60000);
 
-              })();
+                })();
             });
 
             (function worker() {
                 $.get("<?= $api_url ?>orders/new_orders_notification.php", function (data) {
                     // Now that we've completed the request schedule the next one.
 
-                    if(data != "0"){
-                       alert("New Order(s) has(have) been sent");
+                    if (data != "0") {
+                        alert("New Order(s) has(have) been sent");
                     }
                     setTimeout(worker, 60000);
                 });
@@ -144,7 +154,7 @@ if (!@include_once "../../api/dbconfig.php")
                 <div class="col-md-3 left_col">
                     <div class="left_col scroll-view">
                         <div class="navbar nav_title" style="border: 0;">
-                            <a href="<?= $site_url ?>/customers/customers.php" class="site_title"><i class="fa fa-paw"></i> <span>AmProTelecom!</span></a>
+                            <a href="<?= $site_url ?>/customers/customers.php" class="site_title"><i class="fa fa-paw"></i> <span class="title"></span></a>
                         </div>
 
                         <div class="clearfix"></div>

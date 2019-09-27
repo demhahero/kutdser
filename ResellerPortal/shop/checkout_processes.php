@@ -386,27 +386,12 @@ if ($_GET["do"] == "register") {
                   file_put_contents('last_order.pdf', $printOrder->output($order_id));
 
                   $to = mysqli_real_escape_string($dbToolsReseller->getConnection(),$_POST["email"]);
-                  $body = "Dear Customer,\nWe would like to thank you for using our services,\nYour order (".$orid.") has been received and your invoice is attached\nTo finalize your order, please read our Terms and Conditions on (https://www.amprotelecom.com/terms-and-conditions/) and agree by replying to this email with 'I agree'\nBest,\nAmProTelecom INC.";
+                  $body = "Dear Customer,\nWe would like to thank you for using our services,"
+                          . "\nYour order (".$orid.") has been received and your invoice is attached"
+                          . "\nTo finalize your order, please read our Terms and Conditions and agree "
+                          . "by replying to this email with 'I agree'\nBest,\n";
 
-                  // Create the Transport
-                  $transport = (new Swift_SmtpTransport('mail.amprotelecom.com', 25))
-                          ->setUsername('alialsaffar')
-                          ->setPassword('zOIq6dX$@Pq44M')
-                  ;
-
-                  // Create the Mailer using your created Transport
-                  $mailer = new Swift_Mailer($transport);
-
-                  // Create a message
-                  $message = (new Swift_Message('AmProTelecom INC. - Your Order'))
-                          ->setFrom(['info@amprotelecom.com' => 'AmProTelecom INC.'])
-                          ->setTo([$to, 'info@amprotelecom.com'])
-                          ->setBody($body)
-                          ->attach(Swift_Attachment::fromPath(__DIR__ . "/last_order.pdf"))
-                  ;
-
-                  // Send the message
-                  $result = $mailer->send($message);
+                  sendEmail($to, 'Your Order', $body, __DIR__ . "/last_order.pdf");
 
               } catch (Exception $e) {
 
@@ -428,5 +413,44 @@ if ($_GET["do"] == "register") {
     die();
 } else if ($_GET["do"] == "updateSubscription") {
     echo $mGlobalOnePaymentXMLTools->updateSubscription("SS_" . $_POST["merchant_reference"], "SS_" . $_POST["merchant_reference"], "CARD_" . $_POST["merchant_reference"], $_POST["recurring_amount"]);
+}
+
+
+
+function sendEmail($to, $title, $body, $attachement) {
+    try {
+        global $dbTools;
+        $request_query = "select * from `settings` where `setting_id` = '1'"; 
+
+        $stmt1 = $dbTools->getConnection()->prepare($request_query);
+
+        $stmt1->execute();
+
+        $result1 = $stmt1->get_result();
+        
+        $row = mysqli_fetch_array($result1);
+        
+        // Create the Transport
+        $transport = (new Swift_SmtpTransport($row["mail_swift_url"], 25))
+                ->setUsername($row["email_swift_username"])
+                ->setPassword($row["email_swift_password"])
+        ;
+
+        // Create the Mailer using your created Transport
+        $mailer = new Swift_Mailer($transport);
+
+        // Create a message
+        $message = (new Swift_Message($row['mail_name'].' - ' . $title))
+                ->setFrom([$row['mail_sender'] => $row['mail_name']])
+                ->setTo([$to])
+                ->setBody($body)
+                ->attach(Swift_Attachment::fromPath($attachement));
+        ;
+
+        // Send the message
+        $result = $mailer->send($message);
+    } catch (Exception $e) {
+        
+    }
 }
 ?>

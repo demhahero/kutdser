@@ -13,7 +13,7 @@ include_once "../api/dbconfig.php";
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>AmProTelecom | Administration</title>
+    <title><?=$login_title?> | Administration</title>
 
     <!-- Bootstrap -->
     <link href="<?= $site_url ?>/gentelella/vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -38,6 +38,7 @@ include_once "../api/dbconfig.php";
 
     <script>
         $(document).ready(function () {
+            
             $("#login_form").submit(function (e) {
               e.preventDefault();
               var username = $("input[name=\"username\"]").val();
@@ -94,8 +95,8 @@ include_once "../api/dbconfig.php";
                 <br />
 
                 <div>
-                  <h1><i class="fa fa-paw"></i> AmProTelecom!</h1>
-                  <p>©2018 All Rights Reserved. AmProTelecom! is a Bootstrap 3 template. Privacy and Terms</p>
+                  <h1><i class="fa fa-paw"></i> <?=$login_title?>!</h1>
+                  <p>Powered by AmProTelecom!</p>
                 </div>
               </div>
             </form>

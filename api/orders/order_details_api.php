@@ -143,12 +143,7 @@ if(isset($_POST["action"]))
                         . "\n\r Actual installation time is ". $actual_installation_date 
                         . " from:".$actual_installation_time_from." to:".$actual_installation_time_to
                         . "\n\r All the best,");
-                
-                sendEmail("demhahero@gmail.com", "Order " . $displayed_order_id . " has been updated", "Dear Reseller ". $row2["full_name"] .","
-                        . "\n\r Your order ". $displayed_order_id ." has been processed."
-                        . "\n\r Actual installation time is ". $actual_installation_date 
-                        . " from:".$actual_installation_time_from." to:".$actual_installation_time_to
-                        . "\n\r All the best,");
+               
             }
             //End sending email
         } else {
@@ -167,19 +162,29 @@ if(isset($_POST["action"]))
 
 function sendEmail($to, $title, $body) {
     try {
+        include_once "../dbconfig.php";
+        $request_query = "select * from `settings` where `setting_id` = '1'"; 
 
+        $stmt1 = $dbTools->getConnection()->prepare($request_query);
+
+        $stmt1->execute();
+
+        $result1 = $stmt1->get_result();
+        
+        $row = mysqli_fetch_array($result1);
+        
         // Create the Transport
-        $transport = (new Swift_SmtpTransport('mail.amprotelecom.com', 25))
-                ->setUsername('alialsaffar')
-                ->setPassword('zOIq6dX$@Pq44M')
+        $transport = (new Swift_SmtpTransport($row["mail_swift_url"], 25))
+                ->setUsername($row["email_swift_username"])
+                ->setPassword($row["email_swift_password"])
         ;
 
         // Create the Mailer using your created Transport
         $mailer = new Swift_Mailer($transport);
 
         // Create a message
-        $message = (new Swift_Message('AmProTelecom INC. - ' . $title))
-                ->setFrom(['info@amprotelecom.com' => 'AmProTelecom INC.'])
+        $message = (new Swift_Message($row['mail_name'].' - ' . $title))
+                ->setFrom([$row['mail_sender'] => $row['mail_name']])
                 ->setTo([$to])
                 ->setBody($body);
         ;

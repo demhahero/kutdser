@@ -3,9 +3,9 @@
 $servername = "localhost";
 $dbusername = "root";
 $dbpassword = "";
-$dbname = "routers_2018_11_07";
+$dbname = "router";
 
-$root_url="http://localhost/kutdser";
-$root_folder="/kutdser";
-
+$root_url="http://localhost/kutdser-master";
+$root_folder="/kutdser-master";
+$login_title= "NetZone";
 ?>

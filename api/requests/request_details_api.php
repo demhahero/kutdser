@@ -333,7 +333,6 @@ if (isset($_POST["post_action"])) {
             $result2 = $stmt2->get_result();
             $row2 = mysqli_fetch_array($result2);
             sendEmail($row2["email"], "Request " . $request_id . " Updated", "Dear Reseller,\n\r your request has been processed.\n\r Best,");
-            sendEmail("demhahero@gmail.com", "Request " . $request_id . " Updated", "Dear Reseller2 ".$row2["email"].",\n\r your request has been processed.\n\r Best,");
         }
         //End sending email
          
@@ -347,19 +346,29 @@ else {
 
 function sendEmail($to, $title, $body) {
     try {
+        include_once "../dbconfig.php";
+        $request_query = "select * from `settings` where `setting_id` = '1'"; 
 
+        $stmt1 = $dbTools->getConnection()->prepare($request_query);
+
+        $stmt1->execute();
+
+        $result1 = $stmt1->get_result();
+        
+        $row = mysqli_fetch_array($result1);
+        
         // Create the Transport
-        $transport = (new Swift_SmtpTransport('mail.amprotelecom.com', 25))
-                ->setUsername('alialsaffar')
-                ->setPassword('zOIq6dX$@Pq44M')
+        $transport = (new Swift_SmtpTransport($row["mail_swift_url"], 25))
+                ->setUsername($row["email_swift_username"])
+                ->setPassword($row["email_swift_password"])
         ;
 
         // Create the Mailer using your created Transport
         $mailer = new Swift_Mailer($transport);
 
         // Create a message
-        $message = (new Swift_Message('AmProTelecom INC. - ' . $title))
-                ->setFrom(['info@amprotelecom.com' => 'AmProTelecom INC.'])
+        $message = (new Swift_Message($row['mail_name'].' - ' . $title))
+                ->setFrom([$row['mail_sender'] => $row['mail_name']])
                 ->setTo([$to])
                 ->setBody($body);
         ;
