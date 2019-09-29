@@ -59,7 +59,7 @@ include_once "../api/dbconfig.php";
 <div class="login-page">
     <div class="form">
         <center>
-            <img style="margin-top: -10px;" width="200px" src="img/logo.png"/>
+            <img style="margin-top: -10px;" width="200px" src="<?= $api_url ?>/logo-1.png"/>
             <br/>
             <h1 style="color:#fa7921;">Reseller Portal</h1>
         </center>

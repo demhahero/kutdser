@@ -100,7 +100,7 @@ if(!@include_once "../../api/dbconfig.php")
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                     </button>
-                    <a class="navbar-brand" href="<?= $site_url ?>/index.php"><img style="margin-top: -10px;" width="150px" src="<?= $site_url ?>/img/logo.png"/></a>
+                    <a class="navbar-brand" href="<?= $site_url ?>/index.php"><img style="margin-top: -10px; height:50px;" src="<?= $api_url ?>/logo-1.png"/></a>
                 </div>
                 <div id="navbar" class="navbar-collapse collapse">
                     <ul class="nav navbar-nav">
@@ -124,7 +124,7 @@ if(!@include_once "../../api/dbconfig.php")
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                     </button>
-                    <a class="navbar-brand" href="<?= $site_url ?>/index.php"><img style="margin-top: -10px;" width="150px" src="<?= $site_url ?>/img/logo.png"/></a>
+                    <a class="navbar-brand" href="<?= $site_url ?>/index.php"><img style="margin-top: -10px; height:50px;" src="<?= $api_url ?>/logo-1.png"/></a>
                 </div>
                 <div id="navbar" class="navbar-collapse collapse">
                     <ul class="nav navbar-nav">
